@@ -1,5 +1,6 @@
 import { Header } from "./components/Header";
 import { Footer } from "./components/Footer";
+import CoursesTable from './courses/CoursesTable';
 
 function App() {
   return (
@@ -7,8 +8,8 @@ function App() {
       <Header />
       <main>
         <h2>About the Candidate</h2>
-        <p>Content goes here...</p>
       </main>
+      <CoursesTable />
       <Footer />
     </>
   );

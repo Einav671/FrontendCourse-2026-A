@@ -1,0 +1,40 @@
+.courses-container {
+  max-width: 800px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  direction: rtl; /* חשוב לעברית */
+}
+
+.courses-container h2 {
+  text-align: center;
+  color: #333;
+}
+
+.courses-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+
+.courses-table th, .courses-table td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: right;
+}
+
+.courses-table th {
+  background-color: #4CAF50; /* צבע ירוק או הכחול של המותג שלכם */
+  color: white;
+  font-weight: bold;
+}
+
+.courses-table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+.courses-table tr:hover {
+  background-color: #ddd;
+}
