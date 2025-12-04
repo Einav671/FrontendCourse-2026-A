@@ -6,12 +6,15 @@ const CoursesTable: React.FC = () => {
   // 1. אתחול ה-State כמערך ריק בהתחלה
   const [courses, setCourses] = useState<Course[]>([]);
 
+  // מפתח קבוע ל-localStorage (כדי שלא נכתוב "my-courses" כמה פעמים)
+  const LOCAL_STORAGE_KEY = 'my-courses';
+
   // --------------------------------------------------------
   // דרישה 1: טעינת נתונים מ-localStorage עם useEffect
   // --------------------------------------------------------
   useEffect(() => {
     // מנסים לקרוא נתונים שנשמרו בעבר
-    const savedCourses = localStorage.getItem('my-courses');
+    const savedCourses = localStorage.getItem(LOCAL_STORAGE_KEY);
     
     if (savedCourses) {
       // אם יש נתונים, הופכים אותם חזרה למערך ומעדכנים את ה-State
@@ -26,15 +29,17 @@ const CoursesTable: React.FC = () => {
   }, []); // המערך הריק [] מבטיח שזה ירוץ רק פעם אחת בטעינת הקומפוננטה
 
   // --------------------------------------------------------
-  // בונוס חשוב: שמירת נתונים ל-localStorage
-  // (בלי זה, הטעינה לא תעזור לנו בפעם הבאה)
+  // *** דרישה חדשה: אין שמירה אוטומטית, אלא שמירה ידנית בלבד.
+  // לכן ה-useEffect הבא הוצא מפעולה (קומנט).
   // --------------------------------------------------------
+  /*
   useEffect(() => {
     // כל פעם שמשתנה courses משתנה - נשמור את המצב החדש בזיכרון
     if (courses.length > 0) {
-        localStorage.setItem('my-courses', JSON.stringify(courses));
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(courses));
     }
   }, [courses]); // התלות ב-[courses] גורמת לזה לרוץ בכל שינוי בטבלה
+  */
 
   // --------------------------------------------------------
   // דרישה 2: פונקציה להוספת אובייקט אקראי
@@ -68,10 +73,19 @@ const CoursesTable: React.FC = () => {
     setCourses(prevCourses => [...prevCourses, newCourse]);
   };
 
+  // --------------------------------------------------------
+  // דרישה 3: שמירת הנתונים ל-localStorage בלחיצת כפתור
+  // --------------------------------------------------------
+  const saveToLocalStorage = () => {
+    const jsonString = JSON.stringify(courses);          // המרה ל-JSON
+    localStorage.setItem(LOCAL_STORAGE_KEY, jsonString); // שמירה תחת אותו מפתח
+    alert("הנתונים נשמרו בהצלחה ב-Local Storage!");
+  };
+
   // פונקציית עזר למחיקת נתונים (כדי שתוכלו לאפס את הטבלה)
   const clearTable = () => {
       setCourses([]);
-      localStorage.removeItem('my-courses');
+      localStorage.removeItem(LOCAL_STORAGE_KEY);
   }
 
   return (
@@ -82,6 +96,11 @@ const CoursesTable: React.FC = () => {
       <div className="actions-bar">
         <button onClick={addRandomCourse} className="add-btn">
           + הוסף קורס אקראי
+        </button>
+
+        {/* כפתור חדש: שמירה ידנית ל-localStorage */}
+        <button onClick={saveToLocalStorage} className="save-btn">
+          💾 שמור נתונים
         </button>
         
         <button onClick={clearTable} className="clear-btn">
