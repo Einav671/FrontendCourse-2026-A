@@ -16,13 +16,12 @@
 .courses-table {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 15px;
 }
 
 .courses-table th, .courses-table td {
   border: 1px solid #ddd;
   padding: 12px;
-  text-align: right;
+  /* text-align: center; */
 }
 
 .courses-table th {
@@ -46,8 +45,8 @@
     justify-content: center;
 }
 
-.add-btn {
-    background-color: #007bff; /* כחול יפה */
+/* .add-btn {
+    background-color: #007bff; 
     color: white;
     border: none;
     padding: 10px 20px;
@@ -55,27 +54,28 @@
     font-size: 16px;
     cursor: pointer;
     transition: background-color 0.3s;
-}
+} */
+
 
 .add-btn:hover {
     background-color: #0056b3;
 }
 
-.clear-btn {
-    background-color: #dc3545; /* אדום לאיפוס */
+/* .clear-btn {
+    background-color: #dc3545; 
     color: white;
     border: none;
     padding: 10px 20px;
     border-radius: 5px;
     font-size: 16px;
     cursor: pointer;
-}
+} */
 
 .clear-btn:hover {
     background-color: #a71d2a;
 }
 
-.save-btn {
+/* .save-btn {
     background-color: #28a745;
     color: white;
     border: none;
@@ -84,8 +84,8 @@
     font-size: 16px;
     cursor: pointer;
     transition: background-color 0.3s;
-}
+ } */
 
 .save-btn:hover {
-    background-color: #218838;
+    background-color: #155824;
 }

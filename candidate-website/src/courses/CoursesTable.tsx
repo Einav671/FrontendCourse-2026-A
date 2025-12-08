@@ -1,6 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { Course } from './Course';
 import './CoursesTable.css';
+import '@fontsource/roboto/300.css';
+import '@fontsource/roboto/400.css';
+import '@fontsource/roboto/500.css';
+import '@fontsource/roboto/700.css';
+import Button from '@mui/material/Button';
+import SaveIcon from '@mui/icons-material/Save';
+import AddIcon from '@mui/icons-material/Add';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
 
 const CoursesTable: React.FC = () => {
   // 1. אתחול ה-State כמערך ריק בהתחלה
@@ -94,44 +108,46 @@ const CoursesTable: React.FC = () => {
       
       {/* כפתורי פעולה */}
       <div className="actions-bar">
-        <button onClick={addRandomCourse} className="add-btn">
-          + הוסף קורס אקראי
-        </button>
+        <Button variant="contained" color='info' onClick={addRandomCourse} className="add-btn">
+          <AddIcon fontSize='small' /> הוסף קורס אקראי
+        </Button>
 
         {/* כפתור חדש: שמירה ידנית ל-localStorage */}
-        <button onClick={saveToLocalStorage} className="save-btn">
-          💾 שמור נתונים
-        </button>
+        <Button variant="contained" color='success' onClick={saveToLocalStorage} className="save-btn">
+          <SaveIcon fontSize='small' /> שמור נתונים
+        </Button>
         
-        <button onClick={clearTable} className="clear-btn">
+        <Button variant="contained" color='error' onClick={clearTable} className="clear-btn">
           אפס טבלה
-        </button>
+        </Button>
       </div>
 
-      <table className="courses-table">
-        <thead>
-          <tr>
-            <th>קוד קורס</th>
-            <th>שם הקורס</th>
-            <th>נק"ז</th>
-            <th>תיאור</th>
-            <th>שייך לתואר</th>
-            <th>סוג</th>
-          </tr>
-        </thead>
-        <tbody>
-          {courses.map((course) => (
-            <tr key={course.id}>
-              <td>{course.code}</td>
-              <td>{course.name}</td>
-              <td>{course.credits}</td>
-              <td>{course.description}</td>
-              <td>{course.degreeCode}</td>
-              <td>{course.type}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <TableContainer component={Paper}>
+        <Table className="courses-table" aria-label="courses table">
+          <TableHead>
+            <TableRow>
+              <TableCell align="center">קוד קורס</TableCell>
+              <TableCell align="center">שם הקורס</TableCell>
+              <TableCell align="center">נק"ז</TableCell>
+              <TableCell align="center">תיאור</TableCell>
+              <TableCell align="center">שייך לתואר</TableCell>
+              <TableCell align="center">סוג</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {courses.map((course) => (
+              <TableRow key={course.id}>
+                <TableCell align="center">{course.code}</TableCell>
+                <TableCell align="right">{course.name}</TableCell>
+                <TableCell align="center">{course.credits}</TableCell>
+                <TableCell align="right">{course.description}</TableCell>
+                <TableCell align="center">{course.degreeCode}</TableCell>
+                <TableCell align="right">{course.type}</TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
     </div>
   );
 };
