@@ -27,9 +27,9 @@ export default function Header() {
       case '/':
         return 'דף הבית';
       case '/management':
-        return 'ניהול קורסים - אזור אישי';
+        return 'ניהול קורסים';
       case '/forms':
-        return 'טפסים ולידים';
+        return 'טפסים';
       case '/help':
         return 'מרכז עזרה';
       default:
