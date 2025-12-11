@@ -2,7 +2,7 @@ import React from 'react';
 
 const Help: React.FC = () => {
   return (
-    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif' }}>
+    <div style={{ padding: '20px', fontFamily: 'Arial, sans-serif',direction: 'rtl' }}>
       <h1>מרכז עזרה</h1>
       <p>ברוכים הבאים למערכת הניהול. כאן תוכלו למצוא תשובות לשאלות נפוצות.</p>
       
