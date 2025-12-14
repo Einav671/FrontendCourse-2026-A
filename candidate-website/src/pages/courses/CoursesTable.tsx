@@ -8,6 +8,7 @@ import '@fontsource/roboto/700.css';
 import Button from '@mui/material/Button';
 import SaveIcon from '@mui/icons-material/Save';
 import AddIcon from '@mui/icons-material/Add';
+import EditIcon from '@mui/icons-material/Edit'; // ייבוא אייקון עריכה
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -15,88 +16,59 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
+import IconButton from '@mui/material/IconButton'; // לכפתור העריכה בטבלה
+import { useNavigate } from 'react-router-dom'; // הוק לניווט
 
 const CoursesTable: React.FC = () => {
-  // 1. אתחול ה-State כמערך ריק בהתחלה
+  const navigate = useNavigate(); // אתחול ה-Hook לניווט
   const [courses, setCourses] = useState<Course[]>([]);
-
-  // מפתח קבוע ל-localStorage (כדי שלא נכתוב "my-courses" כמה פעמים)
   const LOCAL_STORAGE_KEY = 'my-courses';
 
   // --------------------------------------------------------
-  // דרישה 1: טעינת נתונים מ-localStorage עם useEffect
+  // דרישה 1: טעינת נתונים מ-localStorage
   // --------------------------------------------------------
   useEffect(() => {
-    // מנסים לקרוא נתונים שנשמרו בעבר
     const savedCourses = localStorage.getItem(LOCAL_STORAGE_KEY);
-    
     if (savedCourses) {
-      // אם יש נתונים, הופכים אותם חזרה למערך ומעדכנים את ה-State
-      // הערה: JSON.parse מחזיר אובייקטים פשוטים. בקוד מורכב יותר היינו ממירים אותם חזרה ל-new Course
       setCourses(JSON.parse(savedCourses));
     } else {
-      // אופציונלי: אם אין כלום בזיכרון, אפשר לטעון נתונים התחלתיים
       setCourses([
         new Course("1", "מבוא למדעי המחשב", "10111", 5, "קורס בסיס", "CS-BA", "חובה")
       ]);
     }
-  }, []); // המערך הריק [] מבטיח שזה ירוץ רק פעם אחת בטעינת הקומפוננטה
-
-  // --------------------------------------------------------
-  // *** דרישה חדשה: אין שמירה אוטומטית, אלא שמירה ידנית בלבד.
-  // לכן ה-useEffect הבא הוצא מפעולה (קומנט).
-  // --------------------------------------------------------
-  /*
-  useEffect(() => {
-    // כל פעם שמשתנה courses משתנה - נשמור את המצב החדש בזיכרון
-    if (courses.length > 0) {
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(courses));
-    }
-  }, [courses]); // התלות ב-[courses] גורמת לזה לרוץ בכל שינוי בטבלה
-  */
+  }, []);
 
   // --------------------------------------------------------
   // דרישה 2: פונקציה להוספת אובייקט אקראי
   // --------------------------------------------------------
   const addRandomCourse = () => {
-    // מאגרי נתונים להגרלה
     const names = ["סדנת לינוקס", "מבוא לסייבר", "תכנות מונחה עצמים", "מסדי נתונים", "לוגיקה"];
     const types = ["חובה", "בחירה"];
     const degrees = ["CS-BA", "CS-AI", "CS-SEC"];
 
-    // הגרלת ערכים
-    const randomId = Date.now().toString(); // יצירת מזהה ייחודי לפי זמן
-    const randomName = names[Math.floor(Math.random() * names.length)];
-    const randomCode = Math.floor(10000 + Math.random() * 90000).toString(); // מספר בין 10000-99999
-    const randomCredits = Math.floor(Math.random() * 4) + 2; // בין 2 ל-5
-    const randomType = types[Math.floor(Math.random() * types.length)];
-    const randomDegree = degrees[Math.floor(Math.random() * degrees.length)];
-    
-    // יצירת אובייקט חדש מהמחלקה Course
+    const randomId = Date.now().toString();
     const newCourse = new Course(
       randomId,
-      randomName,
-      randomCode,
-      randomCredits,
+      names[Math.floor(Math.random() * names.length)],
+      Math.floor(10000 + Math.random() * 90000).toString(),
+      Math.floor(Math.random() * 4) + 2,
       "קורס שנוצר באופן אקראי",
-      randomDegree,
-      randomType
+      degrees[Math.floor(Math.random() * degrees.length)],
+      types[Math.floor(Math.random() * types.length)]
     );
 
-    // עדכון ה-State בצורה שלא משנה את המערך הקיים אלא יוצרת חדש (Immutability)
     setCourses(prevCourses => [...prevCourses, newCourse]);
   };
 
   // --------------------------------------------------------
-  // דרישה 3: שמירת הנתונים ל-localStorage בלחיצת כפתור
+  // דרישה 3: שמירת הנתונים ל-localStorage
   // --------------------------------------------------------
   const saveToLocalStorage = () => {
-    const jsonString = JSON.stringify(courses);          // המרה ל-JSON
-    localStorage.setItem(LOCAL_STORAGE_KEY, jsonString); // שמירה תחת אותו מפתח
+    const jsonString = JSON.stringify(courses);
+    localStorage.setItem(LOCAL_STORAGE_KEY, jsonString);
     alert("הנתונים נשמרו בהצלחה ב-Local Storage!");
   };
 
-  // פונקציית עזר למחיקת נתונים (כדי שתוכלו לאפס את הטבלה)
   const clearTable = () => {
       setCourses([]);
       localStorage.removeItem(LOCAL_STORAGE_KEY);
@@ -104,20 +76,25 @@ const CoursesTable: React.FC = () => {
 
   return (
     <div className="courses-container">
-      <h2>תוכנית הלימודים - רשימת קורסים</h2>
-      
       {/* כפתורי פעולה */}
-      <div className="actions-bar">
-        <Button variant="contained" color='info' onClick={addRandomCourse} className="add-btn">
-          <AddIcon fontSize='small' /> הוסף קורס אקראי
+      <div className="actions-bar" style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '20px' }}>
+        
+        {/* --- כפתור חדש: מעבר לטופס יצירה --- */}
+        <Button 
+            variant="contained" 
+            color="primary" 
+            onClick={() => navigate('/courses/new')} 
+            startIcon={<AddIcon />}
+            sx={{ fontWeight: 'bold' }}
+        >
+          צור קורס חדש (טופס)
         </Button>
 
-        {/* כפתור חדש: שמירה ידנית ל-localStorage */}
-        <Button variant="contained" color='success' onClick={saveToLocalStorage} className="save-btn">
-          <SaveIcon fontSize='small' /> שמור נתונים
+        <Button variant="contained" color='success' onClick={saveToLocalStorage}>
+          <SaveIcon fontSize='small' sx={{ mr: 1 }} /> שמור שינויים
         </Button>
         
-        <Button variant="contained" color='error' onClick={clearTable} className="clear-btn">
+        <Button variant="contained" color='error' onClick={clearTable}>
           אפס טבלה
         </Button>
       </div>
@@ -126,6 +103,7 @@ const CoursesTable: React.FC = () => {
         <Table className="courses-table" aria-label="courses table">
           <TableHead>
             <TableRow>
+              <TableCell align="center" style={{ fontWeight: 'bold' }}>פעולות</TableCell> {/* עמודה חדשה */}
               <TableCell align="center">קוד קורס</TableCell>
               <TableCell align="center">שם הקורס</TableCell>
               <TableCell align="center">נק"ז</TableCell>
@@ -137,6 +115,17 @@ const CoursesTable: React.FC = () => {
           <TableBody>
             {courses.map((course) => (
               <TableRow key={course.id}>
+                {/* כפתור עריכה לכל שורה */}
+                <TableCell align="center">
+                  <IconButton 
+                    color="primary" 
+                    onClick={() => navigate(`/courses/edit/${course.id}`)}
+                    aria-label="edit"
+                  >
+                    <EditIcon />
+                  </IconButton>
+                </TableCell>
+                
                 <TableCell align="center">{course.code}</TableCell>
                 <TableCell align="right">{course.name}</TableCell>
                 <TableCell align="center">{course.credits}</TableCell>

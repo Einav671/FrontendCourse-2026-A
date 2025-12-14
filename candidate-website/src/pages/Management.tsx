@@ -1,5 +1,5 @@
 import React from 'react';
-import CoursesTable from '../courses/CoursesTable'; // ייבוא הטבלה שלך
+import CoursesTable from './courses/CoursesTable'; // ייבוא הטבלה שלך
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 
