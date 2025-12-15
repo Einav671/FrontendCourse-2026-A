@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Container, Typography, TextField, Button, Paper, Grid, MenuItem 
+  Container, Typography, TextField, Button, Paper, Grid, Radio, FormControlLabel 
 } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
@@ -23,6 +23,16 @@ const CourseForm: React.FC = () => {
     type: 'חובה'
   });
 
+  // טיפול בשגיאות
+  const [errors, setErrors] = useState({
+    name: false,
+    code: false,
+    credits: false,
+    description: false,
+    degreeCode: false,
+    type: false,
+  });
+
   // אם זה מצב עריכה - נטען את הנתונים הקיימים
   useEffect(() => {
     if (isEditMode) {
@@ -34,8 +44,10 @@ const CourseForm: React.FC = () => {
     }
   }, [id, isEditMode]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value, validity } = event.target;
+    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+    setErrors((prevErrors) => ({ ...prevErrors, [name]: !validity.valid }));
   };
 
   const handleSave = () => {
@@ -60,6 +72,8 @@ const CourseForm: React.FC = () => {
     navigate('/management'); 
   };
 
+  const isFormValid = Object.values(errors).every((error) => !error) && Object.values(formData).every((value) => value !== "");
+
   return (
     <Container maxWidth="sm" sx={{ mt: 4 }}>
       <Paper elevation={3} sx={{ p: 4 }}>
@@ -68,24 +82,102 @@ const CourseForm: React.FC = () => {
         </Typography>
 
         <Grid container spacing={2}>
-          <Grid item xs={12}>
-            <TextField fullWidth label="שם הקורס" name="name" value={formData.name} onChange={handleChange} />
+          <Grid size={6}>
+            <TextField
+              fullWidth
+              label="שם הקורס"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+              error={!!errors.name}
+              helperText={errors.name ? "שם הקורס נדרש" : ""}
+            />
           </Grid>
-          <Grid item xs={6}>
-            <TextField fullWidth label="קוד קורס" name="code" value={formData.code} onChange={handleChange} />
+          <Grid size={6}>
+            <TextField
+              fullWidth
+              label="קוד קורס"
+              name="code"
+              value={formData.code}
+              onChange={handleChange}
+              required
+              error={!!errors.code}
+              helperText={errors.code ? "קוד קורס נדרש" : ""}
+            />
           </Grid>
-          <Grid item xs={6}>
-            <TextField fullWidth type="number" label="נקודות זכות" name="credits" value={formData.credits} onChange={handleChange} />
+          <Grid size={6}>
+            <TextField
+              fullWidth
+              type="number"
+              label="נקודות זכות"
+              name="credits"
+              value={formData.credits}
+              onChange={handleChange}
+              required
+              error={!!errors.credits}
+              helperText={errors.credits ? "נקודות זכות נדרשות" : ""}
+            />
           </Grid>
-          <Grid item xs={12}>
-            <TextField select fullWidth label="סוג קורס" name="type" value={formData.type} onChange={handleChange}>
-              <MenuItem value="חובה">חובה</MenuItem>
-              <MenuItem value="בחירה">בחירה</MenuItem>
-              <MenuItem value="סמינר">סמינר</MenuItem>
-            </TextField>
+          <Grid size={12}>
+            <Typography variant="subtitle1" gutterBottom>
+              סוג קורס
+            </Typography>
+            <Grid container spacing={2}>
+              <Grid>
+                <FormControlLabel
+                  control={
+                    <Radio
+                      checked={formData.type === "חובה"}
+                      onChange={handleChange}
+                      value="חובה"
+                      name="type"
+                    />
+                  }
+                  label="חובה"
+                />
+              </Grid>
+              <Grid >
+                <FormControlLabel
+                  control={
+                    <Radio
+                      checked={formData.type === "בחירה"}
+                      onChange={handleChange}
+                      value="בחירה"
+                      name="type"
+                    />
+                  }
+                  label="בחירה"
+                />
+              </Grid>
+              <Grid >
+                <FormControlLabel
+                  control={
+                    <Radio
+                      checked={formData.type === "סמינר"}
+                      onChange={handleChange}
+                      value="סמינר"
+                      name="type"
+                    />
+                  }
+                  label="סמינר"
+                />
+              </Grid>
+            </Grid>
           </Grid>
-          <Grid item xs={12}>
-             <TextField fullWidth multiline rows={3} label="תיאור" name="description" value={formData.description} onChange={handleChange} />
+          <Grid size={12}>
+            <TextField
+              fullWidth
+              multiline
+              rows={3}
+              label="תיאור"
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              required
+              error={!!errors.description}
+              helperText={errors.description ? "תיאור נדרש" : ""}
+            />
           </Grid>
         </Grid>
 
@@ -95,6 +187,7 @@ const CourseForm: React.FC = () => {
             color="primary" 
             startIcon={<SaveIcon />}
             onClick={handleSave}
+            disabled={!isFormValid} // Disable button if form is invalid
           >
             שמור וחזור
           </Button>

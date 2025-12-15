@@ -33,7 +33,7 @@ const Home: React.FC = () => {
       <Grid container spacing={4} sx={{ mb: 10 }}>
         
         {/* כרטיס 1: מפנה לדף הניהול */}
-        <Grid item xs={12} md={4}>
+        <Grid size={{xs: 12, md: 4}}>
           <Paper 
             elevation={2} 
             className="kpi-paper"
@@ -51,7 +51,7 @@ const Home: React.FC = () => {
         </Grid>
 
         {/* כרטיס 2: מפנה לדף טפסים (פניות) */}
-        <Grid item xs={12} md={4}>
+        <Grid size={{xs: 12, md: 4}}>
           <Paper 
             elevation={2} 
             className="kpi-paper"
@@ -69,7 +69,7 @@ const Home: React.FC = () => {
         </Grid>
 
         {/* כרטיס 3: מפנה לדף טפסים (מועמדים) */}
-        <Grid item xs={12} md={4}>
+        <Grid size={{xs: 12, md: 4}}>
           <Paper 
             elevation={2} 
             className="kpi-paper"
@@ -91,7 +91,7 @@ const Home: React.FC = () => {
       <Grid container spacing={4} sx={{ mb: 10 }}>
         
         {/* כרטיס 4: מפנה לעזרה (סתם לדוגמה, כי אין דף מלגות נפרד כרגע) */}
-        <Grid item xs={12} md={6}>
+        <Grid  size={{xs: 12, md: 4}}>
           <Paper 
             elevation={2} 
             className="kpi-paper"
@@ -109,7 +109,7 @@ const Home: React.FC = () => {
         </Grid>
 
         {/* כרטיס 5: מפנה לניהול */}
-        <Grid item xs={12} md={6}>
+        <Grid  size={{xs: 12, md: 4}}>
           <Paper 
             elevation={2} 
             className="kpi-paper"
@@ -131,7 +131,7 @@ const Home: React.FC = () => {
       <Grid container spacing={4}>
         
         {/* התראות מערכת */}
-        <Grid item xs={12} md={6}>
+        <Grid  size={{xs: 12, md: 4}}>
           <Paper elevation={3} className="alerts-paper">
             <Typography variant="h6" className="section-title">
               התראות מערכת
@@ -149,7 +149,7 @@ const Home: React.FC = () => {
         </Grid>
 
         {/* פעולות אחרונות */}
-        <Grid item xs={12} md={6}>
+        <Grid  size={{xs: 12, md: 4}}>
           <Paper elevation={3} className="alerts-paper">
             <Typography variant="h6" className="section-title">
               פעולות אחרונות

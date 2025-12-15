@@ -90,6 +90,11 @@ const CoursesTable: React.FC = () => {
           צור קורס חדש (טופס)
         </Button>
 
+        {/* --- כפתור להוספת קורס רנדומלי (להסרה)--- */}
+        <Button variant="contained" color='info' onClick={addRandomCourse}>
+          <AddIcon fontSize='small' sx={{ mr: 1 }} /> הוסף קורס אקראי
+        </Button>
+        {/* --- כפתור לשמירת שינויים ב-Local Storage --- */}
         <Button variant="contained" color='success' onClick={saveToLocalStorage}>
           <SaveIcon fontSize='small' sx={{ mr: 1 }} /> שמור שינויים
         </Button>
