@@ -97,13 +97,15 @@ const CourseForm: React.FC = () => {
           <Grid size={6}>
             <TextField
               fullWidth
+              type="number"
               label="קוד קורס"
               name="code"
               value={formData.code}
               onChange={handleChange}
               required
               error={!!errors.code}
-              helperText={errors.code ? "קוד קורס נדרש" : ""}
+              helperText={errors.code ? "קוד קורס נדרש מ-10000 ל-99999" : ""}
+              slotProps={{ htmlInput: { min: 10000, max: 99999 } }}
             />
           </Grid>
           <Grid size={6}>
@@ -116,7 +118,8 @@ const CourseForm: React.FC = () => {
               onChange={handleChange}
               required
               error={!!errors.credits}
-              helperText={errors.credits ? "נקודות זכות נדרשות" : ""}
+              helperText={errors.credits ? "נקודות זכות נדרשות מ-0 ל-10" : ""}
+              slotProps={{ htmlInput: { min: 0, max: 10 } }}
             />
           </Grid>
           <Grid size={12}>
