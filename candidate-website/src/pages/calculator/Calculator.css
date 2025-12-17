@@ -1,0 +1,62 @@
+/* src/pages/calculator/Calculator.css */
+.calc-container {
+    background-color: #f0f4f8; /* רקע כללי בהיר */
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 40px;
+}
+
+.calc-icon-wrapper {
+    background-color: #e3f2fd;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 16px;
+    color: #42a5f5;
+}
+
+.calc-title {
+    color: #42a5f5;
+    font-weight: bold !important;
+    margin-bottom: 8px !important;
+}
+
+.calc-subtitle {
+    color: #666;
+    margin-bottom: 32px !important;
+}
+
+.calc-card {
+    border-radius: 12px !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.05) !important;
+    padding: 32px !important;
+    width: 100%;
+    max-width: 500px;
+}
+
+.section-title {
+    color: #333;
+    font-weight: bold !important;
+    text-align: right;
+    margin-bottom: 16px !important;
+    font-size: 1.1rem !important;
+}
+
+.calc-button {
+    background-color: #90caf9 !important; /* תכלת כמו בתמונה */
+    color: white !important;
+    font-weight: bold !important;
+    font-size: 1.1rem !important;
+    padding: 10px 0 !important;
+    box-shadow: none !important;
+    margin-top: 16px !important;
+}
+
+.calc-button:hover {
+    background-color: #64b5f6 !important;
+}

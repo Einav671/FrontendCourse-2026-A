@@ -32,12 +32,12 @@ const Home: React.FC = () => {
       {/* שורה ראשונה */}
       <Grid container spacing={4} sx={{ mb: 10 }}>
         
-        {/* כרטיס 1: מפנה לדף הניהול */}
-        <Grid size={{xs: 12, md: 4}}>
+        {/* כרטיס 1: מפנה למחשבון (תוקן!) */}
+        <Grid item xs={12} md={4}>
           <Paper 
             elevation={2} 
             className="kpi-paper"
-            onClick={() => navigate('/management')} // מעבר לדף ניהול
+            onClick={() => navigate('/calculator')} // --- תיקון: מפנה למחשבון ---
           >
             <Avatar className="icon-avatar" sx={{ bgcolor: '#e8f5e9', color: '#2e7d32' }}>
               <CalculateIcon fontSize="large" />
@@ -45,17 +45,17 @@ const Home: React.FC = () => {
             <Box className="card-content">
               <Typography className="card-title">מחשבוני התאמה</Typography>
               <Typography className="card-value">0</Typography>
-              <Typography className="card-subtext">אין נתונים להצגה</Typography>
+              <Typography className="card-subtext">לחץ לחישוב חדש</Typography>
             </Box>
           </Paper>
         </Grid>
 
         {/* כרטיס 2: מפנה לדף טפסים (פניות) */}
-        <Grid size={{xs: 12, md: 4}}>
+        <Grid item xs={12} md={4}>
           <Paper 
             elevation={2} 
             className="kpi-paper"
-            onClick={() => navigate('/forms')} // מעבר לדף טפסים
+            onClick={() => navigate('/forms')} 
           >
             <Avatar className="icon-avatar" sx={{ bgcolor: '#fff3e0', color: '#ef6c00' }}>
               <ChatBubbleOutlineIcon fontSize="large" />
@@ -68,12 +68,12 @@ const Home: React.FC = () => {
           </Paper>
         </Grid>
 
-        {/* כרטיס 3: מפנה לדף טפסים (מועמדים) */}
-        <Grid size={{xs: 12, md: 4}}>
+        {/* כרטיס 3: מפנה לניהול מועמדים (תוקן!) */}
+        <Grid item xs={12} md={4}>
           <Paper 
             elevation={2} 
             className="kpi-paper"
-            onClick={() => navigate('/forms')} // מעבר לדף טפסים
+            onClick={() => navigate('/candidates')} // --- תיקון: מפנה למועמדים ---
           >
             <Avatar className="icon-avatar" sx={{ bgcolor: '#e3f2fd', color: '#1565c0' }}>
               <PeopleAltIcon fontSize="large" />
@@ -90,8 +90,8 @@ const Home: React.FC = () => {
       {/* שורה שנייה */}
       <Grid container spacing={4} sx={{ mb: 10 }}>
         
-        {/* כרטיס 4: מפנה לעזרה (סתם לדוגמה, כי אין דף מלגות נפרד כרגע) */}
-        <Grid  size={{xs: 12, md: 4}}>
+        {/* כרטיס 4: מפנה לעזרה */}
+        <Grid item xs={12} md={4}>
           <Paper 
             elevation={2} 
             className="kpi-paper"
@@ -109,7 +109,7 @@ const Home: React.FC = () => {
         </Grid>
 
         {/* כרטיס 5: מפנה לניהול */}
-        <Grid  size={{xs: 12, md: 4}}>
+        <Grid item xs={12} md={4}>
           <Paper 
             elevation={2} 
             className="kpi-paper"
@@ -131,7 +131,7 @@ const Home: React.FC = () => {
       <Grid container spacing={4}>
         
         {/* התראות מערכת */}
-        <Grid  size={{xs: 12, md: 4}}>
+        <Grid item xs={12} md={6}>
           <Paper elevation={3} className="alerts-paper">
             <Typography variant="h6" className="section-title">
               התראות מערכת
@@ -149,7 +149,7 @@ const Home: React.FC = () => {
         </Grid>
 
         {/* פעולות אחרונות */}
-        <Grid  size={{xs: 12, md: 4}}>
+        <Grid item xs={12} md={6}>
           <Paper elevation={3} className="alerts-paper">
             <Typography variant="h6" className="section-title">
               פעולות אחרונות
