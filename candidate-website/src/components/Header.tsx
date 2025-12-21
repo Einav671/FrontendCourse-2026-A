@@ -10,7 +10,7 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import { Link } from 'react-router-dom'; 
-// מחקנו את useLocation כי אנחנו כבר לא משתמשים בכותרת דינמית
+import SchoolIcon from '@mui/icons-material/School'; // אייקון אופציונלי ויפה
 
 export default function Header() {
   const [open, setOpen] = useState(false);
@@ -37,10 +37,13 @@ export default function Header() {
             <MenuIcon />
           </IconButton>
 
-          {/* --- שינוי 1: כותרת קבועה אחת --- */}
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1, textAlign: 'right', fontWeight: 'bold' }}>
-            מערכת ניהול אקדמית
-          </Typography>
+          {/* כותרת קבועה עם אייקון */}
+          <div style={{ flexGrow: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '10px' }}>
+            <Typography variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
+              מערכת ניהול אקדמית
+            </Typography>
+            <SchoolIcon />
+          </div>
 
         </Toolbar>
       </AppBar>
@@ -56,23 +59,45 @@ export default function Header() {
             </ListItemButton>
           </ListItem>
 
-          {/* --- שינוי 2: הוספת קישורים חדשים --- */}
-
-          {/* ניהול קורסים */}
           <ListItem disablePadding>
             <ListItemButton component={Link} to="/management" onClick={toggleDrawer} sx={{ textAlign: 'right' }}>
+              <ListItemText primary="דשבורד ניהול ראשי" />
+            </ListItemButton>
+          </ListItem>
+
+          {/* --- החלק שהוספנו --- */}
+          
+          {/* ניהול מלגות (החדש שלך) */}
+          <ListItem disablePadding>
+            <ListItemButton component={Link} to="/scholarships" onClick={toggleDrawer} sx={{ textAlign: 'right' }}>
+              <ListItemText primary="ניהול מלגות" />
+            </ListItemButton>
+          </ListItem>
+
+          {/* ניהול בוגרים */}
+          <ListItem disablePadding>
+            <ListItemButton component={Link} to="/graduates" onClick={toggleDrawer} sx={{ textAlign: 'right' }}>
+              <ListItemText primary="ניהול בוגרים" />
+            </ListItemButton>
+          </ListItem>
+
+          {/* ------------------- */}
+
+          {/* ניהול קורסים (של החברים) */}
+          <ListItem disablePadding>
+            <ListItemButton component={Link} to="/courses/new" onClick={toggleDrawer} sx={{ textAlign: 'right' }}>
               <ListItemText primary="ניהול קורסים" />
             </ListItemButton>
           </ListItem>
 
-          {/* ניהול מועמדים (חדש!) */}
+          {/* ניהול מועמדים */}
           <ListItem disablePadding>
             <ListItemButton component={Link} to="/candidates" onClick={toggleDrawer} sx={{ textAlign: 'right' }}>
               <ListItemText primary="ניהול מועמדים" />
             </ListItemButton>
           </ListItem>
 
-          {/* מחשבון קבלה (חדש!) */}
+          {/* מחשבון קבלה */}
           <ListItem disablePadding>
             <ListItemButton component={Link} to="/calculator" onClick={toggleDrawer} sx={{ textAlign: 'right' }}>
               <ListItemText primary="מחשבון קבלה" />

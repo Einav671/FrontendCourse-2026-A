@@ -1,6 +1,6 @@
 import React from 'react';
 import { Container, Grid, Paper, Typography, Box, Avatar } from '@mui/material';
-import { useNavigate } from 'react-router-dom'; // הוק לניווט
+import { useNavigate } from 'react-router-dom';
 
 // ייבוא אייקונים
 import CalculateIcon from '@mui/icons-material/Calculate';
@@ -10,7 +10,6 @@ import AutorenewIcon from '@mui/icons-material/Autorenew';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 
-// ייבוא קובץ העיצוב
 import './Home.css';
 
 const Home: React.FC = () => {
@@ -32,12 +31,12 @@ const Home: React.FC = () => {
       {/* שורה ראשונה */}
       <Grid container spacing={4} sx={{ mb: 10 }}>
         
-        {/* כרטיס 1: מפנה למחשבון (תוקן!) */}
+        {/* כרטיס 1: מחשבון */}
         <Grid item xs={12} md={4}>
           <Paper 
             elevation={2} 
             className="kpi-paper"
-            onClick={() => navigate('/calculator')} // --- תיקון: מפנה למחשבון ---
+            onClick={() => navigate('/calculator')}
           >
             <Avatar className="icon-avatar" sx={{ bgcolor: '#e8f5e9', color: '#2e7d32' }}>
               <CalculateIcon fontSize="large" />
@@ -50,7 +49,7 @@ const Home: React.FC = () => {
           </Paper>
         </Grid>
 
-        {/* כרטיס 2: מפנה לדף טפסים (פניות) */}
+        {/* כרטיס 2: פניות */}
         <Grid item xs={12} md={4}>
           <Paper 
             elevation={2} 
@@ -68,12 +67,12 @@ const Home: React.FC = () => {
           </Paper>
         </Grid>
 
-        {/* כרטיס 3: מפנה לניהול מועמדים (תוקן!) */}
+        {/* כרטיס 3: מועמדים */}
         <Grid item xs={12} md={4}>
           <Paper 
             elevation={2} 
             className="kpi-paper"
-            onClick={() => navigate('/candidates')} // --- תיקון: מפנה למועמדים ---
+            onClick={() => navigate('/candidates')}
           >
             <Avatar className="icon-avatar" sx={{ bgcolor: '#e3f2fd', color: '#1565c0' }}>
               <PeopleAltIcon fontSize="large" />
@@ -90,12 +89,12 @@ const Home: React.FC = () => {
       {/* שורה שנייה */}
       <Grid container spacing={4} sx={{ mb: 10 }}>
         
-        {/* כרטיס 4: מפנה לעזרה */}
+        {/* --- התיקון כאן: כרטיס 4 מפנה למלגות --- */}
         <Grid item xs={12} md={4}>
           <Paper 
             elevation={2} 
             className="kpi-paper"
-            onClick={() => navigate('/help')}
+            onClick={() => navigate('/scholarships')} // <--- שינינו ל-/scholarships
           >
             <Avatar className="icon-avatar" sx={{ bgcolor: '#e0f2f1', color: '#00695c' }}>
               <AutorenewIcon fontSize="large" />
@@ -103,17 +102,17 @@ const Home: React.FC = () => {
             <Box className="card-content">
               <Typography className="card-title">סטטוס עדכון מלגות</Typography>
               <Typography variant="h5" sx={{ fontWeight: 'bold', my: 1 }}>מעודכן</Typography>
-              <Typography className="card-subtext">אין עדכונים חדשים</Typography>
+              <Typography className="card-subtext">לחץ לניהול המלגות</Typography>
             </Box>
           </Paper>
         </Grid>
 
-        {/* כרטיס 5: מפנה לניהול */}
+        {/* כרטיס 5: ניהול בוגרים (שיניתי שיוביל לבוגרים ולא לניהול כללי) */}
         <Grid item xs={12} md={4}>
           <Paper 
             elevation={2} 
             className="kpi-paper"
-            onClick={() => navigate('/management')}
+            onClick={() => navigate('/graduates')} // <--- שינינו ל-/graduates
           >
             <Avatar className="icon-avatar" sx={{ bgcolor: '#f3e5f5', color: '#7b1fa2' }}>
               <AssignmentIcon fontSize="large" />
@@ -121,7 +120,7 @@ const Home: React.FC = () => {
             <Box className="card-content">
               <Typography className="card-title">חוות דעת לאישור</Typography>
               <Typography className="card-value">0</Typography>
-              <Typography className="card-subtext">אין משימות ממתינות</Typography>
+              <Typography className="card-subtext">לחץ לניהול בוגרים</Typography>
             </Box>
           </Paper>
         </Grid>
