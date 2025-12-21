@@ -16,17 +16,15 @@ import CandidateForm from './pages/candidates/CandidateForm';
 // --- מחשבון ---
 import AdmissionCalculator from './pages/calculator/AdmissionCalculator';
 
-// ------------------------------------------------------------------
 // --- מלגות (Scholarships) ---
-// ------------------------------------------------------------------
+import ScholarshipsManagement from './pages/scholarships/ScholarshipsManagement';
+import ScholarshipForm from './pages/scholarships/ScholarshipForm';
 
-// ------------------------------------------------------------------
-// --- בוגרים (Graduates) ---
-// ------------------------------------------------------------------
+// --- בוגרים (Graduates) - החזרנו את זה! ---
+import GraduatesManagement from './pages/graduates/GraduatesManagement';
+import GraduateForm from './pages/graduates/GraduateForm';
 
 import './App.css';
-import ScholarshipsManagement from './pages/Scholarships/ScholarshipsManagement';
-import ScholarshipForm from './pages/Scholarships/ScholarshipForm';
 
 function App() {
   return (
@@ -55,22 +53,16 @@ function App() {
           {/* ------------------------------------------------------- */}
           {/* --- נתיבים למלגות --- */}
           {/* ------------------------------------------------------- */}
-          {/* מסך הניהול (טבלה) */}
           <Route path="/scholarships" element={<ScholarshipsManagement />} />
-          {/* טופס יצירה חדשה */}
           <Route path="/scholarships/new" element={<ScholarshipForm />} />
-          {/* טופס עריכה (מקבל ID) */}
           <Route path="/scholarships/edit/:id" element={<ScholarshipForm />} />
 
           {/* ------------------------------------------------------- */}
-          {/* --- נתיבים לבוגרים --- */}
+          {/* --- נתיבים לבוגרים (החזרנו את זה!) --- */}
           {/* ------------------------------------------------------- */}
-          {/* מסך הניהול (טבלה) */}
-          
-          {/* טופס יצירה חדשה */}
-          
-          {/* טופס עריכה (מקבל ID) */}
-         
+          <Route path="/graduates" element={<GraduatesManagement />} />
+          <Route path="/graduates/new" element={<GraduateForm />} />
+          <Route path="/graduates/edit/:id" element={<GraduateForm />} />
 
         </Routes>
       </main>
