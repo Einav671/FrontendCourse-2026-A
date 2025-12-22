@@ -48,6 +48,13 @@ const GraduateForm: React.FC = () => {
     status: 'pending'
   });
 
+  const [errors, setErrors] = useState<any>({
+    fullName: false,
+    role: false,
+    degree: false,
+    imageUrl: false,
+    review: false,
+  });
   useEffect(() => {
     if (isEditMode) {
       const saved = JSON.parse(localStorage.getItem('graduates') || '[]');
@@ -56,6 +63,7 @@ const GraduateForm: React.FC = () => {
     }
   }, [id, isEditMode]);
 
+    const isFormValid = Object.values(errors).every((error) => !error) && Object.values(formData).every((value) => value !== "");
 const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     
@@ -109,6 +117,8 @@ const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
             <TextField
               fullWidth label="שם מלא" name="fullName"
               value={formData.fullName} onChange={handleChange}
+              error={!!errors.fullName}
+              helperText={errors.fullName ? 'שם מלא חובה' : ''}
               required
             />
           </Grid>
@@ -116,6 +126,8 @@ const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
             <TextField
               fullWidth label="תפקיד נוכחי" name="role"
               value={formData.role} onChange={handleChange}
+              error={!!errors.role}
+              helperText={errors.role ? 'תפקיד נוכחי חובה' : ''}
               required
               placeholder="למשל: מפתח Full Stack"
             />
@@ -133,6 +145,9 @@ const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
             <TextField
               fullWidth label="קישור לתמונה (URL)" name="imageUrl"
               value={formData.imageUrl} onChange={handleChange}
+              error={!!errors.imageUrl}
+              helperText={errors.imageUrl ? 'קישור לתמונה חובה' : ''}
+              required
               placeholder="https://example.com/photo.jpg"
             />
           </Grid>
@@ -140,6 +155,9 @@ const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
             <TextField
               fullWidth multiline rows={4} label="סיפור הצלחה / חוות דעת" name="review"
               value={formData.review} onChange={handleChange}
+              error={!!errors.review}
+              helperText={errors.review ? 'חוות דעת חובה' : ''}
+              required
             />
           </Grid>
           
@@ -158,7 +176,7 @@ const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         </Grid>
 
         <div style={{ marginTop: '24px', display: 'flex', gap: '10px' }}>
-          <Button variant="contained" onClick={handleSave} startIcon={<SaveIcon />}>שמור</Button>
+          <Button variant="contained" onClick={handleSave} startIcon={<SaveIcon />} disabled={!isFormValid}>שמור</Button>
           <Button variant="outlined" color="secondary" onClick={() => navigate('/graduates')} startIcon={<ArrowForwardIcon />}>ביטול</Button>
         </div>
       </Paper>
