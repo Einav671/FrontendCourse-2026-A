@@ -12,19 +12,17 @@ const CandidateForm: React.FC = () => {
   const { id } = useParams();
   const isEditMode = !!id;
 
-  // 1. State לנתונים (כל השדות של המועמד)
+  // 1. State לנתונים - degreeCode מקובע ל-'CS'
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     phone: '',
-    degreeCode: 'CS',
+    degreeCode: 'CS', // קבוע למדעי המחשב
     bagrut: '',
     psychometric: '',
     status: 'נפתח'
   });
 
-  // 2. State לשגיאות - בוליאני (כמו בקוד שביקשת)
-  // true = יש שגיאה, false = תקין
   const [errors, setErrors] = useState({
     fullName: false,
     email: false,
@@ -35,7 +33,6 @@ const CandidateForm: React.FC = () => {
     status: false,
   });
 
-  // טעינת נתונים בעריכה
   useEffect(() => {
     if (isEditMode) {
       const savedCandidates = JSON.parse(localStorage.getItem('candidates') || '[]');
@@ -46,27 +43,22 @@ const CandidateForm: React.FC = () => {
     }
   }, [id, isEditMode]);
 
-  // 3. פונקציית השינוי עם הולידציה המבוקשת
   const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value, validity } = event.target;
     
     setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-    
-    // בדיקה האם השדה תקין לפי חוקי ה-HTML שהגדרנו למטה (pattern, min, max, required)
     setErrors((prevErrors) => ({ ...prevErrors, [name]: !validity.valid }));
   };
 
   const handleSave = () => {
-    // אין צורך בפונקציית validate ידנית כי הכפתור יהיה נעול אם יש שגיאות
     const savedCandidates = JSON.parse(localStorage.getItem('candidates') || '[]');
     
-    // המרת המספרים ל-number לפני השמירה
     const candidateData = new Candidate(
         isEditMode ? id! : Date.now().toString(),
         formData.fullName,
         formData.email,
         formData.phone,
-        formData.degreeCode,
+        formData.degreeCode, // יישמר תמיד כ-'CS'
         Number(formData.bagrut),
         Number(formData.psychometric),
         formData.status
@@ -84,7 +76,6 @@ const CandidateForm: React.FC = () => {
     navigate('/candidates');
   };
 
-  // 4. בדיקה האם הטופס תקין לשימוש בכפתור השמירה
   const isFormValid = Object.values(errors).every((error) => !error) && 
                       Object.values(formData).every((value) => value !== "");
 
@@ -97,7 +88,6 @@ const CandidateForm: React.FC = () => {
 
         <Grid container spacing={2}>
           
-          {/* שם מלא */}
           <Grid item xs={12}>
             <TextField
               fullWidth
@@ -111,7 +101,6 @@ const CandidateForm: React.FC = () => {
             />
           </Grid>
 
-          {/* אימייל */}
           <Grid item xs={12}>
             <TextField
               fullWidth
@@ -126,7 +115,6 @@ const CandidateForm: React.FC = () => {
             />
           </Grid>
 
-          {/* טלפון - 10 ספרות בדיוק */}
           <Grid item xs={12}>
             <TextField
               fullWidth
@@ -138,31 +126,24 @@ const CandidateForm: React.FC = () => {
               required
               error={!!errors.phone}
               helperText={errors.phone ? "מספר טלפון חייב להכיל 10 ספרות בדיוק" : ""}
-              // Regex: בדיוק 10 ספרות (0-9)
               inputProps={{ pattern: "[0-9]{10}", maxLength: 10 }}
             />
           </Grid>
           
-          {/* תואר */}
+          {/* שדה תואר - תצוגה בלבד ללא אפשרות שינוי */}
           <Grid item xs={12}>
             <TextField
-              select
               fullWidth
               label="תואר התעניינות"
-              name="degreeCode"
-              value={formData.degreeCode}
-              onChange={handleChange}
-              required
-              error={!!errors.degreeCode}
-              helperText={errors.degreeCode ? "יש לבחור תואר" : ""}
-            >
-              <MenuItem value="CS">מדעי המחשב</MenuItem>
-              <MenuItem value="PSY">פסיכולוגיה</MenuItem>
-              <MenuItem value="LAW">משפטים</MenuItem>
-            </TextField>
+              value="מדעי המחשב"
+              InputProps={{
+                readOnly: true,
+              }}
+              variant="filled"
+              helperText="מסלול לימודים קבוע"
+            />
           </Grid>
 
-          {/* בגרות - 55 עד 120 */}
           <Grid item xs={6}>
             <TextField
               fullWidth
@@ -174,12 +155,10 @@ const CandidateForm: React.FC = () => {
               required
               error={!!errors.bagrut}
               helperText={errors.bagrut ? "טווח תקין: 55-120" : ""}
-              // HTML5 Validation Attributes
               inputProps={{ min: 55, max: 120 }}
             />
           </Grid>
 
-          {/* פסיכומטרי - 200 עד 800 */}
           <Grid item xs={6}>
             <TextField
               fullWidth
@@ -191,12 +170,10 @@ const CandidateForm: React.FC = () => {
               required
               error={!!errors.psychometric}
               helperText={errors.psychometric ? "טווח תקין: 200-800" : ""}
-              // HTML5 Validation Attributes
               inputProps={{ min: 200, max: 800 }}
             />
           </Grid>
 
-          {/* סטטוס */}
           <Grid item xs={12}>
             <TextField
               select
@@ -223,7 +200,7 @@ const CandidateForm: React.FC = () => {
             color="primary" 
             startIcon={<SaveIcon />}
             onClick={handleSave}
-            disabled={!isFormValid} // הכפתור מושבת אם הטופס לא תקין
+            disabled={!isFormValid}
           >
             שמור
           </Button>
