@@ -121,25 +121,25 @@ return (
                 </Grid>
 
                 <Grid item xs={12}>
-                    <TextField
-                        id="userType-select"
-                        select
-                        fullWidth
-                        label="סוג משתמש"
-                        name="userType"
-                        value={formData.userType}
-                        onChange={handleChange}
-                        required
-                        error={!!errors.userType}
-                        helperText={errors.userType ? "יש לבחור סוג משתמש" : ""}
-                        SelectProps={{ id: "userType-select" }}
-                    >
-                        <MenuItem value="מועמד">מועמד</MenuItem>
-                        <MenuItem value="סטודנט">סטודנט</MenuItem>
-                        <MenuItem value="בוגר">בוגר</MenuItem>
-                        <MenuItem value="מנהל מערכת">מנהל מערכת</MenuItem>
-                    </TextField>
-                </Grid>
+                <TextField
+                    id="userType-select"
+                    select
+                    fullWidth
+                    label="סוג משתמש"
+                    name="userType"
+                    value={formData.userType}
+                    onChange={handleChange}
+                    required
+                    error={!!errors.userType}
+                    helperText={errors.userType ? "יש לבחור סוג משתמש" : ""}
+                    SelectProps={{ id: "userType-select" }}
+                >
+                    <MenuItem value="מועמד">מועמד</MenuItem>
+                    <MenuItem value="בוגר">בוגר</MenuItem>
+                    <MenuItem value="מנהל מערכת">מנהל מערכת</MenuItem>
+                </TextField>
+            </Grid>
+
             </Grid>
 
             <div style={{ marginTop: '24px', display: 'flex', gap: '10px' }}>
