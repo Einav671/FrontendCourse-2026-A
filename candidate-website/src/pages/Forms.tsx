@@ -14,16 +14,33 @@ const Forms: React.FC = () => {
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
-    phone: '',
-    notes: ''
+    phone: ''
+  });
+
+  // State לשמירת השגיאות של הטופס
+  const [errors, setErrors] = useState({
+    fullName: false,
+    email: false,
+    phone: false,
+    notes: false
   });
 
   // פונקציה שמתעדכנת בכל הקלדה
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    
+    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+    
+    // בדיקה בטוחה: אם יש validity (כמו בטקסט רגיל) נשתמש בו.
+    // אם אין (כמו לפעמים ב-Select), נבדוק פשוט שהערך לא ריק.
+    const isValid = event.target.validity 
+        ? event.target.validity.valid 
+        : value !== ''; // בדיקת גיבוי
+
+    setErrors((prevErrors) => ({ ...prevErrors, [name]: !isValid }));
   };
 
+    const isFormValid = Object.values(errors).every((error) => !error) && Object.values(formData).every((value) => value !== "");
   // פונקציית שליחת הטופס
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault(); // מניעת רענון דף
@@ -49,6 +66,8 @@ const Forms: React.FC = () => {
             name="fullName"
             value={formData.fullName}
             onChange={handleChange}
+            error={errors.fullName}
+            helperText={errors.fullName ? 'שם מלא הוא שדה חובה' : ''}
             required
             fullWidth
           />
@@ -59,6 +78,8 @@ const Forms: React.FC = () => {
             type="email"
             value={formData.email}
             onChange={handleChange}
+            error={errors.email}
+            helperText={errors.email ? 'אימייל לא תקין' : ''}
             required
             fullWidth
           />
@@ -69,6 +90,9 @@ const Forms: React.FC = () => {
             type="tel"
             value={formData.phone}
             onChange={handleChange}
+            error={errors.phone}
+            helperText={errors.phone ? 'מספר טלפון חייב להכיל 10 ספרות בדיוק' : ''}
+            inputProps={{ pattern: "[0-9]{10}", maxLength: 10 }}
             required
             fullWidth
           />
@@ -89,6 +113,7 @@ const Forms: React.FC = () => {
             size="large" 
             endIcon={<SendIcon />}
             sx={{ mt: 2 }}
+            disabled={!isFormValid}
           >
             שלח פרטים
           </Button>
