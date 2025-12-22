@@ -56,9 +56,18 @@ const GraduateForm: React.FC = () => {
     }
   }, [id, isEditMode]);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev: any) => ({ ...prev, [name]: value }));
+const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target;
+    
+    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+    
+    // בדיקה בטוחה: אם יש validity (כמו בטקסט רגיל) נשתמש בו.
+    // אם אין (כמו לפעמים ב-Select), נבדוק פשוט שהערך לא ריק.
+    const isValid = event.target.validity 
+        ? event.target.validity.valid 
+        : value !== ''; // בדיקת גיבוי
+
+    setErrors((prevErrors) => ({ ...prevErrors, [name]: !isValid }));
   };
 
   const handleSave = () => {
