@@ -61,7 +61,7 @@ export default function Header() {
 
           <ListItem disablePadding>
             <ListItemButton component={Link} to="/management" onClick={toggleDrawer} sx={{ textAlign: 'right' }}>
-              <ListItemText primary="דשבורד ניהול ראשי" />
+              <ListItemText primary="ניהול קורסים" />
             </ListItemButton>
           </ListItem>
 
@@ -88,14 +88,6 @@ export default function Header() {
             </ListItemButton>
           </ListItem>
 
-          {/* ------------------- */}
-
-          {/* ניהול קורסים (של החברים) */}
-          <ListItem disablePadding>
-            <ListItemButton component={Link} to="/courses/new" onClick={toggleDrawer} sx={{ textAlign: 'right' }}>
-              <ListItemText primary="ניהול קורסים" />
-            </ListItemButton>
-          </ListItem>
 
           {/* ניהול מועמדים */}
           <ListItem disablePadding>
