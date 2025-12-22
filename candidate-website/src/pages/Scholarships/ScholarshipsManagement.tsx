@@ -29,13 +29,25 @@ export class Scholarship {
 
 const ScholarshipsManagement: React.FC = () => {
   const navigate = useNavigate();
-  // שימוש ב-any[] כדי למנוע שגיאות אדומות של TypeScript
   const [scholarships, setScholarships] = useState<any[]>([]);
 
   useEffect(() => {
     const saved = localStorage.getItem('scholarships');
+    
     if (saved) {
+      // אם יש נתונים בזיכרון - טען אותם
       setScholarships(JSON.parse(saved));
+    } else {
+      // --- השינוי כאן: אם אין נתונים, טען את ברירת המחדל ---
+      const defaultScholarships = [
+        new Scholarship("1", "PRES-700", "מלגת מצטייני נשיא", "מצטיינים", 10000, "", "ציון פסיכומטרי מעל 700"),
+        new Scholarship("2", "BAG-110", "מלגת הישגים בבגרות", "תיכון", 5000, "", "ממוצע בגרות מעל 110"),
+        new Scholarship("3", "TECH-NEW", "מלגת עידוד טכנולוגי", "נרשמים חדשים", 2000, "", "מענק חד פעמי לנרשמים החודש")
+      ];
+      
+      setScholarships(defaultScholarships);
+      // שומרים בזיכרון כדי שיישמר לפעם הבאה
+      localStorage.setItem('scholarships', JSON.stringify(defaultScholarships));
     }
   }, []);
 
@@ -80,7 +92,7 @@ const ScholarshipsManagement: React.FC = () => {
                     <TableCell sx={{ fontWeight: 'bold' }}>{s.name}</TableCell>
                     <TableCell>{s.targetAudience}</TableCell>
                     <TableCell>
-                        <Chip label={`₪${s.amount}`} color="success" variant="outlined" size="small" />
+                        <Chip label={`₪${s.amount.toLocaleString()}`} color="success" variant="outlined" size="small" />
                     </TableCell>
                     <TableCell sx={{ maxWidth: 200, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {s.conditions}
