@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
@@ -67,6 +67,13 @@ export default function Header() {
 
           {/* --- החלק שהוספנו --- */}
           
+          {/*ניהול משתמשים*/}
+          <ListItem disablePadding>
+            <ListItemButton component={Link} to="/users" onClick={toggleDrawer} sx={{ textAlign: 'right' }}>
+              <ListItemText primary="ניהול משתמשים" />
+            </ListItemButton>
+          </ListItem>
+
           {/* ניהול מלגות (החדש שלך) */}
           <ListItem disablePadding>
             <ListItemButton component={Link} to="/scholarships" onClick={toggleDrawer} sx={{ textAlign: 'right' }}>
@@ -97,6 +104,13 @@ export default function Header() {
             </ListItemButton>
           </ListItem>
 
+          {/* מסלולי התמחות */}
+          <ListItem disablePadding>
+            <ListItemButton component={Link} to="/internships" onClick={toggleDrawer} sx={{ textAlign: 'right' }}>
+              <ListItemText primary="מסלולי התמחות" />
+            </ListItemButton>
+          </ListItem>
+
           {/* מחשבון קבלה */}
           <ListItem disablePadding>
             <ListItemButton component={Link} to="/calculator" onClick={toggleDrawer} sx={{ textAlign: 'right' }}>
@@ -118,6 +132,7 @@ export default function Header() {
             </ListItemButton>
           </ListItem>
 
+          
         </List>
       </Drawer>
     </>
