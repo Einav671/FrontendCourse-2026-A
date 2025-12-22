@@ -32,6 +32,10 @@ import './App.css';
 import UsersManagement from './pages/Users/UsersManagement';
 import UserForm from './pages/Users/UsersForm';
 
+// --- התראות מערכת (חדש!) ---
+import AlertsManagement from './pages/alerts/AlertsManagement';
+import AlertForm from './pages/alerts/AlertForm';
+
 function App() {
   return (
     <div className="app-container">
@@ -78,7 +82,12 @@ function App() {
           <Route path="/graduates/new" element={<GraduateForm />} />
           <Route path="/graduates/edit/:id" element={<GraduateForm />} />
 
-         
+          {/* ------------------------------------------------------- */}
+          {/* --- נתיבים להתראות מערכת (חדש!) --- */}
+          {/* ------------------------------------------------------- */}
+          <Route path="/alerts" element={<AlertsManagement />} />
+          <Route path="/alerts/new" element={<AlertForm />} />
+          <Route path="/alerts/edit/:id" element={<AlertForm />} />
 
         </Routes>
       </main>
