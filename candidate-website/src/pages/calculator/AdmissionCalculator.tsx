@@ -71,8 +71,9 @@ const AdmissionCalculator: React.FC = () => {
     const bagrut = Number(formData.bagrut);
     const psycho = Number(formData.psychometric);
 
-    // 1. חישוב ציון התאמה (סכם)
-    const score = (bagrut * 4) * 0.3 + (psycho * 0.7);
+    // --- השינוי בוצע כאן: נוסחא מאוזנת יותר ---
+    // מנרמלים את הבגרות (פי 6) ועושים ממוצע עם הפסיכומטרי
+    const score = (bagrut * 6 + psycho) / 2;
     
     // 2. קביעת סטטוס קבלה
     let isAccepted = false;

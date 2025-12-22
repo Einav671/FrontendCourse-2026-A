@@ -9,12 +9,12 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
-import { Link } from 'react-router-dom'; 
+import { Link } from 'react-router-dom';
 import SchoolIcon from '@mui/icons-material/School'; // אייקון אופציונלי ויפה
 
 export default function Header() {
   const [open, setOpen] = useState(false);
-  
+
   const toggleDrawer = () => {
     setOpen(!open);
   };
@@ -24,7 +24,7 @@ export default function Header() {
       <AppBar position="static">
         {/* כיוון מימין לשמאל */}
         <Toolbar sx={{ flexDirection: 'row-reverse' }}>
-          
+
           {/* כפתור המבורגר בצד ימין */}
           <IconButton
             size="large"
@@ -42,7 +42,13 @@ export default function Header() {
             <Typography variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
               מערכת ניהול אקדמית
             </Typography>
-            <SchoolIcon />
+
+            {/* --- כאן השינוי: הפכנו את האייקון לכפתור לחיץ שמוביל לדף הבית --- */}
+            <IconButton component={Link} to="/" color="inherit">
+              <SchoolIcon />
+            </IconButton>
+            {/* ------------------------------------------------------------- */}
+
           </div>
 
         </Toolbar>
@@ -51,7 +57,7 @@ export default function Header() {
       {/* תפריט צד (Drawer) */}
       <Drawer anchor="right" open={open} onClose={toggleDrawer}>
         <List sx={{ width: 250, direction: 'rtl' }}>
-          
+
           {/* דף הבית */}
           <ListItem disablePadding>
             <ListItemButton component={Link} to="/" onClick={toggleDrawer} sx={{ textAlign: 'right' }}>
@@ -66,7 +72,7 @@ export default function Header() {
           </ListItem>
 
           {/* --- החלק שהוספנו --- */}
-          
+
           {/*ניהול משתמשים*/}
           <ListItem disablePadding>
             <ListItemButton component={Link} to="/users" onClick={toggleDrawer} sx={{ textAlign: 'right' }}>
@@ -117,6 +123,12 @@ export default function Header() {
             </ListItemButton>
           </ListItem>
 
+          <ListItem disablePadding>
+            <ListItemButton component={Link} to="/alerts" onClick={toggleDrawer} sx={{ textAlign: 'right' }}>
+              <ListItemText primary="ניהול התראות" />
+            </ListItemButton>
+          </ListItem>
+
           {/* עזרה */}
           <ListItem disablePadding>
             <ListItemButton component={Link} to="/help" onClick={toggleDrawer} sx={{ textAlign: 'right' }}>
@@ -124,7 +136,7 @@ export default function Header() {
             </ListItemButton>
           </ListItem>
 
-          
+
         </List>
       </Drawer>
     </>
