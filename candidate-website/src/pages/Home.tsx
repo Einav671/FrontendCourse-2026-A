@@ -1,6 +1,9 @@
 import React from 'react';
 import { Container, Grid, Paper, Typography, Box, Avatar } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+// הייבואים כבר היו קיימים בקוד שלך
+import { useState, useEffect } from 'react';
+import { SystemAlert } from './alerts/SystemAlert'; // ודא שהנתיב הזה נכון לקובץ שיצרנו
 
 // ייבוא אייקונים
 import CalculateIcon from '@mui/icons-material/Calculate';
@@ -14,6 +17,17 @@ import './Home.css';
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
+
+  // --- הוספה 1: State לניהול ההתראות וטעינתן ---
+  const [alerts, setAlerts] = useState<SystemAlert[]>([]);
+
+  useEffect(() => {
+      // טעינת התראות מהזיכרון בעת טעינת הדף
+      const savedAlerts = JSON.parse(localStorage.getItem('system-alerts') || '[]');
+      setAlerts(savedAlerts);
+  }, []);
+  // -------------------------------------------
+
 
   return (
     <Container maxWidth="xl" className="dashboard-container">
@@ -89,12 +103,12 @@ const Home: React.FC = () => {
       {/* שורה שנייה */}
       <Grid container spacing={4} sx={{ mb: 10 }}>
         
-        {/* --- התיקון כאן: כרטיס 4 מפנה למלגות --- */}
+        {/* כרטיס 4: מלגות */}
         <Grid item xs={12} md={4}>
           <Paper 
             elevation={2} 
             className="kpi-paper"
-            onClick={() => navigate('/scholarships')} // <--- שינינו ל-/scholarships
+            onClick={() => navigate('/scholarships')}
           >
             <Avatar className="icon-avatar" sx={{ bgcolor: '#e0f2f1', color: '#00695c' }}>
               <AutorenewIcon fontSize="large" />
@@ -107,12 +121,12 @@ const Home: React.FC = () => {
           </Paper>
         </Grid>
 
-        {/* כרטיס 5: ניהול בוגרים (שיניתי שיוביל לבוגרים ולא לניהול כללי) */}
+        {/* כרטיס 5: ניהול בוגרים */}
         <Grid item xs={12} md={4}>
           <Paper 
             elevation={2} 
             className="kpi-paper"
-            onClick={() => navigate('/graduates')} // <--- שינינו ל-/graduates
+            onClick={() => navigate('/graduates')} 
           >
             <Avatar className="icon-avatar" sx={{ bgcolor: '#f3e5f5', color: '#7b1fa2' }}>
               <AssignmentIcon fontSize="large" />
@@ -129,7 +143,7 @@ const Home: React.FC = () => {
       {/* שורה שלישית: רשימות */}
       <Grid container spacing={4}>
         
-        {/* התראות מערכת */}
+        {/* התראות מערכת - דינמי */}
         <Grid item xs={12} md={6}>
           <Paper elevation={3} className="alerts-paper">
             <Typography variant="h6" className="section-title">
@@ -137,36 +151,26 @@ const Home: React.FC = () => {
             </Typography>
             
             <Box className="alerts-list">
-              <Box className="alert-item alert-success">
-                המערכת מעודכנת ותקינה <CheckCircleOutlineIcon fontSize="small"/>
-              </Box>
-              <Box className="alert-item" style={{color: '#999', textAlign:'center', marginTop: '20px'}}>
-                אין התראות חדשות
-              </Box>
+              {/* --- הוספה 2: רינדור דינמי של ההתראות --- */}
+              {alerts.length > 0 ? (
+                alerts.map((alert) => (
+                  // שימוש במחלקת CSS דינמית לפי סוג ההתראה (alert-success, alert-warning וכו')
+                  <Box key={alert.id} className={`alert-item alert-${alert.type}`} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    {alert.message}
+                    {/* הוספת אייקון קטן אם זה מסוג הצלחה */}
+                    {alert.type === 'success' && <CheckCircleOutlineIcon fontSize="small" />}
+                  </Box>
+                ))
+              ) : (
+                // אם אין התראות - מציגים הודעה ריקה
+                <Box className="alert-item" style={{color: '#999', textAlign:'center', marginTop: '20px'}}>
+                    אין התראות חדשות
+                </Box>
+              )}
+              {/* ----------------------------------------- */}
             </Box>
           </Paper>
         </Grid>
-
-        {/* פעולות אחרונות */}
-        <Grid item xs={12} md={6}>
-          <Paper elevation={3} className="alerts-paper">
-            <Typography variant="h6" className="section-title">
-              פעולות אחרונות
-            </Typography>
-            
-            <Box className="alerts-list">
-              <Box className="activity-item">
-                <Typography className="activity-text">מערכת הופעלה מחדש</Typography>
-                <Typography className="activity-time">עכשיו</Typography>
-              </Box>
-              <Box className="activity-item">
-                <Typography className="activity-text">בוצע ניקוי מטמון</Typography>
-                <Typography className="activity-time">לפני 5 דקות</Typography>
-              </Box>
-            </Box>
-          </Paper>
-        </Grid>
-
       </Grid>
     </Container>
   );
