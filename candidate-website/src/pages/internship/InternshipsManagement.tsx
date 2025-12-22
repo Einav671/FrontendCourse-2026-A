@@ -69,7 +69,6 @@ const InternshipsManagement: React.FC = () => {
   useEffect(() => {
     const saved = JSON.parse(localStorage.getItem('internships') || 'null');
     if (saved && Array.isArray(saved) && saved.length > 0) {
-      // merge defaults + saved (saved appended so admin entries appear after defaults)
       setInternships([...defaultInternships, ...saved]);
     } else {
       setInternships(defaultInternships);
@@ -86,7 +85,8 @@ const InternshipsManagement: React.FC = () => {
   }, []);
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4 }}>
+    // dir="rtl" הופך את כל העמוד לימין-שמאל
+    <Container maxWidth="lg" sx={{ mt: 4 }} dir="rtl">
       <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', mb: 3, textAlign: 'center' }}>
         מסלולי התמחות
       </Typography>
@@ -94,19 +94,23 @@ const InternshipsManagement: React.FC = () => {
         גלו את המסלולים האקדמיים שלנו ובחרו בקריירה שמתאימה לכם
       </Typography>
 
-      <Button
-        variant="contained"
-        color="primary"
-        startIcon={<AddIcon />}
-        onClick={() => navigate('/internships/new')}
-        sx={{ mb: 4 }}
-      >
-        הוסף מסלול התמחות חדש
-      </Button>
+      {/* יישור הכפתור לימין */}
+      <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 4 }}>
+        <Button
+          variant="contained"
+          color="primary"
+          startIcon={<AddIcon />}
+          onClick={() => navigate('/internships/new')}
+        >
+          הוסף מסלול התמחות חדש
+        </Button>
+      </Box>
 
+      {/* spacing={4} שומר על המרווחים המקוריים בין הקוביות */}
       <Grid container spacing={4}>
         {internships.map((internship, index) => (
           <Grid item xs={12} md={6} lg={4} key={index}>
+            {/* p: 3 שומר על הריווח הפנימי המקורי */}
             <Paper elevation={3} sx={{ p: 3, backgroundColor: internship.color }}>
               <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
                 {iconForKey(internship.icon)}
@@ -117,22 +121,27 @@ const InternshipsManagement: React.FC = () => {
               <Typography variant="body1" sx={{ mb: 2, textAlign: 'center' }}>
                 {internship.description}
               </Typography>
-              <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>
+              
+              <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1, textAlign: 'right' }}>
                 כיווני קריירה:
               </Typography>
-              <ul>
-                {internship.careerPaths.map((path, idx) => (
+              {/* paddingRight: '20px' - דואג שהנקודות יהיו מימין לטקסט במרחק נכון */}
+              <ul style={{ paddingRight: '20px', paddingLeft: 0, margin: 0, textAlign: 'right' }}>
+                {internship.careerPaths.map((path: string, idx: number) => (
                   <li key={idx}>{path}</li>
                 ))}
               </ul>
-              <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>
-                מיומנויות נרכשות:
-              </Typography>
-              <ul>
-                {internship.skills.map((skill, idx) => (
-                  <li key={idx}>{skill}</li>
-                ))}
-              </ul>
+
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1, textAlign: 'right' }}>
+                  מיומנויות נרכשות:
+                </Typography>
+                <ul style={{ paddingRight: '20px', paddingLeft: 0, margin: 0, textAlign: 'right' }}>
+                  {internship.skills.map((skill: string, idx: number) => (
+                    <li key={idx}>{skill}</li>
+                  ))}
+                </ul>
+              </Box>
             </Paper>
           </Grid>
         ))}
