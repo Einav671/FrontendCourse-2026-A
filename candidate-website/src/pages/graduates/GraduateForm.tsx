@@ -42,7 +42,7 @@ const GraduateForm: React.FC = () => {
   const [formData, setFormData] = useState<any>({
     fullName: '',
     role: '',
-    degree: 'מדעי המחשב',
+    degree: 'מדעי המחשב', // ברירת המחדל היא מדעי המחשב
     imageUrl: '',
     review: '',
     status: 'pending'
@@ -55,6 +55,7 @@ const GraduateForm: React.FC = () => {
     imageUrl: false,
     review: false,
   });
+
   useEffect(() => {
     if (isEditMode) {
       const saved = JSON.parse(localStorage.getItem('graduates') || '[]');
@@ -63,20 +64,19 @@ const GraduateForm: React.FC = () => {
     }
   }, [id, isEditMode]);
 
-    const isFormValid = Object.values(errors).every((error) => !error) && Object.values(formData).every((value) => value !== "");
-const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     
     setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
     
-    // בדיקה בטוחה: אם יש validity (כמו בטקסט רגיל) נשתמש בו.
-    // אם אין (כמו לפעמים ב-Select), נבדוק פשוט שהערך לא ריק.
     const isValid = event.target.validity 
         ? event.target.validity.valid 
-        : value !== ''; // בדיקת גיבוי
+        : value !== ''; 
 
     setErrors((prevErrors) => ({ ...prevErrors, [name]: !isValid }));
   };
+
+  const isFormValid = Object.values(errors).every((error) => !error) && Object.values(formData).every((value) => value !== "");
 
   const handleSave = () => {
     if (!formData.fullName || !formData.role) {
@@ -132,15 +132,17 @@ const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
               placeholder="למשל: מפתח Full Stack"
             />
           </Grid>
+          
           <Grid item xs={6}>
             <TextField
               select fullWidth label="תואר" name="degree"
               value={formData.degree} onChange={handleChange}
             >
                 <MenuItem value="מדעי המחשב">מדעי המחשב</MenuItem>
-                <MenuItem value="מערכות מידע">מערכות מידע</MenuItem>
             </TextField>
           </Grid>
+          {/* ------------------------------------------- */}
+
           <Grid item xs={12}>
             <TextField
               fullWidth label="קישור לתמונה (URL)" name="imageUrl"
