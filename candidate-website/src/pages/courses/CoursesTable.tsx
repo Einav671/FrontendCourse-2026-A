@@ -24,9 +24,6 @@ const CoursesTable: React.FC = () => {
   const [courses, setCourses] = useState<Course[]>([]);
   const LOCAL_STORAGE_KEY = 'my-courses';
 
-  // --------------------------------------------------------
-  // דרישה 1: טעינת נתונים מ-localStorage
-  // --------------------------------------------------------
   useEffect(() => {
     const savedCourses = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (savedCourses) {
@@ -38,9 +35,6 @@ const CoursesTable: React.FC = () => {
     }
   }, []);
 
-  // --------------------------------------------------------
-  // דרישה 2: פונקציה להוספת אובייקט אקראי
-  // --------------------------------------------------------
   const addRandomCourse = () => {
     const names = ["סדנת לינוקס", "מבוא לסייבר", "תכנות מונחה עצמים", "מסדי נתונים", "לוגיקה"];
     const types = ["חובה", "בחירה"];
@@ -60,9 +54,6 @@ const CoursesTable: React.FC = () => {
     setCourses(prevCourses => [...prevCourses, newCourse]);
   };
 
-  // --------------------------------------------------------
-  // דרישה 3: שמירת הנתונים ל-localStorage
-  // --------------------------------------------------------
   const saveToLocalStorage = () => {
     const jsonString = JSON.stringify(courses);
     localStorage.setItem(LOCAL_STORAGE_KEY, jsonString);
@@ -70,35 +61,32 @@ const CoursesTable: React.FC = () => {
   };
 
   const clearTable = () => {
-      setCourses([]);
-      localStorage.removeItem(LOCAL_STORAGE_KEY);
+    setCourses([]);
+    localStorage.removeItem(LOCAL_STORAGE_KEY);
   }
 
   return (
     <div className="courses-container">
       {/* כפתורי פעולה */}
       <div className="actions-bar" style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '20px' }}>
-        
-        {/* --- כפתור חדש: מעבר לטופס יצירה --- */}
-        <Button 
-            variant="contained" 
-            color="primary" 
-            onClick={() => navigate('/courses/new')} 
-            startIcon={<AddIcon />}
-            sx={{ fontWeight: 'bold' }}
+
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => navigate('/courses/new')}
+          startIcon={<AddIcon />}
+          sx={{ fontWeight: 'bold' }}
         >
           צור קורס חדש (טופס)
         </Button>
 
-        {/* --- כפתור להוספת קורס רנדומלי (להסרה)--- */}
         <Button variant="contained" color='info' onClick={addRandomCourse}>
           <AddIcon fontSize='small' sx={{ mr: 1 }} /> הוסף קורס אקראי
         </Button>
-        {/* --- כפתור לשמירת שינויים ב-Local Storage --- */}
         <Button variant="contained" color='success' onClick={saveToLocalStorage}>
           <SaveIcon fontSize='small' sx={{ mr: 1 }} /> שמור שינויים
         </Button>
-        
+
         <Button variant="contained" color='error' onClick={clearTable}>
           אפס טבלה
         </Button>
@@ -120,17 +108,16 @@ const CoursesTable: React.FC = () => {
           <TableBody>
             {courses.map((course) => (
               <TableRow key={course.id}>
-                {/* כפתור עריכה לכל שורה */}
                 <TableCell align="center">
-                  <IconButton 
-                    color="primary" 
+                  <IconButton
+                    color="primary"
                     onClick={() => navigate(`/courses/edit/${course.id}`)}
                     aria-label="edit"
                   >
                     <EditIcon />
                   </IconButton>
                 </TableCell>
-                
+
                 <TableCell align="center">{course.code}</TableCell>
                 <TableCell align="right">{course.name}</TableCell>
                 <TableCell align="center">{course.credits}</TableCell>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Container, Typography, TextField, Button, Paper, Grid, MenuItem 
+import {
+  Container, Typography, TextField, Button, Paper, Grid, MenuItem
 } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
@@ -43,36 +43,34 @@ const CandidateForm: React.FC = () => {
     }
   }, [id, isEditMode]);
 
-const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-    
+
     setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-    
-    // בדיקה בטוחה: אם יש validity (כמו בטקסט רגיל) נשתמש בו.
-    // אם אין (כמו לפעמים ב-Select), נבדוק פשוט שהערך לא ריק.
-    const isValid = event.target.validity 
-        ? event.target.validity.valid 
-        : value !== ''; // בדיקת גיבוי
+
+    const isValid = event.target.validity
+      ? event.target.validity.valid
+      : value !== ''; // בדיקת גיבוי
 
     setErrors((prevErrors) => ({ ...prevErrors, [name]: !isValid }));
   };
 
   const handleSave = () => {
     const savedCandidates = JSON.parse(localStorage.getItem('candidates') || '[]');
-    
+
     const candidateData = new Candidate(
-        isEditMode ? id! : Date.now().toString(),
-        formData.fullName,
-        formData.email,
-        formData.phone,
-        formData.degreeCode, // יישמר תמיד כ-'CS'
-        Number(formData.bagrut),
-        Number(formData.psychometric),
-        formData.status
+      isEditMode ? id! : Date.now().toString(),
+      formData.fullName,
+      formData.email,
+      formData.phone,
+      formData.degreeCode, // יישמר תמיד כ-'CS'
+      Number(formData.bagrut),
+      Number(formData.psychometric),
+      formData.status
     );
 
     if (isEditMode) {
-      const updatedCandidates = savedCandidates.map((c: any) => 
+      const updatedCandidates = savedCandidates.map((c: any) =>
         c.id === id ? candidateData : c
       );
       localStorage.setItem('candidates', JSON.stringify(updatedCandidates));
@@ -83,8 +81,8 @@ const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     navigate('/candidates');
   };
 
-  const isFormValid = Object.values(errors).every((error) => !error) && 
-                      Object.values(formData).every((value) => value !== "");
+  const isFormValid = Object.values(errors).every((error) => !error) &&
+    Object.values(formData).every((value) => value !== "");
 
   return (
     <Container maxWidth="sm" sx={{ mt: 4 }}>
@@ -94,7 +92,7 @@ const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         </Typography>
 
         <Grid container spacing={2}>
-          
+
           <Grid item xs={12}>
             <TextField
               fullWidth
@@ -136,7 +134,7 @@ const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
               inputProps={{ pattern: "[0-9]{10}", maxLength: 10 }}
             />
           </Grid>
-          
+
           {/* שדה תואר - תצוגה בלבד ללא אפשרות שינוי */}
           <Grid item xs={12}>
             <TextField
@@ -202,19 +200,19 @@ const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         </Grid>
 
         <div style={{ marginTop: '24px', display: 'flex', gap: '10px' }}>
-          <Button 
-            variant="contained" 
-            color="primary" 
+          <Button
+            variant="contained"
+            color="primary"
             startIcon={<SaveIcon />}
             onClick={handleSave}
             disabled={!isFormValid}
           >
             שמור
           </Button>
-          
-          <Button 
-            variant="outlined" 
-            color="secondary" 
+
+          <Button
+            variant="outlined"
+            color="secondary"
             startIcon={<ArrowForwardIcon />}
             onClick={() => navigate('/candidates')}
           >

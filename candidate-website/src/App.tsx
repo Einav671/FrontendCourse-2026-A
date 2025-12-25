@@ -76,14 +76,14 @@ function App() {
           <Route path="/internships/new" element={<InternshipForm />} />
           
           {/* ------------------------------------------------------- */}
-          {/* --- נתיבים לבוגרים (החזרנו את זה!) --- */}
+          {/* --- נתיבים לבוגרים --- */}
           {/* ------------------------------------------------------- */}
           <Route path="/graduates" element={<GraduatesManagement />} />
           <Route path="/graduates/new" element={<GraduateForm />} />
           <Route path="/graduates/edit/:id" element={<GraduateForm />} />
 
           {/* ------------------------------------------------------- */}
-          {/* --- נתיבים להתראות מערכת (חדש!) --- */}
+          {/* --- נתיבים להתראות מערכת  --- */}
           {/* ------------------------------------------------------- */}
           <Route path="/alerts" element={<AlertsManagement />} />
           <Route path="/alerts/new" element={<AlertForm />} />

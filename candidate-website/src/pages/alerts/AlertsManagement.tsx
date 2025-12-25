@@ -25,12 +25,12 @@ const AlertsManagement: React.FC = () => {
   };
 
   const getTypeColor = (type: string) => {
-      switch(type) {
-          case 'success': return 'success';
-          case 'warning': return 'warning';
-          case 'error': return 'error';
-          default: return 'info';
-      }
+    switch (type) {
+      case 'success': return 'success';
+      case 'warning': return 'warning';
+      case 'error': return 'error';
+      default: return 'info';
+    }
   };
 
   return (
@@ -56,7 +56,7 @@ const AlertsManagement: React.FC = () => {
               <TableRow key={alert.id}>
                 <TableCell>{alert.message}</TableCell>
                 <TableCell align="center">
-                    <Chip label={alert.type} color={getTypeColor(alert.type) as any} size="small" />
+                  <Chip label={alert.type} color={getTypeColor(alert.type) as any} size="small" />
                 </TableCell>
                 <TableCell align="center">
                   <IconButton color="primary" onClick={() => navigate(`/alerts/edit/${alert.id}`)}><EditIcon /></IconButton>
@@ -65,9 +65,9 @@ const AlertsManagement: React.FC = () => {
               </TableRow>
             ))}
             {alerts.length === 0 && (
-                <TableRow>
-                    <TableCell colSpan={3} align="center">אין התראות פעילות כרגע</TableCell>
-                </TableRow>
+              <TableRow>
+                <TableCell colSpan={3} align="center">אין התראות פעילות כרגע</TableCell>
+              </TableRow>
             )}
           </TableBody>
         </Table>

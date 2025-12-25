@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Container, Typography, TextField, Button, Paper, Grid, Radio, FormControlLabel 
+import {
+  Container, Typography, TextField, Button, Paper, Grid, Radio, FormControlLabel
 } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
@@ -10,7 +10,7 @@ import { Course } from './Course';
 const CourseForm: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams(); // אם יש ID ב-URL, אנחנו במצב עריכה
-  
+
   const isEditMode = !!id; // בוליאני - האם עריכה או יצירה
 
   // State לטופס
@@ -44,16 +44,14 @@ const CourseForm: React.FC = () => {
     }
   }, [id, isEditMode]);
 
- const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-    
+
     setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-    
-    // בדיקה בטוחה: אם יש validity (כמו בטקסט רגיל) נשתמש בו.
-    // אם אין (כמו לפעמים ב-Select), נבדוק פשוט שהערך לא ריק.
-    const isValid = event.target.validity 
-        ? event.target.validity.valid 
-        : value !== ''; // בדיקת גיבוי
+
+    const isValid = event.target.validity
+      ? event.target.validity.valid
+      : value !== ''; // בדיקת גיבוי
 
     setErrors((prevErrors) => ({ ...prevErrors, [name]: !isValid }));
   };
@@ -63,21 +61,21 @@ const CourseForm: React.FC = () => {
 
     if (isEditMode) {
       // עדכון קיים
-      const updatedCourses = savedCourses.map((c: Course) => 
+      const updatedCourses = savedCourses.map((c: Course) =>
         c.id === id ? { ...formData, id } : c
       );
       localStorage.setItem('my-courses', JSON.stringify(updatedCourses));
     } else {
       // יצירה חדשה
-      const newCourse = { 
-        ...formData, 
-        id: Date.now().toString() 
+      const newCourse = {
+        ...formData,
+        id: Date.now().toString()
       };
       localStorage.setItem('my-courses', JSON.stringify([...savedCourses, newCourse]));
     }
 
     // החזרה לדף הקודם
-    navigate('/management'); 
+    navigate('/management');
   };
 
   const isFormValid = Object.values(errors).every((error) => !error) && Object.values(formData).every((value) => value !== "");
@@ -193,19 +191,19 @@ const CourseForm: React.FC = () => {
         </Grid>
 
         <div style={{ marginTop: '24px', display: 'flex', gap: '10px' }}>
-          <Button 
-            variant="contained" 
-            color="primary" 
+          <Button
+            variant="contained"
+            color="primary"
             startIcon={<SaveIcon />}
             onClick={handleSave}
             disabled={!isFormValid} // Disable button if form is invalid
           >
             שמור וחזור
           </Button>
-          
-          <Button 
-            variant="outlined" 
-            color="secondary" 
+
+          <Button
+            variant="outlined"
+            color="secondary"
             startIcon={<ArrowForwardIcon />}
             onClick={() => navigate('/management')}
           >

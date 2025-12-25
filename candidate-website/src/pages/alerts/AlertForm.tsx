@@ -11,14 +11,14 @@ const AlertForm: React.FC = () => {
   const { id } = useParams();
   const isEdit = !!id;
 
-  const [formData, setFormData] = useState({ 
-    message: '', 
-    type: 'info' 
+  const [formData, setFormData] = useState({
+    message: '',
+    type: 'info'
   });
 
-  const [errors, setErrors] = useState({ 
+  const [errors, setErrors] = useState({
     message: false,
-    type: false 
+    type: false
   });
 
   useEffect(() => {
@@ -32,14 +32,12 @@ const AlertForm: React.FC = () => {
   // --- התיקון נמצא כאן ---
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-    
+
     setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-    
-    // בדיקה בטוחה: אם יש validity (כמו בטקסט רגיל) נשתמש בו.
-    // אם אין (כמו לפעמים ב-Select), נבדוק פשוט שהערך לא ריק.
-    const isValid = event.target.validity 
-        ? event.target.validity.valid 
-        : value !== ''; // בדיקת גיבוי
+
+    const isValid = event.target.validity
+      ? event.target.validity.valid
+      : value !== ''; // בדיקת גיבוי
 
     setErrors((prevErrors) => ({ ...prevErrors, [name]: !isValid }));
   };
@@ -47,11 +45,11 @@ const AlertForm: React.FC = () => {
 
   const handleSave = () => {
     const saved = JSON.parse(localStorage.getItem('system-alerts') || '[]');
-    
+
     const newAlert = new SystemAlert(
-        isEdit ? id! : Date.now().toString(),
-        formData.message,
-        formData.type
+      isEdit ? id! : Date.now().toString(),
+      formData.message,
+      formData.type
     );
 
     if (isEdit) {
@@ -63,68 +61,68 @@ const AlertForm: React.FC = () => {
     navigate('/alerts');
   };
 
-  const isFormValid = Object.values(errors).every((error) => !error) && 
-                      Object.values(formData).every((value) => value !== "");
+  const isFormValid = Object.values(errors).every((error) => !error) &&
+    Object.values(formData).every((value) => value !== "");
 
   return (
     <Container maxWidth="sm" sx={{ mt: 4 }}>
       <Paper elevation={3} sx={{ p: 4 }}>
         <Typography variant="h5" sx={{ mb: 3, fontWeight: 'bold' }}>
-            {isEdit ? 'עריכת התראה' : 'התראה חדשה'}
+          {isEdit ? 'עריכת התראה' : 'התראה חדשה'}
         </Typography>
 
         <Grid container spacing={2}>
-            <Grid item xs={12}>
-                <TextField 
-                    fullWidth 
-                    label="תוכן ההודעה" 
-                    name="message" 
-                    value={formData.message} 
-                    onChange={handleChange}
-                    required 
-                    error={!!errors.message} 
-                    helperText={errors.message ? "תוכן ההודעה נדרש" : ""}
-                />
-            </Grid>
+          <Grid item xs={12}>
+            <TextField
+              fullWidth
+              label="תוכן ההודעה"
+              name="message"
+              value={formData.message}
+              onChange={handleChange}
+              required
+              error={!!errors.message}
+              helperText={errors.message ? "תוכן ההודעה נדרש" : ""}
+            />
+          </Grid>
 
-            <Grid item xs={12}>
-                <TextField 
-                    select 
-                    fullWidth 
-                    label="סוג התראה" 
-                    name="type" 
-                    value={formData.type} 
-                    onChange={handleChange}
-                    required 
-                    error={!!errors.type}
-                >
-                    <MenuItem value="success">הצלחה (ירוק)</MenuItem>
-                    <MenuItem value="warning">אזהרה (כתום)</MenuItem>
-                    <MenuItem value="error">שגיאה (אדום)</MenuItem>
-                    <MenuItem value="info">מידע (כחול)</MenuItem>
-                </TextField>
-            </Grid>
+          <Grid item xs={12}>
+            <TextField
+              select
+              fullWidth
+              label="סוג התראה"
+              name="type"
+              value={formData.type}
+              onChange={handleChange}
+              required
+              error={!!errors.type}
+            >
+              <MenuItem value="success">הצלחה (ירוק)</MenuItem>
+              <MenuItem value="warning">אזהרה (כתום)</MenuItem>
+              <MenuItem value="error">שגיאה (אדום)</MenuItem>
+              <MenuItem value="info">מידע (כחול)</MenuItem>
+            </TextField>
+          </Grid>
         </Grid>
 
         <div style={{ marginTop: '24px', display: 'flex', gap: '10px' }}>
-            <Button 
-                variant="contained" 
-                color="primary" 
-                startIcon={<SaveIcon />} 
-                onClick={handleSave}
-                disabled={!isFormValid}
-            >
-                שמור וחזור
-            </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            startIcon={<SaveIcon />}
+            onClick={handleSave}
+            disabled={!isFormValid}
+          >
+            שמור וחזור
+          </Button>
 
-            <Button 
-                variant="outlined" 
-                color="secondary" 
-                startIcon={<ArrowForwardIcon />} 
-                onClick={() => navigate('/alerts')}
-            >
-                ביטול
-            </Button>
+          <Button
+            variant="outlined"
+            color="secondary"
+            startIcon={<ArrowForwardIcon />}
+            onClick={() => navigate('/alerts')}
+          >
+            ביטול
+          </Button>
         </div>
 
       </Paper>
