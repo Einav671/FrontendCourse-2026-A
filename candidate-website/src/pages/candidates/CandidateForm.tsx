@@ -14,7 +14,8 @@ const CandidateForm: React.FC = () => {
 
   // 1. State לנתונים - degreeCode מקובע ל-'CS'
   const [formData, setFormData] = useState({
-    fullName: '',
+    firstName: '',
+    lastName: '',
     email: '',
     phone: '',
     degreeCode: 'CS', // קבוע למדעי המחשב
@@ -24,7 +25,8 @@ const CandidateForm: React.FC = () => {
   });
 
   const [errors, setErrors] = useState({
-    fullName: false,
+    firstName: false,
+    lastName: false,
     email: false,
     phone: false,
     degreeCode: false,
@@ -60,7 +62,8 @@ const CandidateForm: React.FC = () => {
 
     const candidateData = new Candidate(
       isEditMode ? id! : Date.now().toString(),
-      formData.fullName,
+      formData.firstName,
+      formData.lastName,
       formData.email,
       formData.phone,
       formData.degreeCode, // יישמר תמיד כ-'CS'
@@ -93,16 +96,29 @@ const CandidateForm: React.FC = () => {
 
         <Grid container spacing={2}>
 
-          <Grid item xs={12}>
+          <Grid item xs={6}>
             <TextField
               fullWidth
-              label="שם מלא"
-              name="fullName"
-              value={formData.fullName}
+              label="שם פרטי"
+              name="firstName"
+              value={formData.firstName}
               onChange={handleChange}
               required
-              error={!!errors.fullName}
-              helperText={errors.fullName ? "שם מלא הוא שדה חובה" : ""}
+              error={!!errors.firstName}
+              helperText={errors.firstName ? "שם פרטי הוא שדה חובה" : ""}
+            />
+          </Grid>
+
+          <Grid item xs={6}>
+            <TextField
+              fullWidth
+              label="שם משפחה"
+              name="lastName"
+              value={formData.lastName}
+              onChange={handleChange}
+              required
+              error={!!errors.lastName}
+              helperText={errors.lastName ? "שם משפחה הוא שדה חובה" : ""}
             />
           </Grid>
 

@@ -1,6 +1,7 @@
 export class Candidate {
   id: string;
-  fullName: string;
+  firstName: string;
+  lastName: string;
   email: string;
   phone: string;
   degreeCode: string;
@@ -10,7 +11,8 @@ export class Candidate {
 
   constructor(
     id: string,
-    fullName: string,
+    firstName: string,
+    lastName: string,
     email: string,
     phone: string,
     degreeCode: string,
@@ -19,7 +21,8 @@ export class Candidate {
     status: string
   ) {
     this.id = id;
-    this.fullName = fullName;
+    this.firstName = firstName;
+    this.lastName = lastName;
     this.email = email;
     this.phone = phone;
     this.degreeCode = degreeCode;

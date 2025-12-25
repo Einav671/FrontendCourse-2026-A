@@ -86,7 +86,6 @@ const ScholarshipForm: React.FC = () => {
 
     const saved = JSON.parse(localStorage.getItem('scholarships') || '[]');
     const newItem = new Scholarship(
-        isEditMode ? id! : Date.now().toString(),
         formData.code,
         formData.name,
         formData.targetAudience,
@@ -94,6 +93,7 @@ const ScholarshipForm: React.FC = () => {
         formData.link,
         formData.conditions
     );
+    (newItem as any).id = isEditMode ? id : Date.now().toString();
 
     if (isEditMode) {
       const updated = saved.map((item: any) => item.id === id ? newItem : item);
