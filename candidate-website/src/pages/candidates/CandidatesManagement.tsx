@@ -18,8 +18,8 @@ const CandidatesManagement: React.FC = () => {
     } else {
       // נתוני דמו אם אין כלום
       setCandidates([
-        new Candidate("1", "ישראל", "ישראלי", "israel@test.com", "050-1234567", "חדש"),
-        new Candidate("2", "דנה", "כהן", "dana@test.com", "052-7654321", "בטיפול")
+        new Candidate("1", "ישראל", "ישראלי", "israel@test.com", "0501234567", "CS", 85, 650, "נפתח"),
+        new Candidate("2", "דנה", "כהן", "dana@test.com", "0527654321", "CS", 90, 700, "בטיפול")
       ]);
     }
   }, []);
@@ -35,10 +35,11 @@ const CandidatesManagement: React.FC = () => {
   // צבע לסטטוס
   const getStatusColor = (status: string) => {
       switch(status) {
-          case 'חדש': return 'info';
+          case 'נפתח': return 'info';
           case 'בטיפול': return 'warning';
           case 'התקבל': return 'success';
           case 'נדחה': return 'error';
+          case 'נסגר': return 'default';
           default: return 'default';
       }
   };

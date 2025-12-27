@@ -76,6 +76,7 @@ const ScholarshipsManagement: React.FC = () => {
               <TableCell><b>שם המלגה</b></TableCell>
               <TableCell><b>קהל יעד</b></TableCell>
               <TableCell><b>סכום</b></TableCell>
+              <TableCell><b>קישור לאתר</b></TableCell>
               <TableCell><b>תנאים</b></TableCell>
               <TableCell align="center"><b>פעולות</b></TableCell>
             </TableRow>
@@ -93,6 +94,9 @@ const ScholarshipsManagement: React.FC = () => {
                     <TableCell>{s.targetAudience}</TableCell>
                     <TableCell>
                         <Chip label={`₪${s.amount.toLocaleString()}`} color="success" variant="outlined" size="small" />
+                    </TableCell>
+                    <TableCell>
+                        {s.link ? <a href={s.link} target="_blank" rel="noopener noreferrer">{s.link}</a> : '-'}
                     </TableCell>
                     <TableCell sx={{ maxWidth: 200, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {s.conditions}
