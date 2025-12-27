@@ -38,16 +38,8 @@ const ScholarshipsManagement: React.FC = () => {
       // אם יש נתונים בזיכרון - טען אותם
       setScholarships(JSON.parse(saved));
     } else {
-      // --- השינוי כאן: אם אין נתונים, טען את ברירת המחדל ---
-      const defaultScholarships = [
-        new Scholarship("1", "PRES-700", "מלגת מצטייני נשיא", "מצטיינים", 10000, "", "ציון פסיכומטרי מעל 700"),
-        new Scholarship("2", "BAG-110", "מלגת הישגים בבגרות", "תיכון", 5000, "", "ממוצע בגרות מעל 110"),
-        new Scholarship("3", "TECH-NEW", "מלגת עידוד טכנולוגי", "נרשמים חדשים", 2000, "", "מענק חד פעמי לנרשמים החודש")
-      ];
-      
-      setScholarships(defaultScholarships);
-      // שומרים בזיכרון כדי שיישמר לפעם הבאה
-      localStorage.setItem('scholarships', JSON.stringify(defaultScholarships));
+      // --- שינוי: מתחילים עם רשימה ריקה ---
+      setScholarships([]); 
     }
   }, []);
 
@@ -84,7 +76,7 @@ const ScholarshipsManagement: React.FC = () => {
           <TableBody>
             {scholarships.length === 0 ? (
                 <TableRow>
-                    <TableCell colSpan={6} align="center">לא נמצאו מלגות. לחץ על "הוסף מלגה" כדי להתחיל.</TableCell>
+                    <TableCell colSpan={7} align="center">לא נמצאו מלגות. לחץ על "הוסף מלגה" כדי להתחיל.</TableCell>
                 </TableRow>
             ) : (
                 scholarships.map((s: any) => (
@@ -96,7 +88,7 @@ const ScholarshipsManagement: React.FC = () => {
                         <Chip label={`₪${s.amount.toLocaleString()}`} color="success" variant="outlined" size="small" />
                     </TableCell>
                     <TableCell>
-                        {s.link ? <a href={s.link} target="_blank" rel="noopener noreferrer">{s.link}</a> : '-'}
+                        {s.link ? <a href={s.link} target="_blank" rel="noopener noreferrer">קישור</a> : '-'}
                     </TableCell>
                     <TableCell sx={{ maxWidth: 200, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {s.conditions}
