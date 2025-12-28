@@ -149,6 +149,7 @@ const GraduateForm: React.FC = () => {
               value={formData.imageUrl} onChange={handleChange}
               error={!!errors.imageUrl}
               helperText={errors.imageUrl ? 'קישור לתמונה חובה' : ''}
+              type='url'
               required
               placeholder="https://example.com/photo.jpg"
             />
