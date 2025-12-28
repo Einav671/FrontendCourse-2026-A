@@ -22,3 +22,4 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_CANDIDATE_WEBSITE_81F63 }}
           channelId: live
           projectId: candidate-website-81f63
+          entryPoint: candidate-website
