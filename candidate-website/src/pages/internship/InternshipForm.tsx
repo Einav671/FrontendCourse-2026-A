@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, TextField, Button, Paper, Grid, MenuItem, Box } from '@mui/material';
+import { 
+  Container, Typography, TextField, Button, Paper, MenuItem, Box, 
+  Snackbar, Alert, Stack 
+} from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useNavigate, useParams } from 'react-router-dom';
+
+// אייקונים
 import SchoolIcon from '@mui/icons-material/School';
 import CodeIcon from '@mui/icons-material/Code';
 import SecurityIcon from '@mui/icons-material/Security';
@@ -12,13 +17,14 @@ import BuildIcon from '@mui/icons-material/Build';
 import DeveloperModeIcon from '@mui/icons-material/DeveloperMode';
 import SettingsEthernetIcon from '@mui/icons-material/SettingsEthernet';
 
+// --- הגדרת המחלקה ---
 export class Internship {
   id: string;
   title: string;
   description: string;
   careerPaths: string[];
   skills: string[];
-  icon: string; // key for selected icon
+  icon: string;
 
   constructor(
     id: string,
@@ -37,12 +43,25 @@ export class Internship {
   }
 }
 
+// הגדרת טיפוס ל-State של הטופס (חשוב לתיקון השגיאות)
+interface InternshipFormState {
+    title: string;
+    description: string;
+    careerPaths: string; // בטופס זה מחרוזת אחת ארוכה
+    skills: string;      // בטופס זה מחרוזת אחת ארוכה
+    icon: string;
+}
+
 const InternshipForm: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditMode = !!id;
 
-  const [formData, setFormData] = useState<any>({
+  // סטייט להודעת הצלחה
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  // סטייט לנתונים עם טיפוס מוגדר
+  const [formData, setFormData] = useState<InternshipFormState>({
     title: '',
     description: '',
     careerPaths: '',
@@ -56,29 +75,40 @@ const InternshipForm: React.FC = () => {
     careerPaths: false,
     skills: false
   });
+
   useEffect(() => {
     if (isEditMode) {
       const saved = JSON.parse(localStorage.getItem('internships') || '[]');
       const itemToEdit = saved.find((i: any) => i.id === id);
-      if (itemToEdit) setFormData(itemToEdit);
+      
+      if (itemToEdit) {
+        setFormData({
+            title: itemToEdit.title,
+            description: itemToEdit.description,
+            // המרה ממערך למחרוזת עבור הטופס
+            careerPaths: Array.isArray(itemToEdit.careerPaths) ? itemToEdit.careerPaths.join(', ') : itemToEdit.careerPaths,
+            skills: Array.isArray(itemToEdit.skills) ? itemToEdit.skills.join(', ') : itemToEdit.skills,
+            icon: itemToEdit.icon
+        });
+      }
     }
   }, [id, isEditMode]);
 
-const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     
+    // כעת TS מבין ש-name הוא מפתח חוקי ב-InternshipFormState
     setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
     
-    // בדיקה בטוחה: אם יש validity (כמו בטקסט רגיל) נשתמש בו.
-    // אם אין (כמו לפעמים ב-Select), נבדוק פשוט שהערך לא ריק.
     const isValid = event.target.validity 
         ? event.target.validity.valid 
-        : value !== ''; // בדיקת גיבוי
+        : value !== ''; 
 
     setErrors((prevErrors) => ({ ...prevErrors, [name]: !isValid }));
   };
 
-  const isFormValid = Object.values(errors).every((error) => !error) && Object.values(formData).every((value) => value !== "");
+  const isFormValid = Object.values(errors).every((error) => !error) && 
+                      Object.values(formData).every((value) => value !== "");
 
   const handleSave = () => {
     if (!formData.title || !formData.description) {
@@ -92,6 +122,7 @@ const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
       isEditMode ? id! : Date.now().toString(),
       formData.title,
       formData.description,
+      // המרה ממחרוזת למערך בעת השמירה
       formData.careerPaths.split(',').map((s: string) => s.trim()).filter(Boolean),
       formData.skills.split(',').map((s: string) => s.trim()).filter(Boolean),
       formData.icon
@@ -103,7 +134,12 @@ const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     } else {
       localStorage.setItem('internships', JSON.stringify([...saved, newItem]));
     }
-    navigate('/internships');
+
+    // הצגת הודעת הצלחה וניווט
+    setShowSuccess(true);
+    setTimeout(() => {
+        navigate('/internships');
+    }, 1500);
   };
 
   return (
@@ -113,8 +149,8 @@ const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
           {isEditMode ? 'עריכת מסלול התמחות' : 'הוספת מסלול התמחות חדש'}
         </Typography>
 
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
+        {/* החלפת Grid ב-Stack */}
+        <Stack spacing={3}>
             <TextField
               fullWidth
               label="כותרת המסלול"
@@ -125,8 +161,7 @@ const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
               helperText={errors.title ? 'יש למלא כותרת' : ''}
               required
             />
-          </Grid>
-          <Grid item xs={12}>
+          
             <TextField
               fullWidth
               multiline
@@ -139,8 +174,7 @@ const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
               helperText={errors.description ? 'יש למלא תיאור' : ''}
               required
             />
-          </Grid>
-          <Grid item xs={12}>
+          
             <TextField
               fullWidth
               label="כיווני קריירה (מופרדים בפסיקים)"
@@ -148,11 +182,10 @@ const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
               value={formData.careerPaths}
               required
               error={!!errors.careerPaths}
-              helperText={errors.careerPaths ? '(לפחות אחד)יש למלא כיווני קריירה' : ''}
+              helperText={errors.careerPaths ? 'יש למלא כיווני קריירה (לפחות אחד)' : ''}
               onChange={handleChange}
             />
-          </Grid>
-          <Grid item xs={12}>
+          
             <TextField
               fullWidth
               label="מיומנויות נרכשות (מופרדות בפסיקים)"
@@ -160,11 +193,10 @@ const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
               value={formData.skills}
               required
               error={!!errors.skills}
-              helperText={errors.skills ? '(לפחות אחד)יש למלא מיומנויות נרכשות' : ''}
+              helperText={errors.skills ? 'יש למלא מיומנויות נרכשות (לפחות אחד)' : ''}
               onChange={handleChange}
             />
-          </Grid>
-          <Grid item xs={12}>
+          
             <TextField
               select
               fullWidth
@@ -222,23 +254,42 @@ const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
                 </Box>
               </MenuItem>
             </TextField>
-          </Grid>
-        </Grid>
 
-        <div style={{ marginTop: '24px', display: 'flex', gap: '10px' }}>
-          <Button variant="contained" onClick={handleSave} startIcon={<SaveIcon />} disabled={!isFormValid}>
-            שמור
-          </Button>
-          <Button
-            variant="outlined"
-            color="secondary"
-            onClick={() => navigate('/internships')}
-            startIcon={<ArrowForwardIcon />}
-          >
-            ביטול
-          </Button>
-        </div>
+            <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
+                <Button 
+                    variant="contained" 
+                    onClick={handleSave} 
+                    startIcon={<SaveIcon />} 
+                    disabled={!isFormValid}
+                    fullWidth
+                >
+                    שמור
+                </Button>
+                <Button
+                    variant="outlined"
+                    color="secondary"
+                    onClick={() => navigate('/internships')}
+                    startIcon={<ArrowForwardIcon />}
+                    fullWidth
+                >
+                    ביטול
+                </Button>
+            </Stack>
+        </Stack>
       </Paper>
+
+      {/* רכיב הודעת הצלחה */}
+      <Snackbar 
+        open={showSuccess} 
+        autoHideDuration={1500} 
+        onClose={() => setShowSuccess(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert severity="success" variant="filled" sx={{ width: '100%' }}>
+          המסלול נשמר בהצלחה!
+        </Alert>
+      </Snackbar>
+
     </Container>
   );
 };

@@ -10,14 +10,14 @@ import {
 import SendIcon from '@mui/icons-material/Send';
 
 const Forms: React.FC = () => {
-  // State לשמירת הנתונים של הטופס
+  // 1. תיקון: הוספת notes ל-State ההתחלתי
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
-    phone: ''
+    phone: '',
+    notes: '' // <--- הוספנו את זה כאן
   });
 
-  // State לשמירת השגיאות של הטופס
   const [errors, setErrors] = useState({
     fullName: false,
     email: false,
@@ -25,28 +25,28 @@ const Forms: React.FC = () => {
     notes: false
   });
 
-  // פונקציה שמתעדכנת בכל הקלדה
-const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     
     setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
     
-    // בדיקה בטוחה: אם יש validity (כמו בטקסט רגיל) נשתמש בו.
-    // אם אין (כמו לפעמים ב-Select), נבדוק פשוט שהערך לא ריק.
     const isValid = event.target.validity 
         ? event.target.validity.valid 
-        : value !== ''; // בדיקת גיבוי
+        : value !== ''; 
 
     setErrors((prevErrors) => ({ ...prevErrors, [name]: !isValid }));
   };
 
-    const isFormValid = Object.values(errors).every((error) => !error) && Object.values(formData).every((value) => value !== "");
-  // פונקציית שליחת הטופס
+  // 2. תיקון: בדיקת התקינות לא צריכה לכלול את notes (כי הוא אופציונלי)
+  // אנו בודקים שאין שגיאות באף שדה, ושרק שדות החובה מלאים
+  const isFormValid = 
+    !errors.fullName && !errors.email && !errors.phone && // אין שגיאות
+    formData.fullName !== "" && formData.email !== "" && formData.phone !== ""; // שדות חובה מלאים
+
   const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault(); // מניעת רענון דף
+    e.preventDefault();
     console.log('Form Submitted:', formData);
     alert(`תודה ${formData.fullName}, פרטייך התקבלו! נחזור אליך למספר ${formData.phone}`);
-    // כאן בעתיד נשלח את הנתונים לשרת או נשמור ב-LocalStorage
   };
 
   return (
@@ -97,10 +97,11 @@ const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
             fullWidth
           />
 
+          {/* כעת זה יעבוד כי notes קיים ב-formData */}
           <TextField
             label="הערות נוספות / שאלות"
             name="notes"
-            value={formData.notes}
+            value={formData.notes} 
             onChange={handleChange}
             multiline
             rows={4}

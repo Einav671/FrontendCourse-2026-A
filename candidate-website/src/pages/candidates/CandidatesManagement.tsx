@@ -46,7 +46,7 @@ const CandidatesManagement: React.FC = () => {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
         <Typography variant="h4" sx={{ fontWeight: 'bold' }}>ניהול מועמדים</Typography>
         <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/candidates/new')}>
           מועמד חדש

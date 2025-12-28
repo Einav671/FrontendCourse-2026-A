@@ -1,6 +1,8 @@
-// src/pages/alerts/AlertForm.tsx
 import React, { useState, useEffect } from 'react';
-import { Container, Paper, Typography, TextField, Button, Grid, MenuItem } from '@mui/material';
+import { 
+  Container, Paper, Typography, TextField, Button, MenuItem, 
+  Snackbar, Alert, Stack 
+} from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -10,6 +12,9 @@ const AlertForm: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEdit = !!id;
+
+  // סטייט להודעת הצלחה
+  const [showSuccess, setShowSuccess] = useState(false);
 
   const [formData, setFormData] = useState({
     message: '',
@@ -23,13 +28,19 @@ const AlertForm: React.FC = () => {
 
   useEffect(() => {
     if (isEdit) {
-      const saved = JSON.parse(localStorage.getItem('system-alerts') || '[]');
-      const found = saved.find((a: any) => a.id === id);
-      if (found) setFormData(found);
+      const saved: SystemAlert[] = JSON.parse(localStorage.getItem('system-alerts') || '[]');
+      const found = saved.find((a) => a.id === id);
+      
+      if (found) {
+        // תיקון: מעדכנים רק את השדות הרלוונטיים לטופס (בלי ה-ID)
+        setFormData({
+            message: found.message,
+            type: found.type
+        });
+      }
     }
   }, [id, isEdit]);
 
-  // --- התיקון נמצא כאן ---
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
 
@@ -37,14 +48,13 @@ const AlertForm: React.FC = () => {
 
     const isValid = event.target.validity
       ? event.target.validity.valid
-      : value !== ''; // בדיקת גיבוי
+      : value !== '';
 
     setErrors((prevErrors) => ({ ...prevErrors, [name]: !isValid }));
   };
-  // ----------------------
 
   const handleSave = () => {
-    const saved = JSON.parse(localStorage.getItem('system-alerts') || '[]');
+    const saved: SystemAlert[] = JSON.parse(localStorage.getItem('system-alerts') || '[]');
 
     const newAlert = new SystemAlert(
       isEdit ? id! : Date.now().toString(),
@@ -53,16 +63,21 @@ const AlertForm: React.FC = () => {
     );
 
     if (isEdit) {
-      const updated = saved.map((a: any) => a.id === id ? newAlert : a);
+      const updated = saved.map((a) => a.id === id ? newAlert : a);
       localStorage.setItem('system-alerts', JSON.stringify(updated));
     } else {
       localStorage.setItem('system-alerts', JSON.stringify([...saved, newAlert]));
     }
-    navigate('/alerts');
+    
+    // הצגת הודעת הצלחה וניווט
+    setShowSuccess(true);
+    setTimeout(() => {
+        navigate('/alerts');
+    }, 1500);
   };
 
   const isFormValid = Object.values(errors).every((error) => !error) &&
-    Object.values(formData).every((value) => value !== "");
+    formData.message !== "";
 
   return (
     <Container maxWidth="sm" sx={{ mt: 4 }}>
@@ -71,8 +86,8 @@ const AlertForm: React.FC = () => {
           {isEdit ? 'עריכת התראה' : 'התראה חדשה'}
         </Typography>
 
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
+        {/* החלפנו את Grid ב-Stack לסידור אנכי פשוט ונקי */}
+        <Stack spacing={3}>
             <TextField
               fullWidth
               label="תוכן ההודעה"
@@ -83,9 +98,7 @@ const AlertForm: React.FC = () => {
               error={!!errors.message}
               helperText={errors.message ? "תוכן ההודעה נדרש" : ""}
             />
-          </Grid>
 
-          <Grid item xs={12}>
             <TextField
               select
               fullWidth
@@ -101,31 +114,44 @@ const AlertForm: React.FC = () => {
               <MenuItem value="error">שגיאה (אדום)</MenuItem>
               <MenuItem value="info">מידע (כחול)</MenuItem>
             </TextField>
-          </Grid>
-        </Grid>
 
-        <div style={{ marginTop: '24px', display: 'flex', gap: '10px' }}>
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<SaveIcon />}
-            onClick={handleSave}
-            disabled={!isFormValid}
-          >
-            שמור וחזור
-          </Button>
+            <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    startIcon={<SaveIcon />}
+                    onClick={handleSave}
+                    disabled={!isFormValid}
+                    fullWidth
+                >
+                    שמור וחזור
+                </Button>
 
-          <Button
-            variant="outlined"
-            color="secondary"
-            startIcon={<ArrowForwardIcon />}
-            onClick={() => navigate('/alerts')}
-          >
-            ביטול
-          </Button>
-        </div>
-
+                <Button
+                    variant="outlined"
+                    color="secondary"
+                    startIcon={<ArrowForwardIcon />}
+                    onClick={() => navigate('/alerts')}
+                    fullWidth
+                >
+                    ביטול
+                </Button>
+            </div>
+        </Stack>
       </Paper>
+
+      {/* רכיב הודעת הצלחה */}
+      <Snackbar 
+        open={showSuccess} 
+        autoHideDuration={1500} 
+        onClose={() => setShowSuccess(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert severity="success" variant="filled" sx={{ width: '100%' }}>
+          הנתונים נשמרו בהצלחה!
+        </Alert>
+      </Snackbar>
+
     </Container>
   );
 };

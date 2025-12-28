@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, TextField, Button, Paper, Grid, MenuItem } from '@mui/material';
+import { 
+  Container, Typography, TextField, Button, Paper, MenuItem, 
+  Snackbar, Alert, Stack 
+} from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -34,21 +37,35 @@ export class Graduate {
 }
 // --------------------
 
+// הגדרת טיפוס ל-State של הטופס כדי למנוע שגיאות ב-setFormData
+interface GraduateFormState {
+    fullName: string;
+    role: string;
+    degree: string;
+    imageUrl: string;
+    review: string;
+    status: 'pending' | 'approved' | 'rejected';
+}
+
 const GraduateForm: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditMode = !!id;
 
-  const [formData, setFormData] = useState<any>({
+  // סטייט להודעת הצלחה
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  // סטייט לנתונים (עם טיפוס מוגדר)
+  const [formData, setFormData] = useState<GraduateFormState>({
     fullName: '',
     role: '',
-    degree: 'מדעי המחשב', // ברירת המחדל היא מדעי המחשב
+    degree: 'מדעי המחשב',
     imageUrl: '',
     review: '',
     status: 'pending'
   });
 
-  const [errors, setErrors] = useState<any>({
+  const [errors, setErrors] = useState({
     fullName: false,
     role: false,
     degree: false,
@@ -60,13 +77,24 @@ const GraduateForm: React.FC = () => {
     if (isEditMode) {
       const saved = JSON.parse(localStorage.getItem('graduates') || '[]');
       const itemToEdit = saved.find((g: any) => g.id === id);
-      if (itemToEdit) setFormData(itemToEdit);
+      if (itemToEdit) {
+          // מוודאים שאנחנו מכניסים רק את השדות הרלוונטיים ל-state
+          setFormData({
+              fullName: itemToEdit.fullName,
+              role: itemToEdit.role,
+              degree: itemToEdit.degree,
+              imageUrl: itemToEdit.imageUrl,
+              review: itemToEdit.review,
+              status: itemToEdit.status
+          });
+      }
     }
   }, [id, isEditMode]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     
+    // בגלל שהגדרנו Interface, טייפסקריפט עכשיו מבין מה זה prevFormData
     setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
     
     const isValid = event.target.validity 
@@ -76,14 +104,10 @@ const GraduateForm: React.FC = () => {
     setErrors((prevErrors) => ({ ...prevErrors, [name]: !isValid }));
   };
 
-  const isFormValid = Object.values(errors).every((error) => !error) && Object.values(formData).every((value) => value !== "");
+  const isFormValid = Object.values(errors).every((error) => !error) && 
+                      Object.values(formData).every((value) => value !== "");
 
   const handleSave = () => {
-    if (!formData.fullName || !formData.role) {
-        alert("יש למלא שם ותפקיד");
-        return;
-    }
-
     const saved = JSON.parse(localStorage.getItem('graduates') || '[]');
     
     const newItem = new Graduate(
@@ -102,7 +126,12 @@ const GraduateForm: React.FC = () => {
     } else {
       localStorage.setItem('graduates', JSON.stringify([...saved, newItem]));
     }
-    navigate('/graduates');
+
+    // הצגת הודעת הצלחה וניווט
+    setShowSuccess(true);
+    setTimeout(() => {
+        navigate('/graduates');
+    }, 1500);
   };
 
   return (
@@ -112,8 +141,9 @@ const GraduateForm: React.FC = () => {
           {isEditMode ? 'עריכת פרטי בוגר' : 'הוספת בוגר חדש'}
         </Typography>
 
-        <Grid container spacing={2}>
-          <Grid item xs={12}>
+        {/* שימוש ב-Stack במקום Grid */}
+        <Stack spacing={3}>
+            
             <TextField
               fullWidth label="שם מלא" name="fullName"
               value={formData.fullName} onChange={handleChange}
@@ -121,29 +151,26 @@ const GraduateForm: React.FC = () => {
               helperText={errors.fullName ? 'שם מלא חובה' : ''}
               required
             />
-          </Grid>
-          <Grid item xs={6}>
-            <TextField
-              fullWidth label="תפקיד נוכחי" name="role"
-              value={formData.role} onChange={handleChange}
-              error={!!errors.role}
-              helperText={errors.role ? 'תפקיד נוכחי חובה' : ''}
-              required
-              placeholder="למשל: מפתח Full Stack"
-            />
-          </Grid>
-          
-          <Grid item xs={6}>
-            <TextField
-              select fullWidth label="תואר" name="degree"
-              value={formData.degree} onChange={handleChange}
-            >
-                <MenuItem value="מדעי המחשב">מדעי המחשב</MenuItem>
-            </TextField>
-          </Grid>
-          {/* ------------------------------------------- */}
 
-          <Grid item xs={12}>
+            {/* שורה אחת לשני שדות קצרים */}
+            <Stack direction="row" spacing={2}>
+                <TextField
+                fullWidth label="תפקיד נוכחי" name="role"
+                value={formData.role} onChange={handleChange}
+                error={!!errors.role}
+                helperText={errors.role ? 'תפקיד חובה' : ''}
+                required
+                placeholder="למשל: מפתח Full Stack"
+                />
+                
+                <TextField
+                select fullWidth label="תואר" name="degree"
+                value={formData.degree} onChange={handleChange}
+                >
+                    <MenuItem value="מדעי המחשב">מדעי המחשב</MenuItem>
+                </TextField>
+            </Stack>
+
             <TextField
               fullWidth label="קישור לתמונה (URL)" name="imageUrl"
               value={formData.imageUrl} onChange={handleChange}
@@ -153,8 +180,7 @@ const GraduateForm: React.FC = () => {
               required
               placeholder="https://example.com/photo.jpg"
             />
-          </Grid>
-          <Grid item xs={12}>
+
             <TextField
               fullWidth multiline rows={4} label="סיפור הצלחה / חוות דעת" name="review"
               value={formData.review} onChange={handleChange}
@@ -162,10 +188,8 @@ const GraduateForm: React.FC = () => {
               helperText={errors.review ? 'חוות דעת חובה' : ''}
               required
             />
-          </Grid>
-          
-          {isEditMode && (
-              <Grid item xs={12}>
+            
+            {isEditMode && (
                 <TextField
                   select fullWidth label="סטטוס אישור" name="status"
                   value={formData.status} onChange={handleChange}
@@ -174,15 +198,44 @@ const GraduateForm: React.FC = () => {
                     <MenuItem value="approved">מאושר</MenuItem>
                     <MenuItem value="rejected">נדחה</MenuItem>
                 </TextField>
-              </Grid>
-          )}
-        </Grid>
+            )}
 
-        <div style={{ marginTop: '24px', display: 'flex', gap: '10px' }}>
-          <Button variant="contained" onClick={handleSave} startIcon={<SaveIcon />} disabled={!isFormValid}>שמור</Button>
-          <Button variant="outlined" color="secondary" onClick={() => navigate('/graduates')} startIcon={<ArrowForwardIcon />}>ביטול</Button>
-        </div>
+            {/* כפתורים */}
+            <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
+                <Button 
+                    variant="contained" 
+                    onClick={handleSave} 
+                    startIcon={<SaveIcon />} 
+                    disabled={!isFormValid}
+                    fullWidth
+                >
+                    שמור
+                </Button>
+                <Button 
+                    variant="outlined" 
+                    color="secondary" 
+                    onClick={() => navigate('/graduates')} 
+                    startIcon={<ArrowForwardIcon />}
+                    fullWidth
+                >
+                    ביטול
+                </Button>
+            </Stack>
+        </Stack>
       </Paper>
+
+      {/* רכיב הודעת הצלחה */}
+      <Snackbar 
+        open={showSuccess} 
+        autoHideDuration={1500} 
+        onClose={() => setShowSuccess(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert severity="success" variant="filled" sx={{ width: '100%' }}>
+          הנתונים נשמרו בהצלחה!
+        </Alert>
+      </Snackbar>
+
     </Container>
   );
 };

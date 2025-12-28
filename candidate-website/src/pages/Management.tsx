@@ -1,10 +1,8 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
 import CoursesTable from './courses/CoursesTable'; // הטבלה של החברים שלך
-import { Container, Typography, Grid, Card, CardActionArea, CardContent, Box } from '@mui/material';
+import { Container, Typography, Box } from '@mui/material';
 
 const Management: React.FC = () => {
-  const navigate = useNavigate();
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>

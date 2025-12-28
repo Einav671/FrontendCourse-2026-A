@@ -16,6 +16,7 @@ const InternshipsManagement: React.FC = () => {
 
   const defaultInternships = [
     {
+      // כדאי להוסיף כאן id ייחודי אם תרצה לאפשר עריכה של ברירות המחדל בעתיד
       title: 'בינה מלאכותית (AI)',
       description: 'מסלול זה מתמקד בפיתוח אלגוריתמים חכמים, למידת מכונה וניתוח נתונים.',
       careerPaths: ['חוקר AI', 'מהנדס למידת מכונה', 'מדען נתונים'],
@@ -85,7 +86,6 @@ const InternshipsManagement: React.FC = () => {
   }, []);
 
   return (
-    // dir="rtl" הופך את כל העמוד לימין-שמאל
     <Container maxWidth="lg" sx={{ mt: 4 }} dir="rtl">
       <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', mb: 3, textAlign: 'center' }}>
         מסלולי התמחות
@@ -94,7 +94,6 @@ const InternshipsManagement: React.FC = () => {
         גלו את המסלולים האקדמיים שלנו ובחרו בקריירה שמתאימה לכם
       </Typography>
 
-      {/* יישור הכפתור לימין */}
       <Box sx={{ display: 'flex', justifyContent: 'flex-start', mb: 4 }}>
         <Button
           variant="contained"
@@ -106,12 +105,11 @@ const InternshipsManagement: React.FC = () => {
         </Button>
       </Box>
 
-      {/* spacing={4} שומר על המרווחים המקוריים בין הקוביות */}
       <Grid container spacing={4}>
         {internships.map((internship, index) => (
-          <Grid item xs={12} md={6} lg={4} key={index}>
-            {/* p: 3 שומר על הריווח הפנימי המקורי */}
-            <Paper elevation={3} sx={{ p: 3, backgroundColor: internship.color }}>
+          // תיקון: Grid נקי ללא פרמטרים נוספים
+          <Grid key={index}>
+            <Paper elevation={3} sx={{ p: 3, backgroundColor: internship.color, height: '100%' }}>
               <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
                 {iconForKey(internship.icon)}
               </Box>
@@ -125,7 +123,6 @@ const InternshipsManagement: React.FC = () => {
               <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1, textAlign: 'right' }}>
                 כיווני קריירה:
               </Typography>
-              {/* paddingRight: '20px' - דואג שהנקודות יהיו מימין לטקסט במרחק נכון */}
               <ul style={{ paddingRight: '20px', paddingLeft: 0, margin: 0, textAlign: 'right' }}>
                 {internship.careerPaths.map((path: string, idx: number) => (
                   <li key={idx}>{path}</li>

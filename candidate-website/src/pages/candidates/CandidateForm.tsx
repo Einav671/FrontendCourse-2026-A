@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Container, Typography, TextField, Button, Paper, Grid, MenuItem
+  Container, Typography, TextField, Button, Paper, MenuItem,
+  Snackbar, Alert, Stack // החלפנו את Grid ב-Stack
 } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
@@ -12,13 +13,14 @@ const CandidateForm: React.FC = () => {
   const { id } = useParams();
   const isEditMode = !!id;
 
-  // 1. State לנתונים - degreeCode מקובע ל-'CS'
+  const [showSuccess, setShowSuccess] = useState(false);
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
     phone: '',
-    degreeCode: 'CS', // קבוע למדעי המחשב
+    degreeCode: 'CS',
     bagrut: '',
     psychometric: '',
     status: 'נפתח'
@@ -52,7 +54,7 @@ const CandidateForm: React.FC = () => {
 
     const isValid = event.target.validity
       ? event.target.validity.valid
-      : value !== ''; // בדיקת גיבוי
+      : value !== '';
 
     setErrors((prevErrors) => ({ ...prevErrors, [name]: !isValid }));
   };
@@ -66,7 +68,7 @@ const CandidateForm: React.FC = () => {
       formData.lastName,
       formData.email,
       formData.phone,
-      formData.degreeCode, // יישמר תמיד כ-'CS'
+      formData.degreeCode,
       Number(formData.bagrut),
       Number(formData.psychometric),
       formData.status
@@ -81,7 +83,10 @@ const CandidateForm: React.FC = () => {
       localStorage.setItem('candidates', JSON.stringify([...savedCandidates, candidateData]));
     }
 
-    navigate('/candidates');
+    setShowSuccess(true);
+    setTimeout(() => {
+        navigate('/candidates');
+    }, 1500);
   };
 
   const isFormValid = Object.values(errors).every((error) => !error) &&
@@ -94,9 +99,11 @@ const CandidateForm: React.FC = () => {
           {isEditMode ? 'עריכת מועמד' : 'מועמד חדש'}
         </Typography>
 
-        <Grid container spacing={2}>
-
-          <Grid item xs={6}>
+        {/* שימוש ב-Stack במקום Grid - הרבה יותר נקי */}
+        <Stack spacing={2}>
+          
+          {/* שורה ראשונה: שם פרטי ושם משפחה */}
+          <Stack direction="row" spacing={2}>
             <TextField
               fullWidth
               label="שם פרטי"
@@ -105,11 +112,8 @@ const CandidateForm: React.FC = () => {
               onChange={handleChange}
               required
               error={!!errors.firstName}
-              helperText={errors.firstName ? "שם פרטי הוא שדה חובה" : ""}
+              helperText={errors.firstName ? "שדה חובה" : ""}
             />
-          </Grid>
-
-          <Grid item xs={6}>
             <TextField
               fullWidth
               label="שם משפחה"
@@ -118,54 +122,46 @@ const CandidateForm: React.FC = () => {
               onChange={handleChange}
               required
               error={!!errors.lastName}
-              helperText={errors.lastName ? "שם משפחה הוא שדה חובה" : ""}
+              helperText={errors.lastName ? "שדה חובה" : ""}
             />
-          </Grid>
+          </Stack>
 
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              type="email"
-              label="אימייל"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              required
-              error={!!errors.email}
-              helperText={errors.email ? "אימייל לא תקין" : ""}
-            />
-          </Grid>
+          <TextField
+            fullWidth
+            type="email"
+            label="אימייל"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+            error={!!errors.email}
+            helperText={errors.email ? "אימייל לא תקין" : ""}
+          />
 
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              type="tel"
-              label="טלפון (10 ספרות)"
-              name="phone"
-              value={formData.phone}
-              onChange={handleChange}
-              required
-              error={!!errors.phone}
-              helperText={errors.phone ? "מספר טלפון חייב להכיל 10 ספרות בדיוק" : ""}
-              inputProps={{ pattern: "[0-9]{10}", maxLength: 10 }}
-            />
-          </Grid>
+          <TextField
+            fullWidth
+            type="tel"
+            label="טלפון (10 ספרות)"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            required
+            error={!!errors.phone}
+            helperText={errors.phone ? "נדרשות 10 ספרות" : ""}
+            inputProps={{ pattern: "[0-9]{10}", maxLength: 10 }}
+          />
 
-          {/* שדה תואר - תצוגה בלבד ללא אפשרות שינוי */}
-          <Grid item xs={12}>
-            <TextField
-              fullWidth
-              label="תואר התעניינות"
-              value="מדעי המחשב"
-              InputProps={{
-                readOnly: true,
-              }}
-              variant="filled"
-              helperText="מסלול לימודים קבוע"
-            />
-          </Grid>
+          <TextField
+            fullWidth
+            label="תואר התעניינות"
+            value="מדעי המחשב"
+            InputProps={{ readOnly: true }}
+            variant="filled"
+            helperText="מסלול לימודים קבוע"
+          />
 
-          <Grid item xs={6}>
+          {/* שורה לציונים */}
+          <Stack direction="row" spacing={2}>
             <TextField
               fullWidth
               type="number"
@@ -175,12 +171,9 @@ const CandidateForm: React.FC = () => {
               onChange={handleChange}
               required
               error={!!errors.bagrut}
-              helperText={errors.bagrut ? "טווח תקין: 55-120" : ""}
+              helperText={errors.bagrut ? "55-120" : ""}
               inputProps={{ min: 55, max: 120 }}
             />
-          </Grid>
-
-          <Grid item xs={6}>
             <TextField
               fullWidth
               type="number"
@@ -190,52 +183,66 @@ const CandidateForm: React.FC = () => {
               onChange={handleChange}
               required
               error={!!errors.psychometric}
-              helperText={errors.psychometric ? "טווח תקין: 200-800" : ""}
+              helperText={errors.psychometric ? "200-800" : ""}
               inputProps={{ min: 200, max: 800 }}
             />
-          </Grid>
+          </Stack>
 
-          <Grid item xs={12}>
-            <TextField
-              select
+          <TextField
+            select
+            fullWidth
+            label="סטטוס טיפול"
+            name="status"
+            value={formData.status}
+            onChange={handleChange}
+            required
+            error={!!errors.status}
+          >
+            <MenuItem value="נפתח">נפתח</MenuItem>
+            <MenuItem value="בטיפול">בטיפול</MenuItem>
+            <MenuItem value="התקבל">התקבל</MenuItem>
+            <MenuItem value="נדחה">נדחה</MenuItem>
+            <MenuItem value="נסגר">נסגר</MenuItem>
+          </TextField>
+
+          {/* כפתורים */}
+          <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<SaveIcon />}
+              onClick={handleSave}
+              disabled={!isFormValid}
               fullWidth
-              label="סטטוס טיפול"
-              name="status"
-              value={formData.status}
-              onChange={handleChange}
-              required
-              error={!!errors.status}
             >
-              <MenuItem value="נפתח">נפתח</MenuItem>
-              <MenuItem value="בטיפול">בטיפול</MenuItem>
-              <MenuItem value="התקבל">התקבל</MenuItem>
-              <MenuItem value="נדחה">נדחה</MenuItem>
-              <MenuItem value="נסגר">נסגר</MenuItem>
-            </TextField>
-          </Grid>
-        </Grid>
+              שמור
+            </Button>
 
-        <div style={{ marginTop: '24px', display: 'flex', gap: '10px' }}>
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<SaveIcon />}
-            onClick={handleSave}
-            disabled={!isFormValid}
-          >
-            שמור
-          </Button>
+            <Button
+              variant="outlined"
+              color="secondary"
+              startIcon={<ArrowForwardIcon />}
+              onClick={() => navigate('/candidates')}
+              fullWidth
+            >
+              ביטול
+            </Button>
+          </Stack>
 
-          <Button
-            variant="outlined"
-            color="secondary"
-            startIcon={<ArrowForwardIcon />}
-            onClick={() => navigate('/candidates')}
-          >
-            ביטול
-          </Button>
-        </div>
+        </Stack>
       </Paper>
+
+      <Snackbar 
+        open={showSuccess} 
+        autoHideDuration={1500} 
+        onClose={() => setShowSuccess(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert severity="success" variant="filled" sx={{ width: '100%' }}>
+          המועמד נשמר בהצלחה!
+        </Alert>
+      </Snackbar>
+
     </Container>
   );
 };

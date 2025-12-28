@@ -156,7 +156,7 @@ const Home: React.FC = () => {
       <Grid container spacing={4} sx={{ mb: 10 }}>
         
         {/* כרטיס 1: מחשבון */}
-        <Grid item xs={12} md={4}>
+        <Grid>
           <Paper 
             elevation={2} 
             className="kpi-paper"
@@ -174,7 +174,7 @@ const Home: React.FC = () => {
         </Grid>
 
         {/* כרטיס 2: פניות */}
-        <Grid item xs={12} md={4}>
+        <Grid>
           <Paper 
             elevation={2} 
             className="kpi-paper"
@@ -192,7 +192,7 @@ const Home: React.FC = () => {
         </Grid>
 
         {/* כרטיס 3: מועמדים */}
-        <Grid item xs={12} md={4}>
+        <Grid>
           <Paper 
             elevation={2} 
             className="kpi-paper"
@@ -214,7 +214,7 @@ const Home: React.FC = () => {
       <Grid container spacing={4} sx={{ mb: 10 }}>
         
         {/* כרטיס 4: מלגות */}
-        <Grid item xs={12} md={4}>
+        <Grid>
           <Paper 
             elevation={2} 
             className="kpi-paper"
@@ -232,7 +232,7 @@ const Home: React.FC = () => {
         </Grid>
 
         {/* כרטיס 5: ניהול בוגרים */}
-        <Grid item xs={12} md={4}>
+        <Grid>
           <Paper 
             elevation={2} 
             className="kpi-paper"
@@ -254,7 +254,7 @@ const Home: React.FC = () => {
       <Grid container spacing={4}>
         
         {/* התראות מערכת - דינמי */}
-        <Grid item xs={12} md={6}>
+        <Grid>
           <Paper elevation={3} className="alerts-paper">
             <Typography variant="h6" className="section-title">
               התראות מערכת

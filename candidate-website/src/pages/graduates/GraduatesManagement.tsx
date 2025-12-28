@@ -83,7 +83,7 @@ const GraduatesManagement: React.FC = () => {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
         <Typography variant="h4" sx={{ fontWeight: 'bold' }}>ניהול בוגרים וחוות דעת</Typography>
         <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/graduates/new')}>
           הוסף בוגר

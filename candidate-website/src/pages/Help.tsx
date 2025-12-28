@@ -2,7 +2,7 @@ import React from 'react';
 import { 
   Container, Typography, Box, Accordion, AccordionSummary, AccordionDetails, Paper 
 } from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+// import ExpandMoreIcon from '@mui/icons-material/ExpandMore'; // הסרנו את הייבוא
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 
 const Help: React.FC = () => {
