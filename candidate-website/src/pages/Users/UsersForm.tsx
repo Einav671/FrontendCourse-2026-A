@@ -3,9 +3,10 @@ import SaveIcon from '@mui/icons-material/Save';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useNavigate, useParams } from 'react-router-dom';
 import { 
-    Container, Typography, TextField, Button, Paper, MenuItem, 
-    Stack, Snackbar, Alert // 1. הוספנו Stack, Snackbar, Alert ומחקנו את Grid
+    Container, TextField, Button, Paper, MenuItem, 
+    Stack, Snackbar, Alert 
 } from '@mui/material';
+import { PageHeader } from '../../components/PageHeader';
 
 interface User {
     id: string;
@@ -20,9 +21,9 @@ const UsersForm: React.FC = () => {
     const { id } = useParams();
     const isEditMode = !!id;
 
-    // 2. סטייט להודעת הצלחה
     const [showSuccess, setShowSuccess] = useState(false);
-
+    
+    // קבועים
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]{8,}$/;
     const passwordHelperText = "לפחות 8 תווים, חייב לכלול אותיות ומספרים";
 
@@ -52,18 +53,15 @@ const UsersForm: React.FC = () => {
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = event.target;
+        setFormData((prev) => ({ ...prev, [name]: value }));
 
-        setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-
-        let isValid = event.target.validity
-            ? event.target.validity.valid
-            : value !== ''; 
+        let isValid = event.target.validity ? event.target.validity.valid : value !== ''; 
 
         if (name === 'password') {
             isValid = passwordRegex.test(value);
         }
 
-        setErrors((prevErrors) => ({ ...prevErrors, [name]: !isValid }));
+        setErrors((prev) => ({ ...prev, [name]: !isValid }));
     };
 
     const handleSave = () => {
@@ -80,7 +78,6 @@ const UsersForm: React.FC = () => {
             localStorage.setItem('users', JSON.stringify([...savedUsers, userData]));
         }
 
-        // 3. הצגת הודעה וניווט מושהה
         setShowSuccess(true);
         setTimeout(() => {
             navigate('/users');
@@ -91,101 +88,65 @@ const UsersForm: React.FC = () => {
         Object.values(formData).every((value) => value !== "");
 
     return (
-        <Container maxWidth="sm" sx={{ mt: 4 }}>
-            <Paper elevation={3} sx={{ p: 4 }}>
-                <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', mb: 3 }}>
-                    {isEditMode ? 'עריכת משתמש' : 'משתמש חדש'}
-                </Typography>
+        <Container maxWidth="sm">
+            
+            <PageHeader title={isEditMode ? 'עריכת משתמש' : 'משתמש חדש'} />
 
-                {/* שימוש ב-Stack במקום Grid לסידור אנכי פשוט */}
+            <Paper elevation={3} sx={{ p: 4 }}>
                 <Stack spacing={3}>
                     <TextField
-                        id="fullName-input"
-                        fullWidth
-                        label="שם מלא"
-                        name="fullName"
-                        value={formData.fullName}
-                        onChange={handleChange}
-                        required
-                        error={!!errors.fullName}
+                        fullWidth label="שם מלא" name="fullName"
+                        value={formData.fullName} onChange={handleChange}
+                        required error={!!errors.fullName}
                         helperText={errors.fullName ? "שם מלא הוא שדה חובה" : ""}
                     />
 
                     <TextField
-                        id="email-input"
-                        fullWidth
-                        type="email"
-                        label="אימייל"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                        error={!!errors.email}
+                        fullWidth type="email" label="אימייל" name="email"
+                        value={formData.email} onChange={handleChange}
+                        required error={!!errors.email}
                         helperText={errors.email ? "אימייל לא תקין" : ""}
                     />
 
                     <TextField
-                        id="password-input"
-                        fullWidth
-                        type="password"
-                        label="סיסמא"
-                        name="password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        required
-                        error={!!errors.password}
+                        fullWidth type="password" label="סיסמא" name="password"
+                        value={formData.password} onChange={handleChange}
+                        required error={!!errors.password}
                         helperText={errors.password ? "סיסמא חלשה מדי: " + passwordHelperText : passwordHelperText}
                     />
 
                     <TextField
-                        id="userType-select"
-                        select
-                        fullWidth
-                        label="סוג משתמש"
-                        name="userType"
-                        value={formData.userType}
-                        onChange={handleChange}
-                        required
-                        error={!!errors.userType}
+                        select fullWidth label="סוג משתמש" name="userType"
+                        value={formData.userType} onChange={handleChange}
+                        required error={!!errors.userType}
                         helperText={errors.userType ? "יש לבחור סוג משתמש" : ""}
-                        SelectProps={{ id: "userType-select" }}
                     >
                         <MenuItem value="מועמד">מועמד</MenuItem>
                         <MenuItem value="בוגר">בוגר</MenuItem>
                         <MenuItem value="מנהל מערכת">מנהל מערכת</MenuItem>
                     </TextField>
 
-                    {/* כפתורים */}
-                    <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+                    {/* סידור כפתורים ב-Stack במקום div עם inline styles */}
+                    <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
                         <Button
-                            variant="contained"
-                            color="primary"
-                            startIcon={<SaveIcon />}
-                            onClick={handleSave}
-                            disabled={!isFormValid}
-                            fullWidth
+                            variant="contained" color="primary" startIcon={<SaveIcon />}
+                            onClick={handleSave} disabled={!isFormValid} fullWidth
                         >
                             שמור
                         </Button>
 
                         <Button
-                            variant="outlined"
-                            color="secondary"
-                            startIcon={<ArrowForwardIcon />}
-                            onClick={() => navigate('/users')}
-                            fullWidth
+                            variant="outlined" color="secondary" startIcon={<ArrowForwardIcon />}
+                            onClick={() => navigate('/users')} fullWidth
                         >
                             ביטול
                         </Button>
-                    </div>
+                    </Stack>
                 </Stack>
             </Paper>
 
-            {/* רכיב ה-Snackbar */}
             <Snackbar 
-                open={showSuccess} 
-                autoHideDuration={1500} 
-                onClose={() => setShowSuccess(false)}
+                open={showSuccess} autoHideDuration={1500} onClose={() => setShowSuccess(false)}
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
             >
                 <Alert severity="success" variant="filled" sx={{ width: '100%' }}>

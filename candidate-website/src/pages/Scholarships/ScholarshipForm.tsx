@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Container, Typography, TextField, Button, Paper, Stack, 
+  Container, TextField, Button, Paper, Stack, 
   Snackbar, Alert 
 } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useNavigate, useParams } from 'react-router-dom';
+import { PageHeader } from '../../components/PageHeader';
 
-// --- הגדרת המחלקה (Class) ---
+// הגדרת המחלקה (ניתן לייבא מקובץ חיצוני אם קיים)
 export class Scholarship {
-    id: string; // הוספנו את ה-id לכאן כדי למנוע שגיאות
+    id: string;
     code: string;
     name: string;
     targetAudience: string;
@@ -18,13 +19,8 @@ export class Scholarship {
     conditions: string;
 
     constructor(
-        id: string,
-        code: string, 
-        name: string, 
-        targetAudience: string, 
-        amount: number, 
-        link: string, 
-        conditions: string
+        id: string, code: string, name: string, targetAudience: string, 
+        amount: number, link: string, conditions: string
     ) {
         this.id = id;
         this.code = code;
@@ -35,14 +31,12 @@ export class Scholarship {
         this.conditions = conditions;
     }
 }
-// ------------------------------
 
-// הגדרת Interface ל-State של הטופס
 interface ScholarshipFormState {
     code: string;
     name: string;
     targetAudience: string;
-    amount: string | number; // מאפשר גמישות בשדה הקלט
+    amount: string | number;
     link: string;
     conditions: string;
 }
@@ -51,11 +45,8 @@ const ScholarshipForm: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditMode = !!id;
-
-  // סטייט להודעת הצלחה
   const [showSuccess, setShowSuccess] = useState(false);
 
-  // State לנתונים
   const [formData, setFormData] = useState<ScholarshipFormState>({
     code: '',
     name: '',
@@ -75,9 +66,8 @@ const ScholarshipForm: React.FC = () => {
   useEffect(() => {
     if (isEditMode) {
       const saved = JSON.parse(localStorage.getItem('scholarships') || '[]');
-      const itemToEdit = saved.find((s: Scholarship) => s.id === id);
+      const itemToEdit = saved.find((s: any) => s.id === id);
       if (itemToEdit) {
-        // מעדכנים את ה-State עם הנתונים שנמצאו
         setFormData({
             code: itemToEdit.code,
             name: itemToEdit.name,
@@ -92,17 +82,11 @@ const ScholarshipForm: React.FC = () => {
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-    
-    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-    
-    const isValid = event.target.validity 
-        ? event.target.validity.valid 
-        : value !== ''; 
-
-    setErrors((prevErrors) => ({ ...prevErrors, [name]: !isValid }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    const isValid = event.target.validity ? event.target.validity.valid : value !== ''; 
+    setErrors((prev) => ({ ...prev, [name]: !isValid }));
   };
 
-  // בדיקת תקינות: מוודאים שאין שגיאות ושהשדות *הכרחיים* מלאים (לא חייב הכל)
   const isFormValid = !errors.code && !errors.name && !errors.amount && !errors.link &&
                       formData.code !== '' && formData.name !== '' && formData.amount !== '';
   
@@ -115,7 +99,7 @@ const ScholarshipForm: React.FC = () => {
     const saved = JSON.parse(localStorage.getItem('scholarships') || '[]');
     
     const newItem = new Scholarship(
-        isEditMode ? id! : Date.now().toString(), // כאן ה-ID נוצר או נלקח מה-URL
+        isEditMode ? id! : Date.now().toString(),
         formData.code,
         formData.name,
         formData.targetAudience,
@@ -131,7 +115,6 @@ const ScholarshipForm: React.FC = () => {
       localStorage.setItem('scholarships', JSON.stringify([...saved, newItem]));
     }
 
-    // הצגת הודעת הצלחה וניווט
     setShowSuccess(true);
     setTimeout(() => {
         navigate('/scholarships');
@@ -139,30 +122,27 @@ const ScholarshipForm: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 4 }}>
-      <Paper elevation={3} sx={{ p: 4 }}>
-        <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', mb: 3 }}>
-          {isEditMode ? 'עריכת מלגה' : 'הוספת מלגה חדשה'}
-        </Typography>
+    <Container maxWidth="sm">
+      
+      <PageHeader title={isEditMode ? 'עריכת מלגה' : 'הוספת מלגה חדשה'} />
 
-        {/* החלפנו את Grid ב-Stack */}
+      <Paper elevation={3} sx={{ p: 4 }}>
         <Stack spacing={3}>
             
-            {/* שורה אחת לקוד וסכום */}
             <Stack direction="row" spacing={2}>
                 <TextField
-                fullWidth label="קוד מלגה" name="code"
-                value={formData.code} onChange={handleChange}
-                required error={!!errors.code}
-                helperText={errors.code ? 'שדה חובה' : ''}
+                    fullWidth label="קוד מלגה" name="code"
+                    value={formData.code} onChange={handleChange}
+                    required error={!!errors.code}
+                    helperText={errors.code ? 'שדה חובה' : ''}
                 />
                 
                 <TextField
-                fullWidth type="number" label="סכום (₪)" name="amount"
-                value={formData.amount} onChange={handleChange}
-                required error={!!errors.amount}
-                slotProps={{ htmlInput: { min: 0 } }}
-                helperText={errors.amount ? 'סכום תקין' : ''}
+                    fullWidth type="number" label="סכום (₪)" name="amount"
+                    value={formData.amount} onChange={handleChange}
+                    required error={!!errors.amount}
+                    slotProps={{ htmlInput: { min: 0 } }}
+                    helperText={errors.amount ? 'סכום תקין' : ''}
                 />
             </Stack>
 
@@ -180,10 +160,8 @@ const ScholarshipForm: React.FC = () => {
 
             <TextField
               fullWidth label="קישור לאתר" name="link"
-              type="url"
-              placeholder="https://"
-              error={!!errors.link}
-              required
+              type="url" placeholder="https://"
+              error={!!errors.link} required
               helperText={errors.link ? 'קישור תקין' : ''}
               value={formData.link} onChange={handleChange}
             />
@@ -193,24 +171,16 @@ const ScholarshipForm: React.FC = () => {
               value={formData.conditions} onChange={handleChange}
             />
 
-            {/* כפתורים */}
             <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
                 <Button 
-                    variant="contained" 
-                    color="primary" 
-                    startIcon={<SaveIcon />} 
-                    onClick={handleSave} 
-                    disabled={!isFormValid}
-                    fullWidth
+                    variant="contained" color="primary" startIcon={<SaveIcon />} 
+                    onClick={handleSave} disabled={!isFormValid} fullWidth
                 >
                     שמור
                 </Button>
                 <Button 
-                    variant="outlined" 
-                    color="secondary" 
-                    startIcon={<ArrowForwardIcon />} 
-                    onClick={() => navigate('/scholarships')}
-                    fullWidth
+                    variant="outlined" color="secondary" startIcon={<ArrowForwardIcon />} 
+                    onClick={() => navigate('/scholarships')} fullWidth
                 >
                     ביטול
                 </Button>
@@ -218,11 +188,8 @@ const ScholarshipForm: React.FC = () => {
         </Stack>
       </Paper>
 
-      {/* רכיב הודעת הצלחה */}
       <Snackbar 
-        open={showSuccess} 
-        autoHideDuration={1500} 
-        onClose={() => setShowSuccess(false)}
+        open={showSuccess} autoHideDuration={1500} onClose={() => setShowSuccess(false)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
         <Alert severity="success" variant="filled" sx={{ width: '100%' }}>

@@ -1,11 +1,11 @@
-// src/pages/alerts/AlertsManagement.tsx
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Chip } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
+import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Chip } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { useNavigate } from 'react-router-dom';
 import { SystemAlert } from './SystemAlert';
+// ייבוא הרכיב המשותף לכותרת
+import { PageHeader } from '../../components/PageHeader';
 
 const AlertsManagement: React.FC = () => {
   const navigate = useNavigate();
@@ -35,32 +35,37 @@ const AlertsManagement: React.FC = () => {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '20px' }}>
-        <Typography variant="h4" fontWeight="bold">ניהול התראות מערכת</Typography>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/alerts/new')}>
-          הוסף התראה
-        </Button>
-      </div>
+      {/* שימוש ברכיב המשותף - כותרת וכפתור הוספה */}
+      <PageHeader 
+        title="ניהול התראות מערכת"
+        buttonText="הוסף התראה"
+        onButtonClick={() => navigate('/alerts/new')}
+      />
 
-      <TableContainer component={Paper}>
+      <TableContainer component={Paper} elevation={3}>
         <Table>
           <TableHead sx={{ bgcolor: '#f5f5f5' }}>
             <TableRow>
-              <TableCell>הודעה</TableCell>
-              <TableCell align="center">סוג/דחיפות</TableCell>
-              <TableCell align="center">פעולות</TableCell>
+              {/* בגלל ה-RTL הגלובלי, העמודות יסתדרו מימין לשמאל אוטומטית */}
+              <TableCell sx={{ fontWeight: 'bold' }}>הודעה</TableCell>
+              <TableCell align="center" sx={{ fontWeight: 'bold' }}>סוג/דחיפות</TableCell>
+              <TableCell align="center" sx={{ fontWeight: 'bold' }}>פעולות</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {alerts.map((alert) => (
-              <TableRow key={alert.id}>
+              <TableRow key={alert.id} hover>
                 <TableCell>{alert.message}</TableCell>
                 <TableCell align="center">
                   <Chip label={alert.type} color={getTypeColor(alert.type) as any} size="small" />
                 </TableCell>
                 <TableCell align="center">
-                  <IconButton color="primary" onClick={() => navigate(`/alerts/edit/${alert.id}`)}><EditIcon /></IconButton>
-                  <IconButton color="error" onClick={() => handleDelete(alert.id)}><DeleteIcon /></IconButton>
+                  <IconButton color="primary" onClick={() => navigate(`/alerts/edit/${alert.id}`)}>
+                    <EditIcon />
+                  </IconButton>
+                  <IconButton color="error" onClick={() => handleDelete(alert.id)}>
+                    <DeleteIcon />
+                  </IconButton>
                 </TableCell>
               </TableRow>
             ))}

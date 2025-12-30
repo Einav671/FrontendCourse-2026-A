@@ -2,11 +2,10 @@ import React from 'react';
 import { 
   Container, Typography, Box, Accordion, AccordionSummary, AccordionDetails, Paper 
 } from '@mui/material';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'; // הסרנו את הייבוא
-//import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { PageHeader } from '../components/PageHeader';
 
 const Help: React.FC = () => {
-  // רשימת השאלות והתשובות - תוכלי להוסיף כאן שאלות נוספות בקלות
   const faqData = [
     {
       question: "איך מוסיפים מועמד חדש?",
@@ -31,13 +30,13 @@ const Help: React.FC = () => {
   ];
 
   return (
-    <Container maxWidth="md" sx={{ mt: 8, mb: 8, direction: 'rtl' }}>
-      {/* כותרת הדף */}
-      <Box sx={{ textAlign: 'center', mb: 6 }}>
-        <Typography variant="h3" component="h1" gutterBottom sx={{ fontWeight: 'bold', color: '#1976d2' }}>
-          מרכז עזרה
-        </Typography>
-        <Typography variant="h6" color="text.secondary">
+    <Container maxWidth="md">
+      
+      {/* כותרת ראשית */}
+      <PageHeader title="מרכז עזרה" />
+      
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h6" color="text.secondary" gutterBottom>
           כאן תוכלו למצוא תשובות לשאלות נפוצות.
         </Typography>
       </Box>
@@ -50,23 +49,20 @@ const Help: React.FC = () => {
             sx={{ 
               mb: 2, 
               borderRadius: '8px !important', 
-              boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+              boxShadow: 1, // שימוש בצלליות מובנות
               '&:before': { display: 'none' } 
             }}
           >
             <AccordionSummary
-              expandIcon={<ExpandMoreIcon sx={{ color: '#1976d2' }} />}
-              sx={{ 
-                flexDirection: 'row-reverse', // הופך את כיוון החץ לעברית
-                '& .MuiAccordionSummary-content': { mr: 2 } 
-              }}
+              expandIcon={<ExpandMoreIcon sx={{ color: 'primary.main' }} />}
+              // ב-RTL האייקון אוטומטית יופיע בצד הנכון ללא צורך ב-flexDirection
             >
-              <Typography sx={{ fontWeight: 'bold', color: '#333', fontSize: '1.1rem' }}>
+              <Typography sx={{ fontWeight: 'bold', fontSize: '1.1rem' }}>
                 {item.question}
               </Typography>
             </AccordionSummary>
-            <AccordionDetails sx={{ borderTop: '1px solid #f0f0f0', bgcolor: '#fafafa' }}>
-              <Typography sx={{ color: '#555', lineHeight: 1.6 }}>
+            <AccordionDetails sx={{ borderTop: 1, borderColor: 'divider', bgcolor: 'action.hover' }}>
+              <Typography sx={{ color: 'text.secondary', lineHeight: 1.6 }}>
                 {item.answer}
               </Typography>
             </AccordionDetails>
@@ -75,13 +71,16 @@ const Help: React.FC = () => {
       </Box>
 
       {/* אזור יצירת קשר בתחתית */}
-      <Paper elevation={0} sx={{ mt: 6, p: 4, bgcolor: '#e3f2fd', borderRadius: 3, textAlign: 'center' }}>
-        <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1, color: '#0d47a1' }}>
-          עדיין זקוקים לעזרה?
-        </Typography>
-        <Typography variant="body1">
-          צוות התמיכה הטכנית זמין עבורכם במייל: <strong>support@system.co.il</strong>
-        </Typography>
+      <Paper elevation={0} sx={{ mt: 6, p: 4, bgcolor: 'primary.light', bgOpacity: 0.1, borderRadius: 3, textAlign: 'center' }}>
+        {/* הערה: bgcolor צריך להיות צבע חוקי מהתמה, כאן השתמשתי בקידוד פשוט, עדיף להשתמש ב-theme.palette */}
+        <Box sx={{ bgcolor: '#e3f2fd', p: 4, borderRadius: 3 }}>
+            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1, color: 'primary.dark' }}>
+            עדיין זקוקים לעזרה?
+            </Typography>
+            <Typography variant="body1">
+            צוות התמיכה הטכנית זמין עבורכם במייל: <strong>support@system.co.il</strong>
+            </Typography>
+        </Box>
       </Paper>
     </Container>
   );

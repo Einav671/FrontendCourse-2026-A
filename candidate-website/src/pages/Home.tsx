@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Grid, Paper, Typography, Box, Avatar } from '@mui/material';
+import { Container, Grid, Paper, Typography, Box, Avatar, Stack } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
+import { PageHeader } from '../components/PageHeader'; // וודא שהנתיב תקין
 import { SystemAlert } from './alerts/SystemAlert'; 
 
 // ייבוא אייקונים
@@ -11,153 +12,115 @@ import AutorenewIcon from '@mui/icons-material/Autorenew';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 
-import './Home.css';
+// --- הפרדת עיצוב (Styles Object) ---
+const styles = {
+  kpiPaper: {
+    p: 3,
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    height: '100%',
+    cursor: 'pointer',
+    transition: 'transform 0.2s, box-shadow 0.2s',
+    '&:hover': {
+      transform: 'translateY(-5px)',
+      boxShadow: 4, // שימוש בצלליות של ה-Theme
+    },
+  },
+  cardValue: {
+    fontWeight: 'bold',
+    fontSize: '2.2rem',
+    my: 1,
+    lineHeight: 1,
+  },
+  cardSubtext: {
+    fontSize: '0.85rem',
+    color: 'text.secondary',
+  },
+  alertItem: {
+    p: 2,
+    borderRadius: 2,
+    fontWeight: 500,
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  }
+};
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
   const [alerts, setAlerts] = useState<SystemAlert[]>([]);
 
-  // --- טעינת התראות בלבד (ללא יצירת נתונים) ---
   useEffect(() => {
     const savedAlerts = JSON.parse(localStorage.getItem('system-alerts') || '[]');
     setAlerts(savedAlerts);
   }, []);
 
+  // פונקציית עזר לרינדור כרטיס
+  const renderKpiCard = (title: string, value: string | number, subtext: string, icon: React.ReactNode, bgColor: string, color: string, path: string) => (
+    <Grid item xs={12} md={4}>
+      <Paper elevation={2} sx={styles.kpiPaper} onClick={() => navigate(path)}>
+        <Avatar sx={{ width: 56, height: 56, bgcolor: bgColor, color: color }}>
+          {icon}
+        </Avatar>
+        <Box sx={{ textAlign: 'start' }}> {/* textAlign start מתאים את עצמו ל-RTL */}
+          <Typography variant="subtitle1" color="text.secondary" fontWeight={500}>{title}</Typography>
+          <Typography sx={styles.cardValue}>{value}</Typography>
+          <Typography sx={styles.cardSubtext}>{subtext}</Typography>
+        </Box>
+      </Paper>
+    </Grid>
+  );
+
   return (
-    <Container maxWidth="xl" className="dashboard-container">
+    <Container maxWidth="xl">
       
-      {/* כותרת ראשית */}
-      <Box className="header-section">
-        <Typography variant="h4" component="h1" className="page-title">
-          דשבורד ניהול
-        </Typography>
-        <Typography variant="subtitle1" className="page-subtitle">
-          סקירה כללית של הפעילויות במערכת
-        </Typography>
-      </Box>
+      {/* כותרת הדף באמצעות הרכיב המשותף */}
+      <PageHeader title="דשבורד ניהול" />
 
-      {/* שורה ראשונה */}
-      <Grid container spacing={4} sx={{ mb: 10 }}>
+      {/* גריד ראשי */}
+      <Grid container spacing={4} sx={{ mb: 8 }}>
         
-        {/* כרטיס 1: מחשבון */}
-        <Grid>
-          <Paper 
-            elevation={2} 
-            className="kpi-paper"
-            onClick={() => navigate('/calculator')}
-          >
-            <Avatar className="icon-avatar" sx={{ bgcolor: '#e8f5e9', color: '#2e7d32' }}>
-              <CalculateIcon fontSize="large" />
-            </Avatar>
-            <Box className="card-content">
-              <Typography className="card-title">מחשבוני התאמה</Typography>
-              <Typography className="card-value">0</Typography>
-              <Typography className="card-subtext">לחץ לחישוב חדש</Typography>
-            </Box>
-          </Paper>
-        </Grid>
+        {/* שורה ראשונה */}
+        {renderKpiCard('מחשבוני התאמה', '0', 'לחץ לחישוב חדש', <CalculateIcon fontSize="large" />, '#e8f5e9', '#2e7d32', '/calculator')}
+        {renderKpiCard('פניות פתוחות', '0', 'תיבת דואר נקייה', <ChatBubbleOutlineIcon fontSize="large" />, '#fff3e0', '#ef6c00', '/forms')}
+        {renderKpiCard('מועמדים חדשים', '0', 'ממתין לרישום', <PeopleAltIcon fontSize="large" />, '#e3f2fd', '#1565c0', '/candidates')}
 
-        {/* כרטיס 2: פניות */}
-        <Grid>
-          <Paper 
-            elevation={2} 
-            className="kpi-paper"
-            onClick={() => navigate('/forms')} 
-          >
-            <Avatar className="icon-avatar" sx={{ bgcolor: '#fff3e0', color: '#ef6c00' }}>
-              <ChatBubbleOutlineIcon fontSize="large" />
-            </Avatar>
-            <Box className="card-content">
-              <Typography className="card-title">פניות פתוחות</Typography>
-              <Typography className="card-value">0</Typography>
-              <Typography className="card-subtext">תיבת דואר נקייה</Typography>
-            </Box>
-          </Paper>
-        </Grid>
-
-        {/* כרטיס 3: מועמדים */}
-        <Grid>
-          <Paper 
-            elevation={2} 
-            className="kpi-paper"
-            onClick={() => navigate('/candidates')}
-          >
-            <Avatar className="icon-avatar" sx={{ bgcolor: '#e3f2fd', color: '#1565c0' }}>
-              <PeopleAltIcon fontSize="large" />
-            </Avatar>
-            <Box className="card-content">
-              <Typography className="card-title">מועמדים חדשים</Typography>
-              <Typography className="card-value">0</Typography>
-              <Typography className="card-subtext">ממתין לרישום</Typography>
-            </Box>
-          </Paper>
-        </Grid>
+        {/* שורה שנייה */}
+        {renderKpiCard('סטטוס עדכון מלגות', 'מעודכן', 'לחץ לניהול המלגות', <AutorenewIcon fontSize="large" />, '#e0f2f1', '#00695c', '/scholarships')}
+        {renderKpiCard('חוות דעת לאישור', '0', 'לחץ לניהול בוגרים', <AssignmentIcon fontSize="large" />, '#f3e5f5', '#7b1fa2', '/graduates')}
       </Grid>
 
-      {/* שורה שנייה */}
-      <Grid container spacing={4} sx={{ mb: 10 }}>
-        
-        {/* כרטיס 4: מלגות */}
-        <Grid>
-          <Paper 
-            elevation={2} 
-            className="kpi-paper"
-            onClick={() => navigate('/scholarships')}
-          >
-            <Avatar className="icon-avatar" sx={{ bgcolor: '#e0f2f1', color: '#00695c' }}>
-              <AutorenewIcon fontSize="large" />
-            </Avatar>
-            <Box className="card-content">
-              <Typography className="card-title">סטטוס עדכון מלגות</Typography>
-              <Typography variant="h5" sx={{ fontWeight: 'bold', my: 1 }}>מעודכן</Typography>
-              <Typography className="card-subtext">לחץ לניהול המלגות</Typography>
-            </Box>
-          </Paper>
-        </Grid>
-
-        {/* כרטיס 5: ניהול בוגרים */}
-        <Grid>
-          <Paper 
-            elevation={2} 
-            className="kpi-paper"
-            onClick={() => navigate('/graduates')} 
-          >
-            <Avatar className="icon-avatar" sx={{ bgcolor: '#f3e5f5', color: '#7b1fa2' }}>
-              <AssignmentIcon fontSize="large" />
-            </Avatar>
-            <Box className="card-content">
-              <Typography className="card-title">חוות דעת לאישור</Typography>
-              <Typography className="card-value">0</Typography>
-              <Typography className="card-subtext">לחץ לניהול בוגרים</Typography>
-            </Box>
-          </Paper>
-        </Grid>
-      </Grid>
-
-      {/* שורה שלישית: רשימות */}
+      {/* אזור התראות מערכת */}
       <Grid container spacing={4}>
-        
-        {/* התראות מערכת - דינמי */}
-        <Grid>
-          <Paper elevation={3} className="alerts-paper">
-            <Typography variant="h6" className="section-title">
+        <Grid item xs={12}>
+          <Paper elevation={3} sx={{ p: 3, minHeight: 250 }}>
+            <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 3 }}>
               התראות מערכת
             </Typography>
             
-            <Box className="alerts-list">
+            <Stack spacing={2}>
               {alerts.length > 0 ? (
                 alerts.map((alert) => (
-                  <Box key={alert.id} className={`alert-item alert-${alert.type}`} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Box 
+                    key={alert.id} 
+                    sx={{
+                      ...styles.alertItem,
+                      bgcolor: alert.type === 'success' ? '#e8f5e9' : '#fff3e0',
+                      color: alert.type === 'success' ? '#1b5e20' : '#e65100',
+                      borderRight: `4px solid ${alert.type === 'success' ? '#4caf50' : '#ff9800'}`
+                    }}
+                  >
                     {alert.message}
                     {alert.type === 'success' && <CheckCircleOutlineIcon fontSize="small" />}
                   </Box>
                 ))
               ) : (
-                <Box className="alert-item" style={{color: '#999', textAlign:'center', marginTop: '20px'}}>
+                <Typography align="center" color="text.secondary" sx={{ mt: 2 }}>
                     אין התראות חדשות
-                </Box>
+                </Typography>
               )}
-            </Box>
+            </Stack>
           </Paper>
         </Grid>
       </Grid>

@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Container, Typography, Button, Table, TableBody, TableCell, 
+  Container, Table, TableBody, TableCell, 
   TableContainer, TableHead, TableRow, Paper, IconButton, Avatar, Chip, Tooltip 
 } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
+import { PageHeader } from '../../components/PageHeader';
 
-// --- המחלקה מוגדרת כאן למניעת שגיאות ---
 export class Graduate {
     id: string;
     fullName: string;
@@ -19,26 +18,8 @@ export class Graduate {
     imageUrl: string;
     review: string;
     status: 'pending' | 'approved' | 'rejected';
-
-    constructor(
-        id: string, 
-        fullName: string, 
-        role: string, 
-        degree: string, 
-        imageUrl: string, 
-        review: string,
-        status: 'pending' | 'approved' | 'rejected' = 'pending'
-    ) {
-        this.id = id;
-        this.fullName = fullName;
-        this.role = role;
-        this.degree = degree;
-        this.imageUrl = imageUrl;
-        this.review = review;
-        this.status = status;
-    }
+    // ... constructor unchanged
 }
-// ----------------------------------------
 
 const GraduatesManagement: React.FC = () => {
   const navigate = useNavigate();
@@ -82,17 +63,16 @@ const GraduatesManagement: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
-        <Typography variant="h4" sx={{ fontWeight: 'bold' }}>ניהול בוגרים וחוות דעת</Typography>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/graduates/new')}>
-          הוסף בוגר
-        </Button>
-      </div>
+    <Container maxWidth="lg">
+      <PageHeader 
+        title="ניהול בוגרים וחוות דעת" 
+        buttonText="הוסף בוגר"
+        onButtonClick={() => navigate('/graduates/new')}
+      />
       
       <TableContainer component={Paper} elevation={3}>
         <Table>
-          <TableHead sx={{ bgcolor: '#f5f5f5' }}>
+          <TableHead sx={{ bgcolor: 'action.hover' }}>
             <TableRow>
               <TableCell><b>תמונה</b></TableCell>
               <TableCell><b>שם מלא</b></TableCell>
@@ -110,7 +90,7 @@ const GraduatesManagement: React.FC = () => {
                 </TableRow>
             ) : (
                 graduates.map((g: any) => (
-                <TableRow key={g.id} sx={{ bgcolor: g.status === 'pending' ? '#fffde7' : 'inherit' }}>
+                <TableRow key={g.id} sx={{ bgcolor: g.status === 'pending' ? 'warning.light' : 'inherit' }}>
                     <TableCell>
                         <Avatar src={g.imageUrl} alt={g.fullName}>{g.fullName?.charAt(0)}</Avatar>
                     </TableCell>

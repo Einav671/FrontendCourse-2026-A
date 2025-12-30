@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Container, Paper, Typography, TextField, Button, MenuItem, 
+  Container, Paper, TextField, Button, MenuItem, 
   Snackbar, Alert, Stack 
 } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useNavigate, useParams } from 'react-router-dom';
 import { SystemAlert } from './SystemAlert';
+// ייבוא הכותרת המשותפת
+import { PageHeader } from '../../components/PageHeader';
 
 const AlertForm: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEdit = !!id;
 
-  // סטייט להודעת הצלחה
   const [showSuccess, setShowSuccess] = useState(false);
 
   const [formData, setFormData] = useState({
@@ -32,7 +33,6 @@ const AlertForm: React.FC = () => {
       const found = saved.find((a) => a.id === id);
       
       if (found) {
-        // תיקון: מעדכנים רק את השדות הרלוונטיים לטופס (בלי ה-ID)
         setFormData({
             message: found.message,
             type: found.type
@@ -43,19 +43,13 @@ const AlertForm: React.FC = () => {
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-
-    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-
-    const isValid = event.target.validity
-      ? event.target.validity.valid
-      : value !== '';
-
-    setErrors((prevErrors) => ({ ...prevErrors, [name]: !isValid }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    const isValid = event.target.validity ? event.target.validity.valid : value !== '';
+    setErrors((prev) => ({ ...prev, [name]: !isValid }));
   };
 
   const handleSave = () => {
     const saved: SystemAlert[] = JSON.parse(localStorage.getItem('system-alerts') || '[]');
-
     const newAlert = new SystemAlert(
       isEdit ? id! : Date.now().toString(),
       formData.message,
@@ -69,24 +63,20 @@ const AlertForm: React.FC = () => {
       localStorage.setItem('system-alerts', JSON.stringify([...saved, newAlert]));
     }
     
-    // הצגת הודעת הצלחה וניווט
     setShowSuccess(true);
     setTimeout(() => {
         navigate('/alerts');
     }, 1500);
   };
 
-  const isFormValid = Object.values(errors).every((error) => !error) &&
-    formData.message !== "";
+  const isFormValid = Object.values(errors).every((error) => !error) && formData.message !== "";
 
   return (
     <Container maxWidth="sm" sx={{ mt: 4 }}>
-      <Paper elevation={3} sx={{ p: 4 }}>
-        <Typography variant="h5" sx={{ mb: 3, fontWeight: 'bold' }}>
-          {isEdit ? 'עריכת התראה' : 'התראה חדשה'}
-        </Typography>
+      {/* כותרת הדף */}
+      <PageHeader title={isEdit ? 'עריכת התראה' : 'התראה חדשה'} />
 
-        {/* החלפנו את Grid ב-Stack לסידור אנכי פשוט ונקי */}
+      <Paper elevation={3} sx={{ p: 4 }}>
         <Stack spacing={3}>
             <TextField
               fullWidth
@@ -115,7 +105,7 @@ const AlertForm: React.FC = () => {
               <MenuItem value="info">מידע (כחול)</MenuItem>
             </TextField>
 
-            <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
+            <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
                 <Button
                     variant="contained"
                     color="primary"
@@ -130,17 +120,16 @@ const AlertForm: React.FC = () => {
                 <Button
                     variant="outlined"
                     color="secondary"
-                    startIcon={<ArrowForwardIcon />}
+                    startIcon={<ArrowForwardIcon />} // האייקון יתהפך אוטומטית ב-RTL
                     onClick={() => navigate('/alerts')}
                     fullWidth
                 >
                     ביטול
                 </Button>
-            </div>
+            </Stack>
         </Stack>
       </Paper>
 
-      {/* רכיב הודעת הצלחה */}
       <Snackbar 
         open={showSuccess} 
         autoHideDuration={1500} 

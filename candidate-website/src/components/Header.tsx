@@ -10,7 +10,30 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import { Link } from 'react-router-dom';
-import SchoolIcon from '@mui/icons-material/School'; // אייקון אופציונלי ויפה
+import SchoolIcon from '@mui/icons-material/School';
+import { Box } from '@mui/material';
+
+// --- הפרדת עיצובים (Styles) ---
+const styles = {
+  menuButton: {
+    ml: 2, // ב-RTL אנחנו רוצים מרווח משמאל לכפתור (כדי להרחיק את הלוגו)
+  },
+  logoContainer: {
+    flexGrow: 1,
+    display: 'flex',
+    alignItems: 'center',
+    gap: 1
+  },
+  logoText: {
+    fontWeight: 'bold'
+  },
+  drawerList: {
+    width: 250
+  },
+  listItemText: {
+    textAlign: 'right' // מוודא שהטקסט בתפריט מיושר לימין
+  }
+};
 
 export default function Header() {
   const [open, setOpen] = useState(false);
@@ -19,124 +42,64 @@ export default function Header() {
     setOpen(!open);
   };
 
+  const menuItems = [
+    { text: 'דף הבית', path: '/' },
+    { text: 'ניהול קורסים', path: '/management' },
+    { text: 'ניהול משתמשים', path: '/users' },
+    { text: 'ניהול מלגות', path: '/scholarships' },
+    { text: 'ניהול בוגרים', path: '/graduates' },
+    { text: 'ניהול מועמדים', path: '/candidates' },
+    { text: 'מסלולי התמחות', path: '/internships' },
+    { text: 'מחשבון קבלה', path: '/calculator' },
+    { text: 'צור קשר', path: '/forms' },
+    { text: 'ניהול התראות', path: '/alerts' },
+    { text: 'מרכז עזרה', path: '/help' },
+  ];
+
   return (
     <>
       <AppBar position="static">
-        {/* כיוון מימין לשמאל */}
-        <Toolbar sx={{ flexDirection: 'row-reverse' }}>
-
-          {/* כפתור המבורגר בצד ימין */}
+        <Toolbar>
+          {/* כפתור המבורגר */}
           <IconButton
             size="large"
-            edge="end"
+            edge="start"
             color="inherit"
             aria-label="menu"
             onClick={toggleDrawer}
-            sx={{ ml: 2 }}
+            sx={styles.menuButton}
           >
             <MenuIcon />
           </IconButton>
 
-          {/* כותרת קבועה עם אייקון */}
-          <div style={{ flexGrow: 1, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '10px' }}>
-            <Typography variant="h6" component="div" sx={{ fontWeight: 'bold' }}>
-              מערכת ניהול אקדמית
-            </Typography>
-
-            {/* --- כאן השינוי: הפכנו את האייקון לכפתור לחיץ שמוביל לדף הבית --- */}
-            <IconButton component={Link} to="/" color="inherit">
+          {/* לוגו וכותרת */}
+          <Box sx={styles.logoContainer}>
+            <IconButton component={Link} to="/" color="inherit" edge="start">
               <SchoolIcon />
             </IconButton>
-            {/* ------------------------------------------------------------- */}
-
-          </div>
-
+            <Typography variant="h6" component="div" sx={styles.logoText}>
+              מערכת ניהול אקדמית
+            </Typography>
+          </Box>
         </Toolbar>
       </AppBar>
 
-      {/* תפריט צד (Drawer) */}
-      <Drawer anchor="right" open={open} onClose={toggleDrawer}>
-        <List sx={{ width: 250, direction: 'rtl' }}>
-
-          {/* דף הבית */}
-          <ListItem disablePadding>
-            <ListItemButton component={Link} to="/" onClick={toggleDrawer} sx={{ textAlign: 'right' }}>
-              <ListItemText primary="דף הבית" />
-            </ListItemButton>
-          </ListItem>
-
-          <ListItem disablePadding>
-            <ListItemButton component={Link} to="/management" onClick={toggleDrawer} sx={{ textAlign: 'right' }}>
-              <ListItemText primary="ניהול קורסים" />
-            </ListItemButton>
-          </ListItem>
-
-          {/* --- החלק שהוספנו --- */}
-
-          {/*ניהול משתמשים*/}
-          <ListItem disablePadding>
-            <ListItemButton component={Link} to="/users" onClick={toggleDrawer} sx={{ textAlign: 'right' }}>
-              <ListItemText primary="ניהול משתמשים" />
-            </ListItemButton>
-          </ListItem>
-
-          {/* ניהול מלגות (החדש שלך) */}
-          <ListItem disablePadding>
-            <ListItemButton component={Link} to="/scholarships" onClick={toggleDrawer} sx={{ textAlign: 'right' }}>
-              <ListItemText primary="ניהול מלגות" />
-            </ListItemButton>
-          </ListItem>
-
-          {/* ניהול בוגרים */}
-          <ListItem disablePadding>
-            <ListItemButton component={Link} to="/graduates" onClick={toggleDrawer} sx={{ textAlign: 'right' }}>
-              <ListItemText primary="ניהול בוגרים" />
-            </ListItemButton>
-          </ListItem>
-
-
-          {/* ניהול מועמדים */}
-          <ListItem disablePadding>
-            <ListItemButton component={Link} to="/candidates" onClick={toggleDrawer} sx={{ textAlign: 'right' }}>
-              <ListItemText primary="ניהול מועמדים" />
-            </ListItemButton>
-          </ListItem>
-
-          {/* מסלולי התמחות */}
-          <ListItem disablePadding>
-            <ListItemButton component={Link} to="/internships" onClick={toggleDrawer} sx={{ textAlign: 'right' }}>
-              <ListItemText primary="מסלולי התמחות" />
-            </ListItemButton>
-          </ListItem>
-
-          {/* מחשבון קבלה */}
-          <ListItem disablePadding>
-            <ListItemButton component={Link} to="/calculator" onClick={toggleDrawer} sx={{ textAlign: 'right' }}>
-              <ListItemText primary="מחשבון קבלה" />
-            </ListItemButton>
-          </ListItem>
-
-          {/* טפסים כלליים */}
-          <ListItem disablePadding>
-            <ListItemButton component={Link} to="/forms" onClick={toggleDrawer} sx={{ textAlign: 'right' }}>
-              <ListItemText primary="צור קשר" />
-            </ListItemButton>
-          </ListItem>
-
-          <ListItem disablePadding>
-            <ListItemButton component={Link} to="/alerts" onClick={toggleDrawer} sx={{ textAlign: 'right' }}>
-              <ListItemText primary="ניהול התראות" />
-            </ListItemButton>
-          </ListItem>
-
-          {/* עזרה */}
-          <ListItem disablePadding>
-            <ListItemButton component={Link} to="/help" onClick={toggleDrawer} sx={{ textAlign: 'right' }}>
-              <ListItemText primary="מרכז עזרה" />
-            </ListItemButton>
-          </ListItem>
-
-
+      {/* תיקון הכיוון:
+         בגלל stylis-plugin-rtl שמותקן אצלך, הוא הופך את ה-CSS.
+         לכן, anchor="left" יהפוך בפועל ל-Right במסך.
+      */}
+      <Drawer anchor="left" open={open} onClose={toggleDrawer}>
+        <List sx={styles.drawerList}>
+          {menuItems.map((item) => (
+            <ListItem key={item.path} disablePadding>
+              <ListItemButton component={Link} to={item.path} onClick={toggleDrawer}>
+                <ListItemText
+                  primary={item.text}
+                  style={{ textAlign: 'right' }}
+                />
+              </ListItemButton>
+            </ListItem>
+          ))}
         </List>
       </Drawer>
     </>

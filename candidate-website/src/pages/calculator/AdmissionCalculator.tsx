@@ -4,7 +4,7 @@ import {
     List, ListItem, ListItemIcon, ListItemText, Chip, Divider, Fade
 } from '@mui/material';
 import CalculateIcon from '@mui/icons-material/Calculate';
-import SchoolIcon from '@mui/icons-material/School'; // אייקון למלגות
+import SchoolIcon from '@mui/icons-material/School';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import StarsIcon from '@mui/icons-material/Stars';
 import './Calculator.css';
@@ -18,18 +18,14 @@ interface Scholarship {
 }
 
 const AdmissionCalculator: React.FC = () => {
-    // נתונים
     const [formData, setFormData] = useState({
         degree: 'CS',
         bagrut: '',
         psychometric: ''
     });
 
-    // תוצאות
     const [admissionResult, setAdmissionResult] = useState<{ status: string, message: string, color: "success" | "warning" | "error" } | null>(null);
     const [eligibleScholarships, setEligibleScholarships] = useState<Scholarship[]>([]);
-
-    // ניהול שגיאות
     const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -62,7 +58,6 @@ const AdmissionCalculator: React.FC = () => {
     };
 
     const calculate = () => {
-        // איפוס תוצאות קודמות
         setAdmissionResult(null);
         setEligibleScholarships([]);
 
@@ -70,10 +65,8 @@ const AdmissionCalculator: React.FC = () => {
 
         const bagrut = Number(formData.bagrut);
         const psycho = Number(formData.psychometric);
-
         const score = (bagrut * 6 + psycho) / 2;
 
-        // 2. קביעת סטטוס קבלה
         let isAccepted = false;
         if (score >= 650) {
             isAccepted = true;
@@ -83,7 +76,7 @@ const AdmissionCalculator: React.FC = () => {
                 color: "success"
             });
         } else if (score >= 550) {
-            isAccepted = true; // גבולי אבל נחשב כבעל סיכוי למלגות מסוימות
+            isAccepted = true;
             setAdmissionResult({
                 status: "המתנה / וועדה",
                 message: `ציון מתאם: ${score.toFixed(0)} - נתונים גבוליים, עובר לוועדת קבלה.`,
@@ -97,38 +90,11 @@ const AdmissionCalculator: React.FC = () => {
             });
         }
 
-        // 3. בדיקת זכאות למלגות (רק אם יש סיכוי לקבלה)
         if (isAccepted) {
             const scholarships: Scholarship[] = [];
-
-            // מלגת מצטייני פסיכומטרי
-            if (psycho >= 700) {
-                scholarships.push({
-                    id: 1,
-                    name: "מלגת מצטייני נשיא",
-                    amount: "10,000 ₪",
-                    description: "בזכות ציון פסיכומטרי מעל 700"
-                });
-            }
-
-            // מלגת מצטייני בגרות
-            if (bagrut >= 110) {
-                scholarships.push({
-                    id: 2,
-                    name: "מלגת הישגים בבגרות",
-                    amount: "5,000 ₪",
-                    description: "בזכות ממוצע בגרות מעל 110"
-                });
-            }
-
-            // מלגת עידוד למדעי המחשב (לכולם אם התקבלו)
-            scholarships.push({
-                id: 3,
-                name: "מלגת עידוד טכנולוגי",
-                amount: "2,000 ₪",
-                description: "מענק חד פעמי לנרשמים החודש"
-            });
-
+            if (psycho >= 700) scholarships.push({ id: 1, name: "מלגת מצטייני נשיא", amount: "10,000 ₪", description: "בזכות ציון פסיכומטרי מעל 700" });
+            if (bagrut >= 110) scholarships.push({ id: 2, name: "מלגת הישגים בבגרות", amount: "5,000 ₪", description: "בזכות ממוצע בגרות מעל 110" });
+            scholarships.push({ id: 3, name: "מלגת עידוד טכנולוגי", amount: "2,000 ₪", description: "מענק חד פעמי לנרשמים החודש" });
             setEligibleScholarships(scholarships);
         }
     };
@@ -151,7 +117,6 @@ const AdmissionCalculator: React.FC = () => {
                 <Typography className="section-title">הזנת נתונים</Typography>
 
                 <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
-
                     <TextField
                         select
                         label="בחירת תואר"
@@ -167,7 +132,8 @@ const AdmissionCalculator: React.FC = () => {
                         <MenuItem value="CS">מדעי המחשב</MenuItem>
                     </TextField>
 
-                    <div style={{ textAlign: 'right' }}>
+                    {/* הסרנו את ה-div עם ה-textAlign, כי זה אוטומטי עכשיו */}
+                    <Box>
                         <Typography variant="caption" sx={{ fontWeight: 'bold', mb: 1, display: 'block' }}>
                             ציון פסיכומטרי (200-800)
                         </Typography>
@@ -183,9 +149,9 @@ const AdmissionCalculator: React.FC = () => {
                             error={!!errors.psychometric}
                             helperText={errors.psychometric}
                         />
-                    </div>
+                    </Box>
 
-                    <div style={{ textAlign: 'right' }}>
+                    <Box>
                         <Typography variant="caption" sx={{ fontWeight: 'bold', mb: 1, display: 'block' }}>
                             ממוצע בגרויות (55-120)
                         </Typography>
@@ -201,24 +167,17 @@ const AdmissionCalculator: React.FC = () => {
                             error={!!errors.bagrut}
                             helperText={errors.bagrut}
                         />
-                    </div>
+                    </Box>
 
-                    <Button
-                        variant="contained"
-                        className="calc-button"
-                        onClick={calculate}
-                    >
+                    <Button variant="contained" className="calc-button" onClick={calculate}>
                         בדוק התאמה ומלגות
                     </Button>
                 </Box>
 
-                {/* הצגת תוצאות - מופיע רק אחרי חישוב */}
                 {admissionResult && (
                     <Fade in={true}>
                         <Box sx={{ mt: 4 }}>
                             <Divider sx={{ mb: 3 }}>תוצאות הבדיקה</Divider>
-
-                            {/* סטטוס קבלה */}
                             <Alert
                                 severity={admissionResult.color}
                                 icon={admissionResult.color === 'success' ? <CheckCircleIcon fontSize="inherit" /> : undefined}
@@ -227,7 +186,6 @@ const AdmissionCalculator: React.FC = () => {
                                 {admissionResult.message}
                             </Alert>
 
-                            {/* רשימת מלגות - אם יש */}
                             {eligibleScholarships.length > 0 && (
                                 <Box sx={{ mt: 3, bgcolor: '#e8f5e9', p: 2, borderRadius: 2 }}>
                                     <Typography variant="h6" sx={{ color: '#2e7d32', fontWeight: 'bold', mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>

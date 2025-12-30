@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Container, Typography, TextField, Button, Paper, MenuItem, 
+  Container, TextField, Button, Paper, MenuItem, 
   Snackbar, Alert, Stack 
 } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useNavigate, useParams } from 'react-router-dom';
+import { PageHeader } from '../../components/PageHeader';
 
 // --- הגדרת המחלקה ---
 export class Graduate {
@@ -35,9 +36,7 @@ export class Graduate {
         this.status = status;
     }
 }
-// --------------------
 
-// הגדרת טיפוס ל-State של הטופס כדי למנוע שגיאות ב-setFormData
 interface GraduateFormState {
     fullName: string;
     role: string;
@@ -51,11 +50,8 @@ const GraduateForm: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditMode = !!id;
-
-  // סטייט להודעת הצלחה
   const [showSuccess, setShowSuccess] = useState(false);
 
-  // סטייט לנתונים (עם טיפוס מוגדר)
   const [formData, setFormData] = useState<GraduateFormState>({
     fullName: '',
     role: '',
@@ -78,7 +74,6 @@ const GraduateForm: React.FC = () => {
       const saved = JSON.parse(localStorage.getItem('graduates') || '[]');
       const itemToEdit = saved.find((g: any) => g.id === id);
       if (itemToEdit) {
-          // מוודאים שאנחנו מכניסים רק את השדות הרלוונטיים ל-state
           setFormData({
               fullName: itemToEdit.fullName,
               role: itemToEdit.role,
@@ -93,15 +88,9 @@ const GraduateForm: React.FC = () => {
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-    
-    // בגלל שהגדרנו Interface, טייפסקריפט עכשיו מבין מה זה prevFormData
-    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-    
-    const isValid = event.target.validity 
-        ? event.target.validity.valid 
-        : value !== ''; 
-
-    setErrors((prevErrors) => ({ ...prevErrors, [name]: !isValid }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    const isValid = event.target.validity ? event.target.validity.valid : value !== ''; 
+    setErrors((prev) => ({ ...prev, [name]: !isValid }));
   };
 
   const isFormValid = Object.values(errors).every((error) => !error) && 
@@ -109,7 +98,6 @@ const GraduateForm: React.FC = () => {
 
   const handleSave = () => {
     const saved = JSON.parse(localStorage.getItem('graduates') || '[]');
-    
     const newItem = new Graduate(
         isEditMode ? id! : Date.now().toString(),
         formData.fullName,
@@ -127,7 +115,6 @@ const GraduateForm: React.FC = () => {
       localStorage.setItem('graduates', JSON.stringify([...saved, newItem]));
     }
 
-    // הצגת הודעת הצלחה וניווט
     setShowSuccess(true);
     setTimeout(() => {
         navigate('/graduates');
@@ -135,37 +122,30 @@ const GraduateForm: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="sm" sx={{ mt: 4 }}>
-      <Paper elevation={3} sx={{ p: 4 }}>
-        <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', mb: 3 }}>
-          {isEditMode ? 'עריכת פרטי בוגר' : 'הוספת בוגר חדש'}
-        </Typography>
+    <Container maxWidth="sm">
+      <PageHeader title={isEditMode ? 'עריכת פרטי בוגר' : 'הוספת בוגר חדש'} />
 
-        {/* שימוש ב-Stack במקום Grid */}
+      <Paper elevation={3} sx={{ p: 4 }}>
         <Stack spacing={3}>
             
             <TextField
               fullWidth label="שם מלא" name="fullName"
               value={formData.fullName} onChange={handleChange}
-              error={!!errors.fullName}
-              helperText={errors.fullName ? 'שם מלא חובה' : ''}
+              error={!!errors.fullName} helperText={errors.fullName ? 'שם מלא חובה' : ''}
               required
             />
 
-            {/* שורה אחת לשני שדות קצרים */}
             <Stack direction="row" spacing={2}>
                 <TextField
-                fullWidth label="תפקיד נוכחי" name="role"
-                value={formData.role} onChange={handleChange}
-                error={!!errors.role}
-                helperText={errors.role ? 'תפקיד חובה' : ''}
-                required
-                placeholder="למשל: מפתח Full Stack"
+                    fullWidth label="תפקיד נוכחי" name="role"
+                    value={formData.role} onChange={handleChange}
+                    error={!!errors.role} helperText={errors.role ? 'תפקיד חובה' : ''}
+                    required placeholder="למשל: מפתח Full Stack"
                 />
                 
                 <TextField
-                select fullWidth label="תואר" name="degree"
-                value={formData.degree} onChange={handleChange}
+                    select fullWidth label="תואר" name="degree"
+                    value={formData.degree} onChange={handleChange}
                 >
                     <MenuItem value="מדעי המחשב">מדעי המחשב</MenuItem>
                 </TextField>
@@ -174,18 +154,14 @@ const GraduateForm: React.FC = () => {
             <TextField
               fullWidth label="קישור לתמונה (URL)" name="imageUrl"
               value={formData.imageUrl} onChange={handleChange}
-              error={!!errors.imageUrl}
-              helperText={errors.imageUrl ? 'קישור לתמונה חובה' : ''}
-              type='url'
-              required
-              placeholder="https://example.com/photo.jpg"
+              error={!!errors.imageUrl} helperText={errors.imageUrl ? 'קישור לתמונה חובה' : ''}
+              type='url' required placeholder="https://example.com/photo.jpg"
             />
 
             <TextField
               fullWidth multiline rows={4} label="סיפור הצלחה / חוות דעת" name="review"
               value={formData.review} onChange={handleChange}
-              error={!!errors.review}
-              helperText={errors.review ? 'חוות דעת חובה' : ''}
+              error={!!errors.review} helperText={errors.review ? 'חוות דעת חובה' : ''}
               required
             />
             
@@ -200,23 +176,16 @@ const GraduateForm: React.FC = () => {
                 </TextField>
             )}
 
-            {/* כפתורים */}
             <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
                 <Button 
-                    variant="contained" 
-                    onClick={handleSave} 
-                    startIcon={<SaveIcon />} 
-                    disabled={!isFormValid}
-                    fullWidth
+                    variant="contained" onClick={handleSave} 
+                    startIcon={<SaveIcon />} disabled={!isFormValid} fullWidth
                 >
                     שמור
                 </Button>
                 <Button 
-                    variant="outlined" 
-                    color="secondary" 
-                    onClick={() => navigate('/graduates')} 
-                    startIcon={<ArrowForwardIcon />}
-                    fullWidth
+                    variant="outlined" color="secondary" onClick={() => navigate('/graduates')} 
+                    startIcon={<ArrowForwardIcon />} fullWidth
                 >
                     ביטול
                 </Button>
@@ -224,18 +193,14 @@ const GraduateForm: React.FC = () => {
         </Stack>
       </Paper>
 
-      {/* רכיב הודעת הצלחה */}
       <Snackbar 
-        open={showSuccess} 
-        autoHideDuration={1500} 
-        onClose={() => setShowSuccess(false)}
+        open={showSuccess} autoHideDuration={1500} onClose={() => setShowSuccess(false)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
         <Alert severity="success" variant="filled" sx={{ width: '100%' }}>
           הנתונים נשמרו בהצלחה!
         </Alert>
       </Snackbar>
-
     </Container>
   );
 };

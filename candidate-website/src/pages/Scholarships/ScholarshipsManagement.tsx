@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Chip } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
+import { 
+  Container, Table, TableBody, TableCell, TableContainer, 
+  TableHead, TableRow, Paper, IconButton, Chip 
+} from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from 'react-router-dom';
+import { PageHeader } from '../../components/PageHeader';
 
-// --- הגדרת המחלקה (Class) בתוך הקובץ ---
-export class Scholarship {
+// הערה: עדיף לייבא את Scholarship מקובץ Scholarship.ts אם הוא קיים בפרויקט
+// לצורך הדוגמה נשאיר את המבנה שהיה בטבלה
+interface ScholarshipData {
     id: string;
     code: string;
     name: string;
@@ -14,55 +18,41 @@ export class Scholarship {
     amount: number;
     link: string;
     conditions: string;
-
-    constructor(id: string, code: string, name: string, targetAudience: string, amount: number, link: string, conditions: string) {
-        this.id = id;
-        this.code = code;
-        this.name = name;
-        this.targetAudience = targetAudience;
-        this.amount = amount;
-        this.link = link;
-        this.conditions = conditions;
-    }
 }
-// ----------------------------------------
 
 const ScholarshipsManagement: React.FC = () => {
   const navigate = useNavigate();
-  const [scholarships, setScholarships] = useState<any[]>([]);
+  const [scholarships, setScholarships] = useState<ScholarshipData[]>([]);
 
   useEffect(() => {
     const saved = localStorage.getItem('scholarships');
-    
     if (saved) {
-      // אם יש נתונים בזיכרון - טען אותם
       setScholarships(JSON.parse(saved));
     } else {
-      // --- שינוי: מתחילים עם רשימה ריקה ---
       setScholarships([]); 
     }
   }, []);
 
   const handleDelete = (id: string) => {
     if (window.confirm("למחוק את המלגה?")) {
-      const updated = scholarships.filter((s: any) => s.id !== id);
+      const updated = scholarships.filter((s) => s.id !== id);
       setScholarships(updated);
       localStorage.setItem('scholarships', JSON.stringify(updated));
     }
   };
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4 }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
-        <Typography variant="h4" sx={{ fontWeight: 'bold' }}>ניהול מלגות</Typography>
-        <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/scholarships/new')}>
-          הוסף מלגה
-        </Button>
-      </div>
+    <Container maxWidth="lg">
+      
+      <PageHeader 
+        title="ניהול מלגות" 
+        buttonText="הוסף מלגה"
+        onButtonClick={() => navigate('/scholarships/new')}
+      />
       
       <TableContainer component={Paper} elevation={3}>
         <Table>
-          <TableHead sx={{ bgcolor: '#f5f5f5' }}>
+          <TableHead sx={{ bgcolor: 'action.hover' }}>
             <TableRow>
               <TableCell><b>קוד</b></TableCell>
               <TableCell><b>שם המלגה</b></TableCell>
@@ -79,7 +69,7 @@ const ScholarshipsManagement: React.FC = () => {
                     <TableCell colSpan={7} align="center">לא נמצאו מלגות. לחץ על "הוסף מלגה" כדי להתחיל.</TableCell>
                 </TableRow>
             ) : (
-                scholarships.map((s: any) => (
+                scholarships.map((s) => (
                 <TableRow key={s.id}>
                     <TableCell>{s.code}</TableCell>
                     <TableCell sx={{ fontWeight: 'bold' }}>{s.name}</TableCell>
@@ -94,8 +84,12 @@ const ScholarshipsManagement: React.FC = () => {
                         {s.conditions}
                     </TableCell>
                     <TableCell align="center">
-                    <IconButton color="primary" onClick={() => navigate(`/scholarships/edit/${s.id}`)}><EditIcon /></IconButton>
-                    <IconButton color="error" onClick={() => handleDelete(s.id)}><DeleteIcon /></IconButton>
+                        <IconButton color="primary" onClick={() => navigate(`/scholarships/edit/${s.id}`)}>
+                            <EditIcon />
+                        </IconButton>
+                        <IconButton color="error" onClick={() => handleDelete(s.id)}>
+                            <DeleteIcon />
+                        </IconButton>
                     </TableCell>
                 </TableRow>
                 ))

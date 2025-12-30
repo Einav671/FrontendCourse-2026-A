@@ -1,26 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Chip } from '@mui/material';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { useNavigate } from 'react-router-dom';
 import { Course } from './Course';
-import './CoursesTable.css';
-import '@fontsource/roboto/300.css';
-import '@fontsource/roboto/400.css';
-import '@fontsource/roboto/500.css';
-import '@fontsource/roboto/700.css';
-import Button from '@mui/material/Button';
-import SaveIcon from '@mui/icons-material/Save';
-import AddIcon from '@mui/icons-material/Add';
-import EditIcon from '@mui/icons-material/Edit'; // ייבוא אייקון עריכה
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
-import IconButton from '@mui/material/IconButton'; // לכפתור העריכה בטבלה
-import { useNavigate } from 'react-router-dom'; // הוק לניווט
+import { PageHeader } from '../../components/PageHeader'; // ייבוא הרכיב המשותף
+import './CoursesTable.css'; 
 
 const CoursesTable: React.FC = () => {
-  const navigate = useNavigate(); // אתחול ה-Hook לניווט
+  const navigate = useNavigate();
   const [courses, setCourses] = useState<Course[]>([]);
   const LOCAL_STORAGE_KEY = 'my-courses';
 
@@ -29,107 +17,85 @@ const CoursesTable: React.FC = () => {
     if (savedCourses) {
       setCourses(JSON.parse(savedCourses));
     } else {
-      setCourses([
+      const initialData = [
         new Course("1", "מבוא למדעי המחשב", "10111", 5, "קורס בסיס", "CS-BA", "חובה")
-      ]);
+      ];
+      setCourses(initialData);
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(initialData));
     }
   }, []);
 
-  const addRandomCourse = () => {
-    const names = ["סדנת לינוקס", "מבוא לסייבר", "תכנות מונחה עצמים", "מסדי נתונים", "לוגיקה"];
-    const types = ["חובה", "בחירה"];
-    const degrees = ["CS-BA", "CS-AI", "CS-SEC"];
-
-    const randomId = Date.now().toString();
-    const newCourse = new Course(
-      randomId,
-      names[Math.floor(Math.random() * names.length)],
-      Math.floor(10000 + Math.random() * 90000).toString(),
-      Math.floor(Math.random() * 4) + 2,
-      "קורס שנוצר באופן אקראי",
-      degrees[Math.floor(Math.random() * degrees.length)],
-      types[Math.floor(Math.random() * types.length)]
-    );
-
-    setCourses(prevCourses => [...prevCourses, newCourse]);
+  const handleDelete = (id: string) => {
+    if (window.confirm("האם אתה בטוח שברצונך למחוק קורס זה?")) {
+      const updatedCourses = courses.filter(c => c.id !== id);
+      setCourses(updatedCourses);
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updatedCourses));
+    }
   };
-
-  const saveToLocalStorage = () => {
-    const jsonString = JSON.stringify(courses);
-    localStorage.setItem(LOCAL_STORAGE_KEY, jsonString);
-    alert("הנתונים נשמרו בהצלחה ב-Local Storage!");
-  };
-
-  const clearTable = () => {
-    setCourses([]);
-    localStorage.removeItem(LOCAL_STORAGE_KEY);
-  }
 
   return (
-    <div className="courses-container">
-      {/* כפתורי פעולה */}
-      <div className="actions-bar" style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '20px' }}>
+    <Container maxWidth="lg" sx={{ mt: 4 }}>
+      {/* שימוש ב-PageHeader לכותרת וכפתור */}
+      <PageHeader 
+        title="ניהול קורסים" 
+        buttonText="הוסף קורס חדש" 
+        onButtonClick={() => navigate('/courses/new')} 
+      />
 
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => navigate('/courses/new')}
-          startIcon={<AddIcon />}
-          sx={{ fontWeight: 'bold' }}
-        >
-          צור קורס חדש (טופס)
-        </Button>
-
-        <Button variant="contained" color='info' onClick={addRandomCourse}>
-          <AddIcon fontSize='small' sx={{ mr: 1 }} /> הוסף קורס אקראי
-        </Button>
-        <Button variant="contained" color='success' onClick={saveToLocalStorage}>
-          <SaveIcon fontSize='small' sx={{ mr: 1 }} /> שמור שינויים
-        </Button>
-
-        <Button variant="contained" color='error' onClick={clearTable}>
-          אפס טבלה
-        </Button>
-      </div>
-
-      <TableContainer component={Paper}>
-        <Table className="courses-table" aria-label="courses table">
-          <TableHead>
+      <TableContainer component={Paper} elevation={3}>
+        <Table aria-label="courses table">
+          <TableHead sx={{ bgcolor: '#f5f5f5' }}>
             <TableRow>
-              <TableCell align="center" style={{ fontWeight: 'bold' }}>פעולות</TableCell> {/* עמודה חדשה */}
-              <TableCell align="center">קוד קורס</TableCell>
-              <TableCell align="center">שם הקורס</TableCell>
-              <TableCell align="center">נק"ז</TableCell>
-              <TableCell align="center">תיאור</TableCell>
-              <TableCell align="center">שייך לתואר</TableCell>
-              <TableCell align="center">סוג</TableCell>
+              <TableCell sx={{ fontWeight: 'bold' }}>קוד קורס</TableCell>
+              <TableCell sx={{ fontWeight: 'bold' }}>שם הקורס</TableCell>
+              <TableCell sx={{ fontWeight: 'bold' }}>נק"ז</TableCell>
+              <TableCell sx={{ fontWeight: 'bold' }}>תיאור</TableCell>
+              <TableCell sx={{ fontWeight: 'bold' }}>תואר</TableCell>
+              <TableCell sx={{ fontWeight: 'bold' }}>סוג</TableCell>
+              <TableCell align="center" sx={{ fontWeight: 'bold' }}>פעולות</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {courses.map((course) => (
-              <TableRow key={course.id}>
-                <TableCell align="center">
-                  <IconButton
-                    color="primary"
-                    onClick={() => navigate(`/courses/edit/${course.id}`)}
-                    aria-label="edit"
-                  >
-                    <EditIcon />
-                  </IconButton>
+            {courses.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} align="center">
+                  לא נמצאו קורסים.
                 </TableCell>
-
-                <TableCell align="center">{course.code}</TableCell>
-                <TableCell align="right">{course.name}</TableCell>
-                <TableCell align="center">{course.credits}</TableCell>
-                <TableCell align="right">{course.description}</TableCell>
-                <TableCell align="center">{course.degreeCode}</TableCell>
-                <TableCell align="right">{course.type}</TableCell>
               </TableRow>
-            ))}
+            ) : (
+              courses.map((course) => (
+                <TableRow key={course.id} hover>
+                  <TableCell>{course.code}</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>{course.name}</TableCell>
+                  <TableCell>{course.credits}</TableCell>
+                  <TableCell sx={{ maxWidth: 200, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    {course.description}
+                  </TableCell>
+                  <TableCell>{course.degreeCode}</TableCell>
+                  <TableCell>
+                    <Chip label={course.type} size="small" color={course.type === 'חובה' ? 'primary' : 'default'} />
+                  </TableCell>
+                  <TableCell align="center">
+                    <IconButton 
+                        color="primary" 
+                        onClick={() => navigate(`/courses/edit/${course.id}`)}
+                    >
+                      <EditIcon />
+                    </IconButton>
+                    <IconButton 
+                        color="error" 
+                        onClick={() => handleDelete(course.id)}
+                    >
+                      <DeleteIcon />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </TableContainer>
-    </div>
+    </Container>
   );
 };
 

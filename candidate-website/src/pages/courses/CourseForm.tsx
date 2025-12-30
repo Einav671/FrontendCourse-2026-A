@@ -1,19 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Container, Typography, TextField, Button, Paper, Grid, Radio, FormControlLabel
+  Container, TextField, Button, Paper, Radio, FormControlLabel,
+  Snackbar, Alert, Stack, Typography, Box, RadioGroup
 } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Course } from './Course';
+import { PageHeader } from '../../components/PageHeader';
 
 const CourseForm: React.FC = () => {
   const navigate = useNavigate();
-  const { id } = useParams(); // אם יש ID ב-URL, אנחנו במצב עריכה
+  const { id } = useParams();
+  const isEditMode = !!id;
 
-  const isEditMode = !!id; // בוליאני - האם עריכה או יצירה
+  const [showSuccess, setShowSuccess] = useState(false);
 
-  // State לטופס
   const [formData, setFormData] = useState({
     name: '',
     code: '',
@@ -23,7 +25,6 @@ const CourseForm: React.FC = () => {
     type: 'חובה'
   });
 
-  // טיפול בשגיאות
   const [errors, setErrors] = useState({
     name: false,
     code: false,
@@ -33,7 +34,6 @@ const CourseForm: React.FC = () => {
     type: false,
   });
 
-  // אם זה מצב עריכה - נטען את הנתונים הקיימים
   useEffect(() => {
     if (isEditMode) {
       const savedCourses = JSON.parse(localStorage.getItem('my-courses') || '[]');
@@ -46,27 +46,20 @@ const CourseForm: React.FC = () => {
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-
-    setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
-
-    const isValid = event.target.validity
-      ? event.target.validity.valid
-      : value !== ''; // בדיקת גיבוי
-
-    setErrors((prevErrors) => ({ ...prevErrors, [name]: !isValid }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    const isValid = event.target.validity ? event.target.validity.valid : value !== '';
+    setErrors((prev) => ({ ...prev, [name]: !isValid }));
   };
 
   const handleSave = () => {
     const savedCourses = JSON.parse(localStorage.getItem('my-courses') || '[]');
 
     if (isEditMode) {
-      // עדכון קיים
       const updatedCourses = savedCourses.map((c: Course) =>
         c.id === id ? { ...formData, id } : c
       );
       localStorage.setItem('my-courses', JSON.stringify(updatedCourses));
     } else {
-      // יצירה חדשה
       const newCourse = {
         ...formData,
         id: Date.now().toString()
@@ -74,33 +67,32 @@ const CourseForm: React.FC = () => {
       localStorage.setItem('my-courses', JSON.stringify([...savedCourses, newCourse]));
     }
 
-    // החזרה לדף הקודם
-    navigate('/management');
+    setShowSuccess(true);
+    setTimeout(() => {
+        navigate('/management'); // שים לב: זה מחזיר ל-/management לפי הקוד המקורי שלך, אולי תרצה לשנות ל-/courses?
+    }, 1500);
   };
 
   const isFormValid = Object.values(errors).every((error) => !error) && Object.values(formData).every((value) => value !== "");
 
   return (
     <Container maxWidth="sm" sx={{ mt: 4 }}>
-      <Paper elevation={3} sx={{ p: 4 }}>
-        <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', mb: 3 }}>
-          {isEditMode ? 'עריכת קורס' : 'יצירת קורס חדש'}
-        </Typography>
+      <PageHeader title={isEditMode ? 'עריכת קורס' : 'יצירת קורס חדש'} />
 
-        <Grid container spacing={2}>
-          <Grid size={6}>
-            <TextField
-              fullWidth
-              label="שם הקורס"
-              name="name"
-              value={formData.name}
-              onChange={handleChange}
-              required
-              error={!!errors.name}
-              helperText={errors.name ? "שם הקורס נדרש" : ""}
-            />
-          </Grid>
-          <Grid size={6}>
+      <Paper elevation={3} sx={{ p: 4 }}>
+        <Stack spacing={3}>
+          <TextField
+            fullWidth
+            label="שם הקורס"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+            required
+            error={!!errors.name}
+            helperText={errors.name ? "שם הקורס נדרש" : ""}
+          />
+
+          <Stack direction="row" spacing={2}>
             <TextField
               fullWidth
               type="number"
@@ -110,11 +102,9 @@ const CourseForm: React.FC = () => {
               onChange={handleChange}
               required
               error={!!errors.code}
-              helperText={errors.code ? "קוד קורס נדרש מ-10000 ל-99999" : ""}
+              helperText={errors.code ? "נדרש 10000-99999" : ""}
               slotProps={{ htmlInput: { min: 10000, max: 99999 } }}
             />
-          </Grid>
-          <Grid size={6}>
             <TextField
               fullWidth
               type="number"
@@ -124,93 +114,74 @@ const CourseForm: React.FC = () => {
               onChange={handleChange}
               required
               error={!!errors.credits}
-              helperText={errors.credits ? "נקודות זכות נדרשות מ-0 ל-10" : ""}
+              helperText={errors.credits ? "0-10" : ""}
               slotProps={{ htmlInput: { min: 0, max: 10 } }}
             />
-          </Grid>
-          <Grid size={12}>
-            <Typography variant="subtitle1" gutterBottom>
-              סוג קורס
-            </Typography>
-            <Grid container spacing={2}>
-              <Grid>
-                <FormControlLabel
-                  control={
-                    <Radio
-                      checked={formData.type === "חובה"}
-                      onChange={handleChange}
-                      value="חובה"
-                      name="type"
-                    />
-                  }
-                  label="חובה"
-                />
-              </Grid>
-              <Grid >
-                <FormControlLabel
-                  control={
-                    <Radio
-                      checked={formData.type === "בחירה"}
-                      onChange={handleChange}
-                      value="בחירה"
-                      name="type"
-                    />
-                  }
-                  label="בחירה"
-                />
-              </Grid>
-              <Grid >
-                <FormControlLabel
-                  control={
-                    <Radio
-                      checked={formData.type === "סמינר"}
-                      onChange={handleChange}
-                      value="סמינר"
-                      name="type"
-                    />
-                  }
-                  label="סמינר"
-                />
-              </Grid>
-            </Grid>
-          </Grid>
-          <Grid size={12}>
-            <TextField
+          </Stack>
+
+          <Box>
+            <Typography variant="subtitle1" gutterBottom>סוג קורס</Typography>
+            <RadioGroup
+                row
+                name="type"
+                value={formData.type}
+                onChange={handleChange}
+            >
+                <FormControlLabel value="חובה" control={<Radio />} label="חובה" />
+                <FormControlLabel value="בחירה" control={<Radio />} label="בחירה" />
+                <FormControlLabel value="סמינר" control={<Radio />} label="סמינר" />
+            </RadioGroup>
+          </Box>
+
+          <TextField
+            fullWidth
+            multiline
+            rows={3}
+            label="תיאור"
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            required
+            error={!!errors.description}
+            helperText={errors.description ? "תיאור נדרש" : ""}
+          />
+
+          <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<SaveIcon />}
+              onClick={handleSave}
+              disabled={!isFormValid}
               fullWidth
-              multiline
-              rows={3}
-              label="תיאור"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              required
-              error={!!errors.description}
-              helperText={errors.description ? "תיאור נדרש" : ""}
-            />
-          </Grid>
-        </Grid>
+            >
+              שמור וחזור
+            </Button>
 
-        <div style={{ marginTop: '24px', display: 'flex', gap: '10px' }}>
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<SaveIcon />}
-            onClick={handleSave}
-            disabled={!isFormValid} // Disable button if form is invalid
-          >
-            שמור וחזור
-          </Button>
-
-          <Button
-            variant="outlined"
-            color="secondary"
-            startIcon={<ArrowForwardIcon />}
-            onClick={() => navigate('/management')}
-          >
-            ביטול
-          </Button>
-        </div>
+            <Button
+              variant="outlined"
+              color="secondary"
+              startIcon={<ArrowForwardIcon />}
+              onClick={() => navigate('/management')}
+              fullWidth
+            >
+              ביטול
+            </Button>
+          </Stack>
+        </Stack>
       </Paper>
+
+      <Snackbar 
+        open={showSuccess} 
+        autoHideDuration={1500} 
+        onClose={() => setShowSuccess(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert severity="success" variant="filled" sx={{ width: '100%' }}>
+          הקורס נשמר בהצלחה!
+        </Alert>
+      </Snackbar>
+
     </Container>
   );
 };

@@ -1,19 +1,26 @@
 import React from 'react';
-import CoursesTable from './courses/CoursesTable'; // הטבלה של החברים שלך
-import { Container, Typography, Box } from '@mui/material';
+import CoursesTable from './courses/CoursesTable'; 
+import { Container, Box } from '@mui/material';
+import { PageHeader } from '../components/PageHeader'; // וודא שהנתיב תקין
 
 const Management: React.FC = () => {
 
-  return (
-    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      {/* כותרת הדף */}
-      <Typography variant="h4" component="h1" gutterBottom align="center" sx={{ fontWeight: 'bold', color: '#1976d2', mb: 1 }}>
-       ניהול קורסים
-      </Typography>
-      
+  const handleAddCourse = () => {
+    console.log('Open Add Course Modal');
+    // כאן תהיה הלוגיקה לפתיחת המודל או הניווט
+  };
 
-      {/* --- הטבלה הקיימת (קורסים) --- */}
-      <Box sx={{ mt: 4 }}>
+  return (
+    <Container maxWidth="lg">
+      
+      {/* כותרת וכפתור הוספה מרוכזים ברכיב אחד */}
+      <PageHeader 
+        title="ניהול קורסים" 
+        buttonText="הוסף קורס חדש"
+        onButtonClick={handleAddCourse}
+      />
+
+      <Box sx={{ mt: 2 }}>
         <CoursesTable />
       </Box>
 

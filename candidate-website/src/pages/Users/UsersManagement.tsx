@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Typography, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Chip } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
+import { 
+  Container, Table, TableBody, TableCell, TableContainer, 
+  TableHead, TableRow, Paper, IconButton, Chip 
+} from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from 'react-router-dom';
-
-// filepath: c:/Users/yuval/frontend-2025/FrontendCourse-2026-A/candidate-website/src/pages/Users/UsersManagement.tsx
+import { PageHeader } from '../../components/PageHeader';
 
 interface User {
     id: string;
@@ -24,7 +25,7 @@ const UsersManagement: React.FC = () => {
         if (saved) {
             setUsers(JSON.parse(saved));
         } else {
-            // Demo data if no users exist
+            // נתונים ראשוניים לדוגמה אם אין כלום
             setUsers([
                 { id: "1", fullName: "ישראל ישראלי", email: "israel@test.com", password: "123456", userType: "מועמד" },
                 { id: "2", fullName: "דנה כהן", email: "dana@test.com", password: "abcdef", userType: "סטודנט" }
@@ -51,24 +52,23 @@ const UsersManagement: React.FC = () => {
     };
 
     return (
-        <Container maxWidth="lg" sx={{ mt: 4 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
-                <Typography variant="h4" sx={{ fontWeight: 'bold' }}>ניהול משתמשים</Typography>
-                <Button variant="contained" startIcon={<AddIcon />} onClick={() => navigate('/users/new')}>
-                    משתמש חדש
-                </Button>
-            </div>
-            <br />
+        <Container maxWidth="lg">
+            {/* כותרת וכפתור הוספה */}
+            <PageHeader 
+                title="ניהול משתמשים" 
+                buttonText="משתמש חדש"
+                onButtonClick={() => navigate('/users/new')}
+            />
 
-            <TableContainer component={Paper}>
+            <TableContainer component={Paper} elevation={3}>
                 <Table>
-                    <TableHead sx={{ bgcolor: '#f5f5f5' }}>
+                    <TableHead sx={{ bgcolor: 'action.hover' }}>
                         <TableRow>
-                            <TableCell>שם מלא</TableCell>
-                            <TableCell>מייל</TableCell>
-                            <TableCell>סיסמא</TableCell>
-                            <TableCell align="center">סוג משתמש</TableCell>
-                            <TableCell align="center">פעולות</TableCell>
+                            <TableCell><b>שם מלא</b></TableCell>
+                            <TableCell><b>מייל</b></TableCell>
+                            <TableCell><b>סיסמא</b></TableCell>
+                            <TableCell align="center"><b>סוג משתמש</b></TableCell>
+                            <TableCell align="center"><b>פעולות</b></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -78,11 +78,19 @@ const UsersManagement: React.FC = () => {
                                 <TableCell>{user.email}</TableCell>
                                 <TableCell>{user.password}</TableCell>
                                 <TableCell align="center">
-                                    <Chip label={user.userType} color={getUserTypeColor(user.userType) as any} size="small" />
+                                    <Chip 
+                                        label={user.userType} 
+                                        color={getUserTypeColor(user.userType) as any} 
+                                        size="small" 
+                                    />
                                 </TableCell>
                                 <TableCell align="center">
-                                    <IconButton color="primary" onClick={() => navigate(`/users/edit/${user.id}`)}><EditIcon /></IconButton>
-                                    <IconButton color="error" onClick={() => handleDelete(user.id)}><DeleteIcon /></IconButton>
+                                    <IconButton color="primary" onClick={() => navigate(`/users/edit/${user.id}`)}>
+                                        <EditIcon />
+                                    </IconButton>
+                                    <IconButton color="error" onClick={() => handleDelete(user.id)}>
+                                        <DeleteIcon />
+                                    </IconButton>
                                 </TableCell>
                             </TableRow>
                         ))}
