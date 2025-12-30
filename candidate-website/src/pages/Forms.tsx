@@ -5,8 +5,10 @@ import {
   Paper, 
   Stack, 
   Snackbar, 
-  Alert 
+  Alert,
+  Button 
 } from '@mui/material';
+import SendIcon from '@mui/icons-material/Send'; // אייקון לשליחה
 import { PageHeader } from '../components/PageHeader'; // וודא שהנתיב תקין
 
 // הגדרת הממשק לנתוני הטופס
@@ -36,18 +38,38 @@ const Forms: React.FC = () => {
   // State להודעת הצלחה (Snackbar)
   const [showSuccess, setShowSuccess] = useState(false);
 
+  // פונקציית עזר לביטויים רגולריים (Regex)
+  const validators = {
+    email: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, // בודק מבנה אימייל תקין
+    phone: /^[0-9]{10}$/ // בודק שהמספר מכיל בדיוק 10 ספרות
+  };
+
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     
     setFormData((prev) => ({ ...prev, [name]: value }));
     
-    // בדיקת ולידציה בסיסית בעת הקלדה
-    const isValid = event.target.validity.valid && value !== '';
+    // לוגיקת ולידציה
+    let isValid = true;
+
+    if (name === 'phone') {
+        // בדיקת טלפון: רק ספרות ובדיוק 10 תווים
+        isValid = validators.phone.test(value);
+    } else if (name === 'email') {
+        // בדיקת אימייל
+        isValid = validators.email.test(value);
+    } else if (name === 'fullName') {
+        // בדיקת שם: לא ריק
+        isValid = value.trim().length > 0;
+    }
+
+    // עדכון סטייט השגיאות (אם השדה הוא לא notes)
     if (name !== 'notes') {
         setErrors((prev) => ({ ...prev, [name]: !isValid }));
     }
   };
 
+  // הטופס תקין רק אם אין שגיאות וכל שדות החובה מלאים
   const isFormValid = 
     !errors.fullName && !errors.email && !errors.phone &&
     formData.fullName !== "" && formData.email !== "" && formData.phone !== "";
@@ -55,7 +77,9 @@ const Forms: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // 1. שמירה ל-localStorage (סימולציה של שליחה לשרת)
+    if (!isFormValid) return;
+
+    // 1. שמירה ל-localStorage (סימולציה)
     const existingLeads = JSON.parse(localStorage.getItem('leads') || '[]');
     const newLead = { ...formData, id: Date.now(), date: new Date().toISOString() };
     localStorage.setItem('leads', JSON.stringify([...existingLeads, newLead]));
@@ -63,24 +87,21 @@ const Forms: React.FC = () => {
     // 2. הצגת פידבק למשתמש
     setShowSuccess(true);
 
-    // 3. איפוס הטופס לאחר השהיה קצרה (כדי שהמשתמש יראה את ההודעה)
+    // 3. איפוס הטופס
     setTimeout(() => {
       setFormData({ fullName: '', email: '', phone: '', notes: '' });
+      setErrors({ fullName: false, email: false, phone: false }); // איפוס גם לשגיאות ויזואליות
       setShowSuccess(false);
     }, 1500);
   };
 
   return (
     <Container maxWidth="sm">
-      {/* שימוש בקומפוננטה המשותפת לכותרת */}
-      <PageHeader 
-        title="מתעניינים בתואר?" 
-        // במידה ורוצים כפתור נוסף אפשר להוסיף כאן, כרגע זה טופס רישום אז לא חובה
-      />
+      {/* כותרת הדף */}
+      <PageHeader title="מתעניינים בתואר?" />
 
       <Paper elevation={3} sx={{ p: 4 }}>
         <form onSubmit={handleSubmit}>
-          {/* שימוש ב-Stack לסידור אנכי ומרווחים אחידים */}
           <Stack spacing={3}>
             
             <TextField
@@ -101,7 +122,7 @@ const Forms: React.FC = () => {
               value={formData.email}
               onChange={handleChange}
               error={errors.email}
-              helperText={errors.email ? 'אימייל לא תקין' : ''}
+              helperText={errors.email ? 'נא להזין כתובת אימייל תקינה' : ''}
               required
               fullWidth
             />
@@ -114,7 +135,8 @@ const Forms: React.FC = () => {
               onChange={handleChange}
               error={errors.phone}
               helperText={errors.phone ? 'מספר טלפון חייב להכיל 10 ספרות בדיוק' : ''}
-              inputProps={{ pattern: "[0-9]{10}", maxLength: 10 }}
+              // מגביל את הקלט ברמת ה-HTML
+              inputProps={{ maxLength: 10, inputMode: 'numeric' }} 
               required
               fullWidth
             />
@@ -129,17 +151,18 @@ const Forms: React.FC = () => {
               fullWidth
             />
 
-            {/* הכפתור הראשי של הטופס */}
-            <PageHeader 
-                title="" 
-                buttonText="שלח פרטים" 
-                onButtonClick={() => { /* הקליק מטופל ע"י ה-form submit */ }} 
-            />
-             {/* הערה: אם PageHeader לא תומך ב-type="submit", עדיף להשתמש בכפתור רגיל בתוך ה-Stack: */}
-             {/* <Button type="submit" variant="contained" size="large" disabled={!isFormValid}>
+            {/* כפתור שליחה רגיל (PageHeader לא מתאים כאן) */}
+            <Button 
+                type="submit" 
+                variant="contained" 
+                size="large" 
+                disabled={!isFormValid}
+                endIcon={<SendIcon />} // ב-RTL האייקון יופיע בצד הנכון
+                fullWidth
+            >
                 שלח פרטים
-             </Button> 
-             */}
+            </Button>
+
           </Stack>
         </form>
       </Paper>

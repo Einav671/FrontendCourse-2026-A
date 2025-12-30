@@ -15,8 +15,8 @@ import SecurityIcon from '@mui/icons-material/Security';
 import CloudIcon from '@mui/icons-material/Cloud';
 import StorageIcon from '@mui/icons-material/Storage';
 import BuildIcon from '@mui/icons-material/Build';
-import DeveloperModeIcon from '@mui/icons-material/DeveloperMode';
-import SettingsEthernetIcon from '@mui/icons-material/SettingsEthernet';
+//import DeveloperModeIcon from '@mui/icons-material/DeveloperMode';
+//import SettingsEthernetIcon from '@mui/icons-material/SettingsEthernet';
 
 export class Internship {
   id: string;

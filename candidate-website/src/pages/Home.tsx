@@ -58,7 +58,7 @@ const Home: React.FC = () => {
 
   // פונקציית עזר לרינדור כרטיס
   const renderKpiCard = (title: string, value: string | number, subtext: string, icon: React.ReactNode, bgColor: string, color: string, path: string) => (
-    <Grid item xs={12} md={4}>
+    <Grid>
       <Paper elevation={2} sx={styles.kpiPaper} onClick={() => navigate(path)}>
         <Avatar sx={{ width: 56, height: 56, bgcolor: bgColor, color: color }}>
           {icon}
@@ -93,7 +93,7 @@ const Home: React.FC = () => {
 
       {/* אזור התראות מערכת */}
       <Grid container spacing={4}>
-        <Grid item xs={12}>
+        <Grid>
           <Paper elevation={3} sx={{ p: 3, minHeight: 250 }}>
             <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 3 }}>
               התראות מערכת

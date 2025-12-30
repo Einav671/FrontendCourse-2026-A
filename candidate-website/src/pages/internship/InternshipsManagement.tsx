@@ -104,7 +104,7 @@ const InternshipsManagement: React.FC = () => {
 
       <Grid container spacing={4}>
         {internships.map((internship, index) => (
-          <Grid item xs={12} md={4} key={index}>
+          <Grid key={index}>
             <Paper elevation={3} sx={{ ...styles.card, backgroundColor: internship.color }}>
               
               <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>

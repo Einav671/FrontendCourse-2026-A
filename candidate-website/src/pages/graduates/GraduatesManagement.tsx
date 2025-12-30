@@ -10,7 +10,8 @@ import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '../../components/PageHeader';
 
-export class Graduate {
+
+export interface Graduate {
     id: string;
     fullName: string;
     role: string;
@@ -18,8 +19,8 @@ export class Graduate {
     imageUrl: string;
     review: string;
     status: 'pending' | 'approved' | 'rejected';
-    // ... constructor unchanged
 }
+// אין צורך ב-constructor
 
 const GraduatesManagement: React.FC = () => {
   const navigate = useNavigate();
