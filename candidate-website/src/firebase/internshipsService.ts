@@ -8,7 +8,7 @@ import {
     doc,
 } from 'firebase/firestore';
 import { db } from './config';
-import type { Internship } from '../pages/internships/Internship';
+import type { Internship } from '../pages/internship/Internship';
 
 const COLLECTION_NAME = "internships";
 

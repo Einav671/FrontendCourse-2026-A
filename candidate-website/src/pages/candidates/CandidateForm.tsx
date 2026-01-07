@@ -64,7 +64,7 @@ const CandidateForm: React.FC = () => {
             try {
                 const data = await getCandidateById(id);
                 if (data) {
-                    setFormData({
+                    setFormData({ ...data,
                         identityCard: data.identityCard || id, // אם אין שדה כזה בדאטה הישן, קח מה-ID
                         firstName: data.firstName,
                         lastName: data.lastName,
