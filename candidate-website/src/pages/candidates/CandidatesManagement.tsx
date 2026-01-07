@@ -54,6 +54,7 @@ const CandidatesManagement: React.FC = () => {
   };
 
   return (
+    <DesktopOnly>
     <Container maxWidth="lg" sx={{ mt: 4 }}>
       {/* שימוש ברכיב המשותף לחיסכון בקוד ועיצוב אחיד */}
       <PageHeader 

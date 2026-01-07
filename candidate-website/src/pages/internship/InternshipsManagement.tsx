@@ -28,7 +28,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     transition: 'transform 0.2s',
-    position: 'relative', // כדי למקם את כפתורי הניהול
+    position: 'relative',
     '&:hover': {
       transform: 'translateY(-5px)',
       boxShadow: 6,
@@ -42,42 +42,107 @@ const styles = {
 
 const InternshipsManagement: React.FC = () => {
   const navigate = useNavigate();
+  const theme = useTheme();
+  const [internships, setInternships] = useState<Internship[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const defaultInternships = [
-    {
-      title: 'בינה מלאכותית (AI)',
-      description: 'מסלול זה מתמקד בפיתוח אלגוריתמים חכמים, למידת מכונה וניתוח נתונים.',
-      careerPaths: ['חוקר AI', 'מהנדס למידת מכונה', 'מדען נתונים'],
-      skills: ['TensorFlow', 'Python', 'ניתוח נתונים (NLP)'],
-      icon: 'ai',
-      color: '#e3f2fd'
-    },
-    {
-      title: 'פיתוח תוכנה',
-      description: 'מסלול זה מתמקד בפיתוח יישומים, אתרים ומערכות תוכנה מתקדמות.',
-      careerPaths: ['Full Stack Developer', 'מפתח אפליקציות', 'מהנדס מערכות'],
-      skills: ['React', 'Node.js', 'Agile'],
-      icon: 'software',
-      color: '#e8f5e9'
-    },
-    {
-      title: 'אבטחת מידע',
-      description: 'מסלול זה מתמקד בהגנה על מערכות מידע, סייבר ואבטחת נתונים.',
-      careerPaths: ['מומחה סייבר', 'מנהל אבטחת מידע', 'חוקר אבטחה'],
-      skills: ['Penetration Testing', 'DesSecOps', 'ניהול סיכונים'],
-      icon: 'security',
-      color: '#ffebee'
+  // Map icon key -> base icon color
+  const iconColorMap: { [key: string]: string } = {
+    ai: '#3f51b5',
+    software: '#4caf50',
+    security: '#f44336',
+    cloud: '#1976d2',
+    data: '#6a1b9a',
+    devops: '#ff9800',
+    embedded: '#009688',
+    network: '#455a64',
+  };
+
+  // Card background by icon key for light and dark modes
+  const cardBgLight: { [key: string]: string } = {
+    ai: '#e3f2fd',
+    software: '#e8f5e9',
+    security: '#ffebee',
+    cloud: '#e3f2fd',
+    data: '#f3e5f5',
+    devops: '#fff3e0',
+    embedded: '#e0f2f1',
+    network: '#eceff1',
+  };
+
+  const cardBgDark: { [key: string]: string } = {
+    ai: '#1a3a52',
+    software: '#1b3a1f',
+    security: '#3a1a1a',
+    cloud: '#16324a',
+    data: '#2f1630',
+    devops: '#3a2a10',
+    embedded: '#073232',
+    network: '#263238',
+  };
+
+  const getCardBgFromIcon = (iconKey: string | undefined) => {
+    const key = iconKey || 'ai';
+    return theme.palette.mode === 'dark' ? (cardBgDark[key] || '#1e1e1e') : (cardBgLight[key] || '#ffffff');
+  };
+
+  const getIconColor = (baseColor: string) => {
+    if (theme.palette.mode === 'dark') {
+      const colorMap: { [key: string]: string } = {
+        '#3f51b5': '#5c7cfa',
+        '#4caf50': '#69db7c',
+        '#f44336': '#ff6b6b',
+        '#1976d2': '#4dabf7',
+        '#6a1b9a': '#b197fc',
+        '#ff9800': '#ffa94d',
+        '#009688': '#20c997',
+        '#455a64': '#748b96',
+      };
+      return colorMap[baseColor] || baseColor;
     }
-  ];
+    return baseColor;
+  };
 
-  const [internships, setInternships] = useState<any[]>([]);
+  // צבע רקע ברירת מחדל אם לא מוגדר
+  const getBackgroundColor = (iconKey: string | undefined) => {
+    return getCardBgFromIcon(iconKey);
+  };
+
+  // פונקציה לטעינת הנתונים
+  const fetchInternships = async () => {
+    setLoading(true);
+    try {
+      const data = await getAllInternships();
+      setInternships(data);
+    } catch (error) {
+      console.error("Error fetching internships:", error);
+      alert("שגיאה בטעינת הנתונים");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchInternships();
+  }, []);
+
+  const handleDelete = async (id: string) => {
+    if (window.confirm("האם למחוק את מסלול ההתמחות?")) {
+      try {
+        await deleteInternship(id);
+        setInternships(prev => prev.filter(item => item.id !== id));
+      } catch (error) {
+        console.error("Error deleting:", error);
+        alert("שגיאה במחיקה");
+      }
+    }
+  };
 
   const iconForKey = (key: string | undefined) => {
-    const props = { sx: { fontSize: 40 } };
     const baseColor = iconColorMap[key || 'ai'] || '#3f51b5';
     const iconProps = {
       sx: {
-        ...props.sx,
+        fontSize: 40,
         color: getIconColor(baseColor)
       }
     };
@@ -95,16 +160,6 @@ const InternshipsManagement: React.FC = () => {
     }
   };
 
-  // צבע רקע ברירת מחדל אם לא מוגדר
-  const getBackgroundColor = (iconKey: string) => {
-      switch (iconKey) {
-          case 'ai': return '#e3f2fd';
-          case 'software': return '#e8f5e9';
-          case 'security': return '#ffebee';
-          default: return '#ffffff';
-      }
-  };
-
   return (
     <Container maxWidth="lg">
       <PageHeader 
@@ -117,47 +172,72 @@ const InternshipsManagement: React.FC = () => {
         גלו את המסלולים האקדמיים שלנו ובחרו בקריירה שמתאימה לכם
       </Typography>
 
-      <Grid container spacing={4}>
-        {internships.map((internship, index) => (
-          <Grid key={index}>
-            <Paper elevation={3} sx={{ ...styles.card, backgroundColor: internship.color }}>
+      {loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+          <CircularProgress />
+        </Box>
+      ) : internships.length === 0 ? (
+        <Typography align="center">לא נמצאו מסלולי התמחות.</Typography>
+      ) : (
+        <Grid container spacing={4}>
+          {internships.map((internship) => (
+            <Grid key={internship.id}>
+              <Paper elevation={3} sx={{ ...styles.card, backgroundColor: internship.color || getBackgroundColor(internship.icon) }}>
               
-              <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-                {iconForKey(internship.icon)}
-              </Box>
-              
-              <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', textAlign: 'center' }}>
-                {internship.title}
-              </Typography>
-              
-              <Typography variant="body1" sx={{ mb: 2, textAlign: 'center', flexGrow: 1 }}>
-                {internship.description}
-              </Typography>
-              
-              <Box sx={{ mt: 2 }}>
-                <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>
-                  כיווני קריירה:
-                </Typography>
-                <Box component="ul" sx={styles.list}>
-                  {internship.careerPaths.map((path: string, idx: number) => (
-                    <li key={idx}><Typography variant="body2">{path}</Typography></li>
-                  ))}
+                {/* כפתורי ניהול בפינה */}
+                <Box sx={{ position: 'absolute', top: 8, left: 8, display: 'flex', gap: 0.5 }}>
+                  <IconButton 
+                    size="small" 
+                    onClick={() => navigate(`/internships/edit/${internship.id}`)} 
+                    sx={{ bgcolor: 'rgba(255,255,255,0.7)' }}
+                  >
+                    <EditIcon fontSize="small" color="primary" />
+                  </IconButton>
+                  <IconButton 
+                    size="small" 
+                    onClick={() => handleDelete(internship.id)} 
+                    sx={{ bgcolor: 'rgba(255,255,255,0.7)' }}
+                  >
+                    <DeleteIcon fontSize="small" color="error" />
+                  </IconButton>
                 </Box>
-              </Box>
+
+                <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+                  {iconForKey(internship.icon)}
+                </Box>
+                
+                <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', textAlign: 'center' }}>
+                  {internship.title}
+                </Typography>
+                
+                <Typography variant="body1" sx={{ mb: 2, textAlign: 'center', flexGrow: 1 }}>
+                  {internship.description}
+                </Typography>
+                
+                <Box sx={{ mt: 2 }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>
+                    כיווני קריירה:
+                  </Typography>
+                  <Box component="ul" sx={styles.list}>
+                    {internship.careerPaths?.map((path: string, idx: number) => (
+                      <li key={idx}><Typography variant="body2">{path}</Typography></li>
+                    ))}
+                  </Box>
+                </Box>
 
                 <Box sx={{ mt: 2 }}>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>
                     מיומנויות נרכשות:
-                    </Typography>
-                    <Box component="ul" sx={styles.list}>
-                    {internship.skills.map((skill: string, idx: number) => (
-                        <li key={idx}><Typography variant="body2">{skill}</Typography></li>
+                  </Typography>
+                  <Box component="ul" sx={styles.list}>
+                    {internship.skills?.map((skill: string, idx: number) => (
+                      <li key={idx}><Typography variant="body2">{skill}</Typography></li>
                     ))}
-                    </Box>
+                  </Box>
                 </Box>
-                </Paper>
+              </Paper>
             </Grid>
-            ))}
+          ))}
         </Grid>
       )}
     </Container>

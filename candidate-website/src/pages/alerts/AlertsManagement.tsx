@@ -56,6 +56,7 @@ const AlertsManagement: React.FC = () => {
   };
 
   return (
+    <DesktopOnly>
     <Container maxWidth="lg" sx={{ mt: 4 }}>
       {/* שימוש ברכיב המשותף - כותרת וכפתור הוספה */}
       <PageHeader 
