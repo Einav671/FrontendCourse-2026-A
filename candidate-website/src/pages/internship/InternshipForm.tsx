@@ -1,41 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Container, TextField, Button, Paper, MenuItem, Box, 
-  Snackbar, Alert, Stack 
+  Snackbar, Alert, Stack, CircularProgress 
 } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useNavigate, useParams } from 'react-router-dom';
 import { PageHeader } from '../../components/PageHeader';
 
-// אייקונים
+// אייקונים לבחירה
 import SchoolIcon from '@mui/icons-material/School';
 import CodeIcon from '@mui/icons-material/Code';
 import SecurityIcon from '@mui/icons-material/Security';
 import CloudIcon from '@mui/icons-material/Cloud';
 import StorageIcon from '@mui/icons-material/Storage';
 import BuildIcon from '@mui/icons-material/Build';
-//import DeveloperModeIcon from '@mui/icons-material/DeveloperMode';
-//import SettingsEthernetIcon from '@mui/icons-material/SettingsEthernet';
 
-export class Internship {
-  id: string;
-  title: string;
-  description: string;
-  careerPaths: string[];
-  skills: string[];
-  icon: string;
-  // ... constructor unchanged
-  constructor(id:string, title:string, description:string, careerPaths:string[], skills:string[], icon:string) {
-      this.id=id; this.title=title; this.description=description; this.careerPaths=careerPaths; this.skills=skills; this.icon=icon;
-  }
-}
+// Service
+import { createInternship, getInternshipById, updateInternship } from '../../firebase/internshipsService';
 
 interface InternshipFormState {
     title: string;
     description: string;
-    careerPaths: string;
-    skills: string;
+    careerPaths: string; // נשמר בטופס כמחרוזת עם פסיקים
+    skills: string;      // נשמר בטופס כמחרוזת עם פסיקים
     icon: string;
 }
 
@@ -43,7 +31,10 @@ const InternshipForm: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditMode = !!id;
+  
   const [showSuccess, setShowSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const [formData, setFormData] = useState<InternshipFormState>({
     title: '',
@@ -60,22 +51,35 @@ const InternshipForm: React.FC = () => {
     skills: false
   });
 
+  // טעינת נתונים לעריכה
   useEffect(() => {
-    if (isEditMode) {
-      const saved = JSON.parse(localStorage.getItem('internships') || '[]');
-      const itemToEdit = saved.find((i: any) => i.id === id);
-      
-      if (itemToEdit) {
-        setFormData({
-            title: itemToEdit.title,
-            description: itemToEdit.description,
-            careerPaths: Array.isArray(itemToEdit.careerPaths) ? itemToEdit.careerPaths.join(', ') : itemToEdit.careerPaths,
-            skills: Array.isArray(itemToEdit.skills) ? itemToEdit.skills.join(', ') : itemToEdit.skills,
-            icon: itemToEdit.icon
-        });
-      }
-    }
-  }, [id, isEditMode]);
+    const loadData = async () => {
+        if (isEditMode && id) {
+            setLoading(true);
+            try {
+                const data = await getInternshipById(id);
+                if (data) {
+                    setFormData({
+                        title: data.title,
+                        description: data.description,
+                        // המרה ממערך למחרוזת לתצוגה בשדה
+                        careerPaths: Array.isArray(data.careerPaths) ? data.careerPaths.join(', ') : '',
+                        skills: Array.isArray(data.skills) ? data.skills.join(', ') : '',
+                        icon: data.icon
+                    });
+                } else {
+                    alert("המסלול לא נמצא");
+                    navigate('/internships');
+                }
+            } catch (error) {
+                console.error("Error loading:", error);
+            } finally {
+                setLoading(false);
+            }
+        }
+    };
+    loadData();
+  }, [id, isEditMode, navigate]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -85,33 +89,43 @@ const InternshipForm: React.FC = () => {
   };
 
   const isFormValid = Object.values(errors).every((error) => !error) && 
-                      Object.values(formData).every((value) => value !== "");
+                      formData.title !== "" && formData.description !== "";
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!formData.title || !formData.description) return;
 
-    const saved = JSON.parse(localStorage.getItem('internships') || '[]');
-    const newItem = new Internship(
-      isEditMode ? id! : Date.now().toString(),
-      formData.title,
-      formData.description,
-      formData.careerPaths.split(',').map((s: string) => s.trim()).filter(Boolean),
-      formData.skills.split(',').map((s: string) => s.trim()).filter(Boolean),
-      formData.icon
-    );
+    setSaving(true);
+    try {
+        const dataToSend = {
+            title: formData.title,
+            description: formData.description,
+            // המרה ממחרוזת למערך
+            careerPaths: formData.careerPaths.split(',').map(s => s.trim()).filter(Boolean),
+            skills: formData.skills.split(',').map(s => s.trim()).filter(Boolean),
+            icon: formData.icon,
+            // אפשר להוסיף לוגיקה לבחירת צבע לפי האייקון כאן אם רוצים לשמור ב-DB
+        };
 
-    if (isEditMode) {
-      const updated = saved.map((i: any) => (i.id === id ? newItem : i));
-      localStorage.setItem('internships', JSON.stringify(updated));
-    } else {
-      localStorage.setItem('internships', JSON.stringify([...saved, newItem]));
+        if (isEditMode && id) {
+            await updateInternship(id, dataToSend);
+        } else {
+            await createInternship(dataToSend);
+        }
+
+        setShowSuccess(true);
+        setTimeout(() => {
+            navigate('/internships');
+        }, 1500);
+
+    } catch (error) {
+        console.error("Error saving:", error);
+        alert("שגיאה בשמירה");
+    } finally {
+        setSaving(false);
     }
-
-    setShowSuccess(true);
-    setTimeout(() => {
-        navigate('/internships');
-    }, 1500);
   };
+
+  if (loading) return <CircularProgress sx={{ display: 'block', mx: 'auto', mt: 4 }} />;
 
   return (
     <Container maxWidth="sm">
@@ -137,6 +151,7 @@ const InternshipForm: React.FC = () => {
               fullWidth label="כיווני קריירה (מופרדים בפסיקים)" name="careerPaths"
               value={formData.careerPaths} onChange={handleChange}
               error={!!errors.careerPaths} helperText={errors.careerPaths ? 'שדה חובה' : ''}
+              placeholder="למשל: מפתח Full Stack, ראש צוות, יועץ טכנולוגי"
               required
             />
           
@@ -144,6 +159,7 @@ const InternshipForm: React.FC = () => {
               fullWidth label="מיומנויות נרכשות (מופרדות בפסיקים)" name="skills"
               value={formData.skills} onChange={handleChange}
               error={!!errors.skills} helperText={errors.skills ? 'שדה חובה' : ''}
+              placeholder="למשל: React, Node.js, Agile"
               required
             />
           
@@ -162,9 +178,10 @@ const InternshipForm: React.FC = () => {
             <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
                 <Button 
                     variant="contained" onClick={handleSave} 
-                    startIcon={<SaveIcon />} disabled={!isFormValid} fullWidth
+                    startIcon={saving ? null : <SaveIcon />} 
+                    disabled={!isFormValid || saving} fullWidth
                 >
-                    שמור
+                    {saving ? "שומר..." : "שמור"}
                 </Button>
                 <Button
                     variant="outlined" color="secondary" onClick={() => navigate('/internships')}

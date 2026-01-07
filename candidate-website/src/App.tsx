@@ -51,10 +51,11 @@ function App() {
           {/* --- ניהול משתמשים --- */}
           <Route path="/users" element={<UsersManagement />} />
           <Route path="/users/new" element={<UserForm />} />
-          
+          <Route path="/users/edit/:id" element={<UserForm />} />
+
           {/* --- מחשבון --- */}
           <Route path="/calculator" element={<AdmissionCalculator />} />
-
+    
           {/* --- קורסים --- */}
           <Route path="/courses/new" element={<CourseForm />} />
           <Route path="/courses/edit/:id" element={<CourseForm />} />
@@ -74,6 +75,7 @@ function App() {
           {/* --- מסלולי התמחות --- */}
           <Route path="/internships" element={<InternshipsManagement />} />
           <Route path="/internships/new" element={<InternshipForm />} />
+          <Route path="/internships/edit/:id" element={<InternshipForm />} />
           
           {/* ------------------------------------------------------- */}
           {/* --- נתיבים לבוגרים --- */}

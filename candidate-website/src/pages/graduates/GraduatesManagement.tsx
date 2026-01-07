@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Container, Table, TableBody, TableCell, 
-  TableContainer, TableHead, TableRow, Paper, IconButton, Avatar, Chip, Tooltip 
+  TableContainer, TableHead, TableRow, Paper, IconButton, Avatar, Chip, Tooltip, CircularProgress 
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -9,50 +9,53 @@ import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '../../components/PageHeader';
-
-
-export interface Graduate {
-    id: string;
-    fullName: string;
-    role: string;
-    degree: string;
-    imageUrl: string;
-    review: string;
-    status: 'pending' | 'approved' | 'rejected';
-}
-// אין צורך ב-constructor
+import type { Graduate } from './Graduate';
+import { getAllGraduates, deleteGraduate, updateGraduate } from '../../firebase/graduatesService';
 
 const GraduatesManagement: React.FC = () => {
   const navigate = useNavigate();
-  const [graduates, setGraduates] = useState<any[]>([]);
+  const [graduates, setGraduates] = useState<Graduate[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // טעינת הנתונים
+  const fetchGraduates = async () => {
+    setLoading(true);
+    try {
+      const data = await getAllGraduates();
+      setGraduates(data);
+    } catch (error) {
+      console.error("Error fetching graduates:", error);
+      alert("שגיאה בטעינת הנתונים");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const saved = localStorage.getItem('graduates');
-    if (saved) {
-      setGraduates(JSON.parse(saved));
-    }
+    fetchGraduates();
   }, []);
 
-  const saveToStorage = (updatedList: any[]) => {
-    setGraduates(updatedList);
-    localStorage.setItem('graduates', JSON.stringify(updatedList));
-  };
-
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (window.confirm("למחוק את הבוגר?")) {
-      const updated = graduates.filter((g: any) => g.id !== id);
-      saveToStorage(updated);
+      try {
+        await deleteGraduate(id);
+        setGraduates(prev => prev.filter(g => g.id !== id));
+      } catch (error) {
+        console.error("Error deleting:", error);
+        alert("שגיאה במחיקה");
+      }
     }
   };
 
-  const handleApprove = (id: string) => {
-    const updated = graduates.map((g: any) => g.id === id ? { ...g, status: 'approved' } : g);
-    saveToStorage(updated);
-  };
-
-  const handleReject = (id: string) => {
-    const updated = graduates.map((g: any) => g.id === id ? { ...g, status: 'rejected' } : g);
-    saveToStorage(updated);
+  const handleStatusChange = async (id: string, newStatus: 'approved' | 'rejected') => {
+    try {
+        await updateGraduate(id, { status: newStatus });
+        // עדכון מקומי מהיר
+        setGraduates(prev => prev.map(g => g.id === id ? { ...g, status: newStatus } : g));
+    } catch (error) {
+        console.error("Error updating status:", error);
+        alert("שגיאה בעדכון הסטטוס");
+    }
   };
 
   const getStatusChip = (status: string) => {
@@ -76,6 +79,8 @@ const GraduatesManagement: React.FC = () => {
           <TableHead sx={{ bgcolor: 'action.hover' }}>
             <TableRow>
               <TableCell><b>תמונה</b></TableCell>
+              {/* הוספנו עמודת תעודת זהות */}
+              <TableCell><b>ת.ז</b></TableCell> 
               <TableCell><b>שם מלא</b></TableCell>
               <TableCell><b>תפקיד</b></TableCell>
               <TableCell><b>חוות דעת</b></TableCell>
@@ -85,16 +90,19 @@ const GraduatesManagement: React.FC = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {graduates.length === 0 ? (
+            {loading ? (
+               <TableRow><TableCell colSpan={8} align="center"><CircularProgress /></TableCell></TableRow>
+            ) : graduates.length === 0 ? (
                 <TableRow>
-                    <TableCell colSpan={7} align="center">אין נתונים. לחץ על "הוסף בוגר" כדי להתחיל.</TableCell>
+                    <TableCell colSpan={8} align="center">אין נתונים. לחץ על "הוסף בוגר" כדי להתחיל.</TableCell>
                 </TableRow>
             ) : (
-                graduates.map((g: any) => (
+                graduates.map((g) => (
                 <TableRow key={g.id} sx={{ bgcolor: g.status === 'pending' ? 'warning.light' : 'inherit' }}>
                     <TableCell>
                         <Avatar src={g.imageUrl} alt={g.fullName}>{g.fullName?.charAt(0)}</Avatar>
                     </TableCell>
+                    <TableCell>{g.identityCard || g.id}</TableCell>
                     <TableCell sx={{ fontWeight: 'bold' }}>{g.fullName}</TableCell>
                     <TableCell>{g.role}</TableCell>
                     <TableCell sx={{ maxWidth: 200, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -106,10 +114,10 @@ const GraduatesManagement: React.FC = () => {
                     <TableCell align="center">
                         {g.status === 'pending' && (
                             <>
-                                <IconButton color="success" onClick={() => handleApprove(g.id)} title="אשר">
+                                <IconButton color="success" onClick={() => handleStatusChange(g.id, 'approved')} title="אשר">
                                     <CheckIcon />
                                 </IconButton>
-                                <IconButton color="error" onClick={() => handleReject(g.id)} title="דחה">
+                                <IconButton color="error" onClick={() => handleStatusChange(g.id, 'rejected')} title="דחה">
                                     <CloseIcon />
                                 </IconButton>
                             </>

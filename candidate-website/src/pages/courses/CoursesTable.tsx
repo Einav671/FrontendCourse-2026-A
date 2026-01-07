@@ -1,41 +1,51 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Chip } from '@mui/material';
+import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Chip, CircularProgress } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from 'react-router-dom';
-import { Course } from './Course';
-import { PageHeader } from '../../components/PageHeader'; // ייבוא הרכיב המשותף
+import type { Course } from './Course';
+import { PageHeader } from '../../components/PageHeader';
+import { getAllCourses, deleteCourse } from '../../firebase/coursesService'; // ייבוא ה-Service
 import './CoursesTable.css'; 
 
 const CoursesTable: React.FC = () => {
   const navigate = useNavigate();
   const [courses, setCourses] = useState<Course[]>([]);
-  const LOCAL_STORAGE_KEY = 'my-courses';
+  const [loading, setLoading] = useState(true);
+
+  // פונקציה לטעינת נתונים
+  const fetchCourses = async () => {
+    setLoading(true);
+    try {
+      const data = await getAllCourses();
+      setCourses(data);
+    } catch (error) {
+      console.error("Error fetching courses:", error);
+      alert("שגיאה בטעינת הקורסים");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const savedCourses = localStorage.getItem(LOCAL_STORAGE_KEY);
-    if (savedCourses) {
-      setCourses(JSON.parse(savedCourses));
-    } else {
-      const initialData = [
-        new Course("1", "מבוא למדעי המחשב", "10111", 5, "קורס בסיס", "CS-BA", "חובה")
-      ];
-      setCourses(initialData);
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(initialData));
-    }
+    fetchCourses();
   }, []);
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (window.confirm("האם אתה בטוח שברצונך למחוק קורס זה?")) {
-      const updatedCourses = courses.filter(c => c.id !== id);
-      setCourses(updatedCourses);
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updatedCourses));
+      try {
+        await deleteCourse(id);
+        // עדכון הרשימה המקומית
+        setCourses(prev => prev.filter(c => c.id !== id));
+      } catch (error) {
+        console.error("Error deleting course:", error);
+        alert("שגיאה במחיקת הקורס");
+      }
     }
   };
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4 }}>
-      {/* שימוש ב-PageHeader לכותרת וכפתור */}
       <PageHeader 
         title="ניהול קורסים" 
         buttonText="הוסף קורס חדש" 
@@ -56,10 +66,16 @@ const CoursesTable: React.FC = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {courses.length === 0 ? (
+            {loading ? (
+              <TableRow>
+                <TableCell colSpan={7} align="center" sx={{ py: 3 }}>
+                  <CircularProgress />
+                </TableCell>
+              </TableRow>
+            ) : courses.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={7} align="center">
-                  לא נמצאו קורסים.
+                  לא נמצאו קורסים. לחץ על "הוסף קורס חדש" כדי להתחיל.
                 </TableCell>
               </TableRow>
             ) : (
