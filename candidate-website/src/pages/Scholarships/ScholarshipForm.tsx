@@ -82,8 +82,9 @@ const ScholarshipForm: React.FC = () => {
                       formData.code !== '' && formData.name !== '' && formData.amount !== 0;
   
   const handleSave = async () => {
-    if (!formData.code || !formData.name || !formData.amount) {
-        alert("נא למלא את שדות החובה");
+    // בדיקת שדות חובה
+    if (!formData.code || !formData.name || !formData.amount || isNaN(Number(formData.amount))) {
+        alert("נא למלא את שדות החובה ולוודא שסכום המלגה הוא מספר תקין");
         return;
     }
 
@@ -91,12 +92,11 @@ const ScholarshipForm: React.FC = () => {
 
     try {
         // הכנת האובייקט לשליחה ל-Firebase
-        // שים לב: אנחנו לא שולחים את ה-ID כחלק מהדאטה, הוא המפתח של המסמך
         const dataToSend = {
             code: formData.code,
             name: formData.name,
             targetAudience: formData.targetAudience,
-            amount: Number(formData.amount), // המרה למספר
+            amount: Number(formData.amount), // תמיד מספר
             link: formData.link,
             conditions: formData.conditions
         };
@@ -107,8 +107,17 @@ const ScholarshipForm: React.FC = () => {
             await updateDoc(docRef, dataToSend);
         } else {
             // יצירת מסמך חדש
-            // addDoc מייצר ID ייחודי אוטומטית
             await addDoc(collection(db, "scholarships"), dataToSend);
+            // איפוס הטופס אחרי שמירה
+            setFormData({
+                id: '',
+                code: '',
+                name: '',
+                targetAudience: '',
+                amount: 0,
+                link: '',
+                conditions: ''
+            });
         }
 
         setShowSuccess(true);
@@ -118,7 +127,7 @@ const ScholarshipForm: React.FC = () => {
 
     } catch (error) {
         console.error("Error saving document: ", error);
-        alert("אירעה שגיאה בשמירת הנתונים");
+        alert("אירעה שגיאה בשמירת הנתונים ל-Firestore");
     } finally {
         setSaving(false);
     }

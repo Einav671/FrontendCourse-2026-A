@@ -11,7 +11,7 @@ import { db } from './config'; // או הנתיב לקובץ הקונפיגור�
 import type { Scholarship } from '../pages/Scholarships/Scholarship';
 
 // הגדרת שם האוסף במקום אחד
-const COLLECTION_NAME = "Scholarships";
+const COLLECTION_NAME = "scholarships";
 
 
 // 1. קבלת כל המלגות
