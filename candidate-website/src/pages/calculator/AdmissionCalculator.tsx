@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
     Paper, Typography, TextField, Button, Box, MenuItem, Alert,
-    List, ListItem, ListItemIcon, ListItemText, Chip, Divider, Fade
+    List, ListItem, ListItemIcon, ListItemText, Chip, Divider, Fade, useTheme
 } from '@mui/material';
 import CalculateIcon from '@mui/icons-material/Calculate';
 import SchoolIcon from '@mui/icons-material/School';
@@ -18,6 +18,7 @@ interface Scholarship {
 }
 
 const AdmissionCalculator: React.FC = () => {
+    const theme = useTheme();
     const [formData, setFormData] = useState({
         degree: 'CS',
         bagrut: '',
@@ -100,21 +101,28 @@ const AdmissionCalculator: React.FC = () => {
     };
 
     return (
-        <div className="calc-container">
-            <div className="calc-icon-wrapper">
+        <div className="calc-container" style={{ backgroundColor: theme.palette.background.default }}>
+            <div className="calc-icon-wrapper" style={{
+                backgroundColor: theme.palette.mode === 'dark' ? '#1a3a52' : '#e3f2fd',
+                color: theme.palette.mode === 'dark' ? '#4dabf7' : '#42a5f5',
+            }}>
                 <CalculateIcon fontSize="large" />
             </div>
 
-            <Typography variant="h4" className="calc-title">
+            <Typography variant="h4" className="calc-title" style={{
+                color: theme.palette.mode === 'dark' ? '#4dabf7' : '#42a5f5',
+            }}>
                 מחשבון התאמה ומלגות
             </Typography>
 
-            <Typography variant="body1" className="calc-subtitle">
+            <Typography variant="body1" className="calc-subtitle" style={{
+                color: theme.palette.text.secondary,
+            }}>
                 בדיקה מיידית של סיכויי קבלה וזכאות למלגות הצטיינות
             </Typography>
 
             <Paper className="calc-card">
-                <Typography className="section-title">הזנת נתונים</Typography>
+                <Typography className="section-title" style={{ color: theme.palette.text.primary }}>הזנת נתונים</Typography>
 
                 <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 3 }}>
                     <TextField
@@ -125,7 +133,7 @@ const AdmissionCalculator: React.FC = () => {
                         onChange={handleChange}
                         fullWidth
                         variant="outlined"
-                        sx={{ bgcolor: '#f8fafd' }}
+                        sx={{ bgcolor: theme.palette.mode === 'dark' ? '#263238' : '#f8fafd' }}
                         error={!!errors.degree}
                         helperText={errors.degree}
                     >
@@ -145,7 +153,7 @@ const AdmissionCalculator: React.FC = () => {
                             onChange={handleChange}
                             fullWidth
                             variant="outlined"
-                            sx={{ bgcolor: '#f8fafd' }}
+                            sx={{ bgcolor: theme.palette.mode === 'dark' ? '#263238' : '#f8fafd' }}
                             error={!!errors.psychometric}
                             helperText={errors.psychometric}
                         />
@@ -163,13 +171,13 @@ const AdmissionCalculator: React.FC = () => {
                             onChange={handleChange}
                             fullWidth
                             variant="outlined"
-                            sx={{ bgcolor: '#f8fafd' }}
+                            sx={{ bgcolor: theme.palette.mode === 'dark' ? '#263238' : '#f8fafd' }}
                             error={!!errors.bagrut}
                             helperText={errors.bagrut}
                         />
                     </Box>
 
-                    <Button variant="contained" className="calc-button" onClick={calculate}>
+                    <Button variant="contained" className="calc-button" onClick={calculate} sx={{ backgroundColor: theme.palette.primary.main }}>
                         בדוק התאמה ומלגות
                     </Button>
                 </Box>
@@ -187,14 +195,14 @@ const AdmissionCalculator: React.FC = () => {
                             </Alert>
 
                             {eligibleScholarships.length > 0 && (
-                                <Box sx={{ mt: 3, bgcolor: '#e8f5e9', p: 2, borderRadius: 2 }}>
-                                    <Typography variant="h6" sx={{ color: '#2e7d32', fontWeight: 'bold', mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
+                                <Box sx={{ mt: 3, bgcolor: theme.palette.mode === 'dark' ? '#1b3a1f' : '#e8f5e9', p: 2, borderRadius: 2 }}>
+                                    <Typography variant="h6" sx={{ color: theme.palette.mode === 'dark' ? '#69db7c' : '#2e7d32', fontWeight: 'bold', mb: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
                                         <StarsIcon /> נמצאו {eligibleScholarships.length} מלגות רלוונטיות!
                                     </Typography>
 
                                     <List>
                                         {eligibleScholarships.map((scholarship) => (
-                                            <ListItem key={scholarship.id} disableGutters sx={{ borderBottom: '1px solid #c8e6c9' }}>
+                                            <ListItem key={scholarship.id} disableGutters sx={{ borderBottom: `1px solid ${theme.palette.mode === 'dark' ? '#2d5016' : '#c8e6c9'}` }}>
                                                 <ListItemIcon>
                                                     <SchoolIcon color="success" />
                                                 </ListItemIcon>
@@ -207,7 +215,7 @@ const AdmissionCalculator: React.FC = () => {
                                             </ListItem>
                                         ))}
                                     </List>
-                                    <Typography variant="caption" sx={{ mt: 1, display: 'block', textAlign: 'center', color: '#666' }}>
+                                    <Typography variant="caption" sx={{ mt: 1, display: 'block', textAlign: 'center', color: theme.palette.text.secondary }}>
                                         * הזכאות למלגה מותנית בהרשמה ותשלום מקדמה
                                     </Typography>
                                 </Box>

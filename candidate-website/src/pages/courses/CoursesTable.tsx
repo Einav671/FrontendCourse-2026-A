@@ -5,7 +5,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from 'react-router-dom';
 import { Course } from './Course';
 import { PageHeader } from '../../components/PageHeader'; // ייבוא הרכיב המשותף
-import './CoursesTable.css'; 
 
 const CoursesTable: React.FC = () => {
   const navigate = useNavigate();
@@ -44,7 +43,7 @@ const CoursesTable: React.FC = () => {
 
       <TableContainer component={Paper} elevation={3}>
         <Table aria-label="courses table">
-          <TableHead sx={{ bgcolor: '#f5f5f5' }}>
+          <TableHead>
             <TableRow>
               <TableCell sx={{ fontWeight: 'bold' }}>קוד קורס</TableCell>
               <TableCell sx={{ fontWeight: 'bold' }}>שם הקורס</TableCell>

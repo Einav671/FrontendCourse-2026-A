@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { Candidate } from './Candidate';
 // ייבוא הכותרת המשותפת
 import { PageHeader } from '../../components/PageHeader';
+import DesktopOnly from '../../components/DesktopOnly';
 
 const CandidatesManagement: React.FC = () => {
   const navigate = useNavigate();
@@ -45,7 +46,8 @@ const CandidatesManagement: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4 }}>
+    <DesktopOnly>
+      <Container maxWidth="lg" sx={{ mt: 4 }}>
       {/* שימוש ברכיב המשותף לחיסכון בקוד ועיצוב אחיד */}
       <PageHeader 
         title="ניהול מועמדים" 
@@ -55,7 +57,7 @@ const CandidatesManagement: React.FC = () => {
 
       <TableContainer component={Paper} elevation={3}>
         <Table>
-          <TableHead sx={{ bgcolor: '#f5f5f5' }}>
+          <TableHead>
             <TableRow>
               {/* כותרות מודגשות - יישור לימין הוא אוטומטי בגלל הגדרת ה-RTL */}
               <TableCell sx={{ fontWeight: 'bold' }}>שם פרטי</TableCell>
@@ -94,7 +96,8 @@ const CandidatesManagement: React.FC = () => {
           </TableBody>
         </Table>
       </TableContainer>
-    </Container>
+      </Container>
+    </DesktopOnly>
   );
 };
 

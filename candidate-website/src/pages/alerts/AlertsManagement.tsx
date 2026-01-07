@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { SystemAlert } from './SystemAlert';
 // ייבוא הרכיב המשותף לכותרת
 import { PageHeader } from '../../components/PageHeader';
+import DesktopOnly from '../../components/DesktopOnly';
 
 const AlertsManagement: React.FC = () => {
   const navigate = useNavigate();
@@ -34,7 +35,8 @@ const AlertsManagement: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ mt: 4 }}>
+    <DesktopOnly>
+      <Container maxWidth="lg" sx={{ mt: 4 }}>
       {/* שימוש ברכיב המשותף - כותרת וכפתור הוספה */}
       <PageHeader 
         title="ניהול התראות מערכת"
@@ -44,7 +46,7 @@ const AlertsManagement: React.FC = () => {
 
       <TableContainer component={Paper} elevation={3}>
         <Table>
-          <TableHead sx={{ bgcolor: '#f5f5f5' }}>
+          <TableHead>
             <TableRow>
               {/* בגלל ה-RTL הגלובלי, העמודות יסתדרו מימין לשמאל אוטומטית */}
               <TableCell sx={{ fontWeight: 'bold' }}>הודעה</TableCell>
@@ -77,7 +79,8 @@ const AlertsManagement: React.FC = () => {
           </TableBody>
         </Table>
       </TableContainer>
-    </Container>
+      </Container>
+    </DesktopOnly>
   );
 };
 

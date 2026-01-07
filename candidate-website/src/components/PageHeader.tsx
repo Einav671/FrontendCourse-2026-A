@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box, Typography, Button } from '@mui/material';
+import { Box, Typography, Button, useTheme } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 
 // הגדרת הטיפוסים שהרכיב מקבל
@@ -10,6 +10,8 @@ interface PageHeaderProps {
 }
 
 export const PageHeader: React.FC<PageHeaderProps> = ({ title, buttonText, onButtonClick }) => {
+  const theme = useTheme();
+
   return (
     <Box 
       sx={{ 
@@ -20,7 +22,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({ title, buttonText, onBut
         mt: 2  // מרווח עליון אחיד
       }}
     >
-      <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
+      <Typography variant="h4" component="h1" sx={{ fontWeight: 'bold', color: theme.palette.secondary.main }}>
         {title}
       </Typography>
       

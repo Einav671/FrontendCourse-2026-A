@@ -73,7 +73,7 @@ const Help: React.FC = () => {
       {/* אזור יצירת קשר בתחתית */}
       <Paper elevation={0} sx={{ mt: 6, p: 4, bgcolor: 'primary.light', bgOpacity: 0.1, borderRadius: 3, textAlign: 'center' }}>
         {/* הערה: bgcolor צריך להיות צבע חוקי מהתמה, כאן השתמשתי בקידוד פשוט, עדיף להשתמש ב-theme.palette */}
-        <Box sx={{ bgcolor: '#e3f2fd', p: 4, borderRadius: 3 }}>
+        <Box sx={{p: 4, borderRadius: 3 }}>
             <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1, color: 'primary.dark' }}>
             עדיין זקוקים לעזרה?
             </Typography>

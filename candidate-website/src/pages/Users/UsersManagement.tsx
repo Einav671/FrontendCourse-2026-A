@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Container, Table, TableBody, TableCell, TableContainer, 
-  TableHead, TableRow, Paper, IconButton, Chip 
+    Container, Table, TableBody, TableCell, TableContainer, 
+    TableHead, TableRow, Paper, IconButton, Chip 
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '../../components/PageHeader';
+import DesktopOnly from '../../components/DesktopOnly';
 
 interface User {
     id: string;
@@ -52,6 +53,7 @@ const UsersManagement: React.FC = () => {
     };
 
     return (
+        <DesktopOnly>
         <Container maxWidth="lg">
             {/* כותרת וכפתור הוספה */}
             <PageHeader 
@@ -98,6 +100,7 @@ const UsersManagement: React.FC = () => {
                 </Table>
             </TableContainer>
         </Container>
+        </DesktopOnly>
     );
 };
 

@@ -7,6 +7,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '../../components/PageHeader';
+import DesktopOnly from '../../components/DesktopOnly';
 import { getAllScholarships,deleteScholarship } from '../../firebase/scholarshipService';
 import type { Scholarship } from './Scholarship';
 
@@ -46,7 +47,8 @@ const ScholarshipsManagement: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="lg">
+    <DesktopOnly>
+      <Container maxWidth="lg">
       
       <PageHeader 
         title="ניהול מלגות" 
@@ -107,7 +109,8 @@ const ScholarshipsManagement: React.FC = () => {
           </TableBody>
         </Table>
       </TableContainer>
-    </Container>
+      </Container>
+    </DesktopOnly>
   );
 };
 

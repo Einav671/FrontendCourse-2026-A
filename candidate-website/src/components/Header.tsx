@@ -12,6 +12,9 @@ import ListItemText from '@mui/material/ListItemText';
 import { Link } from 'react-router-dom';
 import SchoolIcon from '@mui/icons-material/School';
 import { Box } from '@mui/material';
+import Brightness4Icon from '@mui/icons-material/Brightness4';
+import Brightness7Icon from '@mui/icons-material/Brightness7';
+import { useThemeContext } from '../theme/ThemeContext';
 
 // --- הפרדת עיצובים (Styles) ---
 const styles = {
@@ -37,6 +40,7 @@ const styles = {
 
 export default function Header() {
   const [open, setOpen] = useState(false);
+  const { isDarkMode, toggleTheme } = useThemeContext();
 
   const toggleDrawer = () => {
     setOpen(!open);
@@ -81,6 +85,15 @@ export default function Header() {
               מערכת ניהול אקדמית
             </Typography>
           </Box>
+
+          {/* כפתור החלפת מצב (light/dark mode) */}
+          <IconButton
+            color="inherit"
+            onClick={toggleTheme}
+            aria-label="toggle theme"
+          >
+            {isDarkMode ? <Brightness7Icon /> : <Brightness4Icon />}
+          </IconButton>
         </Toolbar>
       </AppBar>
 
