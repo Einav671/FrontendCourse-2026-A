@@ -7,6 +7,8 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '../../components/PageHeader';
+import { getAllUsers, deleteUser } from '../../firebase/usersService';
+import type { User } from './User';
 
 interface User {
     id: string;
