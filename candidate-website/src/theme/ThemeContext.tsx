@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+// שים לב לשינוי בשורה הראשונה: הוספנו type לפני ReactNode
+import { createContext, useContext, useState, type ReactNode } from 'react';
 import { createTheme, ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import rtlPlugin from 'stylis-plugin-rtl';
