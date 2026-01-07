@@ -9,6 +9,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '../../components/PageHeader';
+import DesktopOnly from '../../components/DesktopOnly';
 import type { Graduate } from './Graduate';
 import { getAllGraduates, deleteGraduate, updateGraduate } from '../../firebase/graduatesService';
 
@@ -67,7 +68,8 @@ const GraduatesManagement: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="lg">
+    <DesktopOnly>
+      <Container maxWidth="lg">
       <PageHeader 
         title="ניהול בוגרים וחוות דעת" 
         buttonText="הוסף בוגר"
@@ -133,7 +135,8 @@ const GraduatesManagement: React.FC = () => {
           </TableBody>
         </Table>
       </TableContainer>
-    </Container>
+      </Container>
+    </DesktopOnly>
   );
 };
 

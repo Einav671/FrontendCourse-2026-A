@@ -54,7 +54,7 @@ const CoursesTable: React.FC = () => {
 
       <TableContainer component={Paper} elevation={3}>
         <Table aria-label="courses table">
-          <TableHead sx={{ bgcolor: '#f5f5f5' }}>
+          <TableHead>
             <TableRow>
               <TableCell sx={{ fontWeight: 'bold' }}>קוד קורס</TableCell>
               <TableCell sx={{ fontWeight: 'bold' }}>שם הקורס</TableCell>

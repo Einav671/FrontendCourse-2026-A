@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Container, Grid, Paper, Typography, Box, CircularProgress, IconButton } from '@mui/material';
+import { Container, Grid, Paper, Typography, Box, CircularProgress, IconButton, useTheme } from '@mui/material';
 import { PageHeader } from '../../components/PageHeader';
 
 // אייקונים לניהול
@@ -28,7 +28,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     transition: 'transform 0.2s',
-    position: 'relative', // כדי למקם את כפתורי הניהול
+    position: 'relative',
     '&:hover': {
       transform: 'translateY(-5px)',
       boxShadow: 6,
@@ -42,8 +42,71 @@ const styles = {
 
 const InternshipsManagement: React.FC = () => {
   const navigate = useNavigate();
+  const theme = useTheme();
   const [internships, setInternships] = useState<Internship[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Map icon key -> base icon color
+  const iconColorMap: { [key: string]: string } = {
+    ai: '#3f51b5',
+    software: '#4caf50',
+    security: '#f44336',
+    cloud: '#1976d2',
+    data: '#6a1b9a',
+    devops: '#ff9800',
+    embedded: '#009688',
+    network: '#455a64',
+  };
+
+  // Card background by icon key for light and dark modes
+  const cardBgLight: { [key: string]: string } = {
+    ai: '#e3f2fd',
+    software: '#e8f5e9',
+    security: '#ffebee',
+    cloud: '#e3f2fd',
+    data: '#f3e5f5',
+    devops: '#fff3e0',
+    embedded: '#e0f2f1',
+    network: '#eceff1',
+  };
+
+  const cardBgDark: { [key: string]: string } = {
+    ai: '#1a3a52',
+    software: '#1b3a1f',
+    security: '#3a1a1a',
+    cloud: '#16324a',
+    data: '#2f1630',
+    devops: '#3a2a10',
+    embedded: '#073232',
+    network: '#263238',
+  };
+
+  const getCardBgFromIcon = (iconKey: string | undefined) => {
+    const key = iconKey || 'ai';
+    return theme.palette.mode === 'dark' ? (cardBgDark[key] || '#1e1e1e') : (cardBgLight[key] || '#ffffff');
+  };
+
+  const getIconColor = (baseColor: string) => {
+    if (theme.palette.mode === 'dark') {
+      const colorMap: { [key: string]: string } = {
+        '#3f51b5': '#5c7cfa',
+        '#4caf50': '#69db7c',
+        '#f44336': '#ff6b6b',
+        '#1976d2': '#4dabf7',
+        '#6a1b9a': '#b197fc',
+        '#ff9800': '#ffa94d',
+        '#009688': '#20c997',
+        '#455a64': '#748b96',
+      };
+      return colorMap[baseColor] || baseColor;
+    }
+    return baseColor;
+  };
+
+  // צבע רקע ברירת מחדל אם לא מוגדר
+  const getBackgroundColor = (iconKey: string | undefined) => {
+    return getCardBgFromIcon(iconKey);
+  };
 
   // פונקציה לטעינת הנתונים
   const fetchInternships = async () => {
@@ -76,28 +139,25 @@ const InternshipsManagement: React.FC = () => {
   };
 
   const iconForKey = (key: string | undefined) => {
-    const props = { sx: { fontSize: 40 } };
-    switch (key) {
-      case 'ai': return <SchoolIcon {...props} sx={{ ...props.sx, color: '#3f51b5' }} />;
-      case 'software': return <CodeIcon {...props} sx={{ ...props.sx, color: '#4caf50' }} />;
-      case 'security': return <SecurityIcon {...props} sx={{ ...props.sx, color: '#f44336' }} />;
-      case 'cloud': return <CloudIcon {...props} sx={{ ...props.sx, color: '#1976d2' }} />;
-      case 'data': return <StorageIcon {...props} sx={{ ...props.sx, color: '#6a1b9a' }} />;
-      case 'devops': return <BuildIcon {...props} sx={{ ...props.sx, color: '#ff9800' }} />;
-      case 'embedded': return <DeveloperModeIcon {...props} sx={{ ...props.sx, color: '#009688' }} />;
-      case 'network': return <SettingsEthernetIcon {...props} sx={{ ...props.sx, color: '#455a64' }} />;
-      default: return <SchoolIcon {...props} />;
-    }
-  };
-
-  // צבע רקע ברירת מחדל אם לא מוגדר
-  const getBackgroundColor = (iconKey: string) => {
-      switch (iconKey) {
-          case 'ai': return '#e3f2fd';
-          case 'software': return '#e8f5e9';
-          case 'security': return '#ffebee';
-          default: return '#ffffff';
+    const baseColor = iconColorMap[key || 'ai'] || '#3f51b5';
+    const iconProps = {
+      sx: {
+        fontSize: 40,
+        color: getIconColor(baseColor)
       }
+    };
+
+    switch (key) {
+      case 'ai': return <SchoolIcon {...iconProps} />;
+      case 'software': return <CodeIcon {...iconProps} />;
+      case 'security': return <SecurityIcon {...iconProps} />;
+      case 'cloud': return <CloudIcon {...iconProps} />;
+      case 'data': return <StorageIcon {...iconProps} />;
+      case 'devops': return <BuildIcon {...iconProps} />;
+      case 'embedded': return <DeveloperModeIcon {...iconProps} />;
+      case 'network': return <SettingsEthernetIcon {...iconProps} />;
+      default: return <SchoolIcon {...iconProps} />;
+    }
   };
 
   return (
@@ -113,63 +173,71 @@ const InternshipsManagement: React.FC = () => {
       </Typography>
 
       {loading ? (
-          <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-              <CircularProgress />
-          </Box>
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+          <CircularProgress />
+        </Box>
       ) : internships.length === 0 ? (
-          <Typography align="center">לא נמצאו מסלולי התמחות.</Typography>
+        <Typography align="center">לא נמצאו מסלולי התמחות.</Typography>
       ) : (
         <Grid container spacing={4}>
-            {internships.map((internship) => (
+          {internships.map((internship) => (
             <Grid key={internship.id}>
-                <Paper elevation={3} sx={{ ...styles.card, backgroundColor: internship.color || getBackgroundColor(internship.icon) }}>
-                
+              <Paper elevation={3} sx={{ ...styles.card, backgroundColor: internship.color || getBackgroundColor(internship.icon) }}>
+              
                 {/* כפתורי ניהול בפינה */}
                 <Box sx={{ position: 'absolute', top: 8, left: 8, display: 'flex', gap: 0.5 }}>
-                    <IconButton size="small" onClick={() => navigate(`/internships/edit/${internship.id}`)} sx={{ bgcolor: 'rgba(255,255,255,0.7)' }}>
-                        <EditIcon fontSize="small" color="primary" />
-                    </IconButton>
-                    <IconButton size="small" onClick={() => handleDelete(internship.id)} sx={{ bgcolor: 'rgba(255,255,255,0.7)' }}>
-                        <DeleteIcon fontSize="small" color="error" />
-                    </IconButton>
+                  <IconButton 
+                    size="small" 
+                    onClick={() => navigate(`/internships/edit/${internship.id}`)} 
+                    sx={{ bgcolor: 'rgba(255,255,255,0.7)' }}
+                  >
+                    <EditIcon fontSize="small" color="primary" />
+                  </IconButton>
+                  <IconButton 
+                    size="small" 
+                    onClick={() => handleDelete(internship.id)} 
+                    sx={{ bgcolor: 'rgba(255,255,255,0.7)' }}
+                  >
+                    <DeleteIcon fontSize="small" color="error" />
+                  </IconButton>
                 </Box>
 
                 <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
-                    {iconForKey(internship.icon)}
+                  {iconForKey(internship.icon)}
                 </Box>
                 
                 <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold', textAlign: 'center' }}>
-                    {internship.title}
+                  {internship.title}
                 </Typography>
                 
                 <Typography variant="body1" sx={{ mb: 2, textAlign: 'center', flexGrow: 1 }}>
-                    {internship.description}
+                  {internship.description}
                 </Typography>
                 
                 <Box sx={{ mt: 2 }}>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>
                     כיווני קריירה:
-                    </Typography>
-                    <Box component="ul" sx={styles.list}>
-                    {internship.careerPaths.map((path: string, idx: number) => (
-                        <li key={idx}><Typography variant="body2">{path}</Typography></li>
+                  </Typography>
+                  <Box component="ul" sx={styles.list}>
+                    {internship.careerPaths?.map((path: string, idx: number) => (
+                      <li key={idx}><Typography variant="body2">{path}</Typography></li>
                     ))}
-                    </Box>
+                  </Box>
                 </Box>
 
                 <Box sx={{ mt: 2 }}>
-                    <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 'bold', mb: 1 }}>
                     מיומנויות נרכשות:
-                    </Typography>
-                    <Box component="ul" sx={styles.list}>
-                    {internship.skills.map((skill: string, idx: number) => (
-                        <li key={idx}><Typography variant="body2">{skill}</Typography></li>
+                  </Typography>
+                  <Box component="ul" sx={styles.list}>
+                    {internship.skills?.map((skill: string, idx: number) => (
+                      <li key={idx}><Typography variant="body2">{skill}</Typography></li>
                     ))}
-                    </Box>
+                  </Box>
                 </Box>
-                </Paper>
+              </Paper>
             </Grid>
-            ))}
+          ))}
         </Grid>
       )}
     </Container>

@@ -5,9 +5,10 @@ import EditIcon from '@mui/icons-material/Edit';
 import { useNavigate } from 'react-router-dom';
 import type { SystemAlert } from './SystemAlert';
 import { PageHeader } from '../../components/PageHeader';
-
+import DesktopOnly from '../../components/DesktopOnly';
 // Import Service
 import { getAllAlerts, deleteAlert } from '../../firebase/alertsService';
+
 
 const AlertsManagement: React.FC = () => {
   const navigate = useNavigate();
@@ -55,7 +56,9 @@ const AlertsManagement: React.FC = () => {
   };
 
   return (
+    <DesktopOnly>
     <Container maxWidth="lg" sx={{ mt: 4 }}>
+      {/* שימוש ברכיב המשותף - כותרת וכפתור הוספה */}
       <PageHeader 
         title="ניהול התראות מערכת"
         buttonText="הוסף התראה"
@@ -64,7 +67,7 @@ const AlertsManagement: React.FC = () => {
 
       <TableContainer component={Paper} elevation={3}>
         <Table>
-          <TableHead sx={{ bgcolor: '#f5f5f5' }}>
+          <TableHead>
             <TableRow>
               <TableCell sx={{ fontWeight: 'bold' }}>הודעה</TableCell>
               <TableCell align="center" sx={{ fontWeight: 'bold' }}>סוג/דחיפות</TableCell>
@@ -103,7 +106,8 @@ const AlertsManagement: React.FC = () => {
           </TableBody>
         </Table>
       </TableContainer>
-    </Container>
+      </Container>
+    </DesktopOnly>
   );
 };
 

@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import type { Candidate } from './Candidate';
 import { PageHeader } from '../../components/PageHeader';
 import { getAllCandidates, deleteCandidate } from '../../firebase/candidatesService';
+import DesktopOnly from '../../components/DesktopOnly';
 
 const CandidatesManagement: React.FC = () => {
   const navigate = useNavigate();
@@ -53,7 +54,9 @@ const CandidatesManagement: React.FC = () => {
   };
 
   return (
+    <DesktopOnly>
     <Container maxWidth="lg" sx={{ mt: 4 }}>
+      {/* שימוש ברכיב המשותף לחיסכון בקוד ועיצוב אחיד */}
       <PageHeader 
         title="ניהול מועמדים" 
         buttonText="מועמד חדש" 
@@ -62,7 +65,7 @@ const CandidatesManagement: React.FC = () => {
 
       <TableContainer component={Paper} elevation={3}>
         <Table>
-          <TableHead sx={{ bgcolor: '#f5f5f5' }}>
+          <TableHead>
             <TableRow>
               {/* הוספנו עמודת תעודת זהות */}
               <TableCell sx={{ fontWeight: 'bold' }}>ת.ז.</TableCell>
@@ -111,7 +114,8 @@ const CandidatesManagement: React.FC = () => {
           </TableBody>
         </Table>
       </TableContainer>
-    </Container>
+      </Container>
+    </DesktopOnly>
   );
 };
 
