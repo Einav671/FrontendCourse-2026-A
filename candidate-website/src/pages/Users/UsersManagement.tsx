@@ -11,14 +11,6 @@ import { getAllUsers, deleteUser } from '../../firebase/usersService';
 import type { User } from './User';
 import DesktopOnly from '../../components/DesktopOnly';
 
-interface User {
-    id: string;
-    fullName: string;
-    email: string;
-    password: string;
-    userType: string;
-}
-
 const UsersManagement: React.FC = () => {
     const navigate = useNavigate();
     const [users, setUsers] = useState<User[]>([]);
