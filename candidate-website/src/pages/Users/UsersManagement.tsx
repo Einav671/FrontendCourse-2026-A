@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '../../components/PageHeader';
 import { getAllUsers, deleteUser } from '../../firebase/usersService';
 import type { User } from './User';
+import DesktopOnly from '../../components/DesktopOnly';
 
 interface User {
     id: string;
