@@ -1,23 +1,45 @@
 import React, { useState, useEffect } from 'react';
 import {
   Container, Paper, TextField, Button, MenuItem,
-  Snackbar, Alert, Stack
+  Snackbar, Alert, Stack, CircularProgress
 } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Candidate } from './Candidate';
-// ייבוא הכותרת המשותפת
 import { PageHeader } from '../../components/PageHeader';
+
+// Import Service & Type
+import { createCandidate, getCandidateById, updateCandidate } from '../../firebase/candidatesService';
+
+// פונקציית עזר לוולידציה של תעודת זהות ישראלית
+const isValidIsraeliID = (id: string): boolean => {
+    let strId = String(id).trim();
+    if (strId.length > 9 || strId.length < 5) return false;
+    
+    // ריפוד באפסים אם המספר קצר מ-9 ספרות
+    strId = strId.padStart(9, '0');
+    
+    let sum = 0;
+    for (let i = 0; i < 9; i++) {
+        let num = Number(strId.charAt(i)) * ((i % 2) + 1);
+        if (num > 9) num -= 9;
+        sum += num;
+    }
+    
+    return sum % 10 === 0;
+};
 
 const CandidateForm: React.FC = () => {
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { id } = useParams(); // id כאן הוא תעודת הזהות
   const isEditMode = !!id;
 
   const [showSuccess, setShowSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const [formData, setFormData] = useState({
+    identityCard: '', // שדה חדש
     firstName: '',
     lastName: '',
     email: '',
@@ -29,71 +51,139 @@ const CandidateForm: React.FC = () => {
   });
 
   const [errors, setErrors] = useState({
-    firstName: false,
-    lastName: false,
-    email: false,
-    phone: false,
-    degreeCode: false,
-    bagrut: false,
-    psychometric: false,
-    status: false,
+    identityCard: false,
+    firstName: false, lastName: false, email: false, phone: false,
+    degreeCode: false, bagrut: false, psychometric: false, status: false,
   });
 
+  // טעינת נתונים בעריכה
   useEffect(() => {
-    if (isEditMode) {
-      const savedCandidates = JSON.parse(localStorage.getItem('candidates') || '[]');
-      const candidateToEdit = savedCandidates.find((c: Candidate) => c.id === id);
-      if (candidateToEdit) {
-        setFormData(candidateToEdit);
-      }
-    }
-  }, [id, isEditMode]);
+    const loadCandidate = async () => {
+        if (isEditMode && id) {
+            setLoading(true);
+            try {
+                const data = await getCandidateById(id);
+                if (data) {
+                    setFormData({ ...data,
+                        identityCard: data.identityCard || id, // אם אין שדה כזה בדאטה הישן, קח מה-ID
+                        firstName: data.firstName,
+                        lastName: data.lastName,
+                        email: data.email,
+                        phone: data.phone,
+                        degreeCode: data.degreeCode,
+                        bagrut: data.bagrut.toString(),
+                        psychometric: data.psychometric.toString(),
+                        status: data.status
+                    });
+                } else {
+                    alert("המועמד לא נמצא");
+                    navigate('/candidates');
+                }
+            } catch (error) {
+                console.error("Error loading candidate:", error);
+            } finally {
+                setLoading(false);
+            }
+        }
+    };
+    loadCandidate();
+  }, [id, isEditMode, navigate]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    const isValid = event.target.validity ? event.target.validity.valid : value !== '';
-    setErrors((prev) => ({ ...prev, [name]: !isValid }));
+    
+    let isValid = event.target.validity.valid;
+    
+    // בדיקה מיוחדת לתעודת זהות
+    if (name === 'identityCard') {
+        isValid = isValidIsraeliID(value);
+    }
+    
+    setErrors((prev) => ({ ...prev, [name]: !isValid && value !== '' }));
   };
 
-  const handleSave = () => {
-    const savedCandidates = JSON.parse(localStorage.getItem('candidates') || '[]');
-    const candidateData = new Candidate(
-      isEditMode ? id! : Date.now().toString(),
-      formData.firstName,
-      formData.lastName,
-      formData.email,
-      formData.phone,
-      formData.degreeCode,
-      Number(formData.bagrut),
-      Number(formData.psychometric),
-      formData.status
-    );
-
-    if (isEditMode) {
-      const updated = savedCandidates.map((c: any) => c.id === id ? candidateData : c);
-      localStorage.setItem('candidates', JSON.stringify(updated));
-    } else {
-      localStorage.setItem('candidates', JSON.stringify([...savedCandidates, candidateData]));
+  const handleSave = async () => {
+    // בדיקות ולידציה לפני שליחה
+    if (!isValidIsraeliID(formData.identityCard)) {
+        alert("תעודת הזהות אינה תקינה");
+        setErrors(prev => ({...prev, identityCard: true}));
+        return;
     }
 
-    setShowSuccess(true);
-    setTimeout(() => {
-        navigate('/candidates');
-    }, 1500);
+    if (!formData.firstName || !formData.lastName || !formData.email) {
+        alert("נא למלא את כל שדות החובה");
+        return;
+    }
+
+    setSaving(true);
+    try {
+        const dataToSend = {
+            identityCard: formData.identityCard, // נשמור את זה גם כשדה רגיל
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            email: formData.email,
+            phone: formData.phone,
+            degreeCode: formData.degreeCode,
+            bagrut: Number(formData.bagrut),
+            psychometric: Number(formData.psychometric),
+            status: formData.status
+        };
+
+        if (isEditMode && id) {
+            // בעריכה - ה-ID (תעודת זהות) לא משתנה
+            await updateCandidate(id, dataToSend);
+        } else {
+            // ביצירה - אנחנו שולחים את תעודת הזהות כ-ID של המסמך
+            await createCandidate(formData.identityCard, dataToSend);
+        }
+
+        setShowSuccess(true);
+        setTimeout(() => {
+            navigate('/candidates');
+        }, 1500);
+
+    } catch (error) {
+        console.error("Error saving candidate:", error);
+        alert("שגיאה בשמירה (ייתכן שתעודת הזהות כבר קיימת במערכת)");
+    } finally {
+        setSaving(false);
+    }
   };
 
   const isFormValid = Object.values(errors).every((error) => !error) &&
     Object.values(formData).every((value) => value !== "");
 
+  if (loading) {
+      return (
+          <Container maxWidth="sm" sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
+              <CircularProgress />
+          </Container>
+      );
+  }
+
   return (
     <Container maxWidth="sm" sx={{ mt: 4 }}>
-      {/* כותרת אחידה */}
       <PageHeader title={isEditMode ? 'עריכת מועמד' : 'מועמד חדש'} />
 
       <Paper elevation={3} sx={{ p: 4 }}>
         <Stack spacing={3}>
           
+          {/* שדה תעודת זהות - ראשון */}
+          <TextField
+              fullWidth 
+              label="תעודת זהות" 
+              name="identityCard"
+              value={formData.identityCard} 
+              onChange={handleChange}
+              required 
+              error={!!errors.identityCard}
+              helperText={errors.identityCard ? "מספר זהות לא תקין" : "מספר ייחודי (משמש כמזהה)"}
+              // חוסמים עריכה אם אנחנו במצב עריכה - אי אפשר לשנות מפתח ראשי
+              slotProps={{ input: { readOnly: isEditMode } }}
+              variant={isEditMode ? "filled" : "outlined"}
+            />
+
           <Stack direction="row" spacing={2}>
             <TextField
               fullWidth label="שם פרטי" name="firstName"
@@ -161,10 +251,10 @@ const CandidateForm: React.FC = () => {
 
           <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
             <Button
-              variant="contained" color="primary" startIcon={<SaveIcon />}
-              onClick={handleSave} disabled={!isFormValid} fullWidth
+              variant="contained" color="primary" startIcon={saving ? null : <SaveIcon />}
+              onClick={handleSave} disabled={!isFormValid || saving} fullWidth
             >
-              שמור
+              {saving ? "שומר..." : "שמור"}
             </Button>
             <Button
               variant="outlined" color="secondary" startIcon={<ArrowForwardIcon />}

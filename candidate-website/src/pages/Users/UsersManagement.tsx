@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { 
-    Container, Table, TableBody, TableCell, TableContainer, 
-    TableHead, TableRow, Paper, IconButton, Chip 
+  Container, Table, TableBody, TableCell, TableContainer, 
+  TableHead, TableRow, Paper, IconButton, Chip, CircularProgress 
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '../../components/PageHeader';
-import DesktopOnly from '../../components/DesktopOnly';
 
 interface User {
     id: string;
@@ -20,25 +19,34 @@ interface User {
 const UsersManagement: React.FC = () => {
     const navigate = useNavigate();
     const [users, setUsers] = useState<User[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    const fetchUsers = async () => {
+        setLoading(true);
+        try {
+            const data = await getAllUsers();
+            setUsers(data);
+        } catch (error) {
+            console.error("Error fetching users:", error);
+            alert("שגיאה בטעינת המשתמשים");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const saved = localStorage.getItem('users');
-        if (saved) {
-            setUsers(JSON.parse(saved));
-        } else {
-            // נתונים ראשוניים לדוגמה אם אין כלום
-            setUsers([
-                { id: "1", fullName: "ישראל ישראלי", email: "israel@test.com", password: "123456", userType: "מועמד" },
-                { id: "2", fullName: "דנה כהן", email: "dana@test.com", password: "abcdef", userType: "סטודנט" }
-            ]);
-        }
+        fetchUsers();
     }, []);
 
-    const handleDelete = (id: string) => {
-        if (window.confirm("למחוק את המשתמש?")) {
-            const updated = users.filter(user => user.id !== id);
-            setUsers(updated);
-            localStorage.setItem('users', JSON.stringify(updated));
+    const handleDelete = async (email: string) => {
+        if (window.confirm("האם למחוק את המשתמש?")) {
+            try {
+                await deleteUser(email);
+                setUsers(prev => prev.filter(user => user.id !== email));
+            } catch (error) {
+                console.error("Error deleting:", error);
+                alert("שגיאה במחיקת המשתמש");
+            }
         }
     };
 
@@ -55,7 +63,6 @@ const UsersManagement: React.FC = () => {
     return (
         <DesktopOnly>
         <Container maxWidth="lg">
-            {/* כותרת וכפתור הוספה */}
             <PageHeader 
                 title="ניהול משתמשים" 
                 buttonText="משתמש חדש"
@@ -66,36 +73,43 @@ const UsersManagement: React.FC = () => {
                 <Table>
                     <TableHead sx={{ bgcolor: 'action.hover' }}>
                         <TableRow>
+                            <TableCell><b>מייל (מזהה)</b></TableCell>
                             <TableCell><b>שם מלא</b></TableCell>
-                            <TableCell><b>מייל</b></TableCell>
                             <TableCell><b>סיסמא</b></TableCell>
                             <TableCell align="center"><b>סוג משתמש</b></TableCell>
                             <TableCell align="center"><b>פעולות</b></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {users.map((user) => (
-                            <TableRow key={user.id}>
-                                <TableCell>{user.fullName}</TableCell>
-                                <TableCell>{user.email}</TableCell>
-                                <TableCell>{user.password}</TableCell>
-                                <TableCell align="center">
-                                    <Chip 
-                                        label={user.userType} 
-                                        color={getUserTypeColor(user.userType) as any} 
-                                        size="small" 
-                                    />
-                                </TableCell>
-                                <TableCell align="center">
-                                    <IconButton color="primary" onClick={() => navigate(`/users/edit/${user.id}`)}>
-                                        <EditIcon />
-                                    </IconButton>
-                                    <IconButton color="error" onClick={() => handleDelete(user.id)}>
-                                        <DeleteIcon />
-                                    </IconButton>
-                                </TableCell>
-                            </TableRow>
-                        ))}
+                        {loading ? (
+                             <TableRow><TableCell colSpan={5} align="center"><CircularProgress /></TableCell></TableRow>
+                        ) : users.length === 0 ? (
+                            <TableRow><TableCell colSpan={5} align="center">אין משתמשים במערכת</TableCell></TableRow>
+                        ) : (
+                            users.map((user) => (
+                                <TableRow key={user.id}>
+                                    {/* מציגים את המייל שהוא גם ה-ID */}
+                                    <TableCell sx={{ direction: 'ltr', textAlign: 'right' }}>{user.id}</TableCell>
+                                    <TableCell>{user.fullName}</TableCell>
+                                    <TableCell>{user.password}</TableCell>
+                                    <TableCell align="center">
+                                        <Chip 
+                                            label={user.userType} 
+                                            color={getUserTypeColor(user.userType) as any} 
+                                            size="small" 
+                                        />
+                                    </TableCell>
+                                    <TableCell align="center">
+                                        <IconButton color="primary" onClick={() => navigate(`/users/edit/${user.id}`)}>
+                                            <EditIcon />
+                                        </IconButton>
+                                        <IconButton color="error" onClick={() => handleDelete(user.id)}>
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    </TableCell>
+                                </TableRow>
+                            ))
+                        )}
                     </TableBody>
                 </Table>
             </TableContainer>

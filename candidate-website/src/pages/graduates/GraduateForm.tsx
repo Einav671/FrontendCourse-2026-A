@@ -1,43 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Container, TextField, Button, Paper, MenuItem, 
-  Snackbar, Alert, Stack 
+  Snackbar, Alert, Stack, CircularProgress 
 } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useNavigate, useParams } from 'react-router-dom';
 import { PageHeader } from '../../components/PageHeader';
+import { createGraduate, getGraduateById, updateGraduate } from '../../firebase/graduatesService';
 
-// --- הגדרת המחלקה ---
-export class Graduate {
-    id: string;
-    fullName: string;
-    role: string;
-    degree: string;
-    imageUrl: string;
-    review: string;
-    status: 'pending' | 'approved' | 'rejected';
-
-    constructor(
-        id: string, 
-        fullName: string, 
-        role: string, 
-        degree: string, 
-        imageUrl: string, 
-        review: string,
-        status: 'pending' | 'approved' | 'rejected' = 'pending'
-    ) {
-        this.id = id;
-        this.fullName = fullName;
-        this.role = role;
-        this.degree = degree;
-        this.imageUrl = imageUrl;
-        this.review = review;
-        this.status = status;
+// פונקציית עזר לוולידציה של תעודת זהות ישראלית
+const isValidIsraeliID = (id: string): boolean => {
+    let strId = String(id).trim();
+    if (strId.length > 9 || strId.length < 5) return false;
+    strId = strId.padStart(9, '0');
+    let sum = 0;
+    for (let i = 0; i < 9; i++) {
+        let num = Number(strId.charAt(i)) * ((i % 2) + 1);
+        if (num > 9) num -= 9;
+        sum += num;
     }
-}
+    return sum % 10 === 0;
+};
 
 interface GraduateFormState {
+    identityCard: string;
     fullName: string;
     role: string;
     degree: string;
@@ -48,11 +35,15 @@ interface GraduateFormState {
 
 const GraduateForm: React.FC = () => {
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { id } = useParams(); // ה-ID הוא תעודת הזהות
   const isEditMode = !!id;
+  
   const [showSuccess, setShowSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const [formData, setFormData] = useState<GraduateFormState>({
+    identityCard: '',
     fullName: '',
     role: '',
     degree: 'מדעי המחשב',
@@ -62,6 +53,7 @@ const GraduateForm: React.FC = () => {
   });
 
   const [errors, setErrors] = useState({
+    identityCard: false,
     fullName: false,
     role: false,
     degree: false,
@@ -69,57 +61,95 @@ const GraduateForm: React.FC = () => {
     review: false,
   });
 
+  // טעינת נתונים בעריכה
   useEffect(() => {
-    if (isEditMode) {
-      const saved = JSON.parse(localStorage.getItem('graduates') || '[]');
-      const itemToEdit = saved.find((g: any) => g.id === id);
-      if (itemToEdit) {
-          setFormData({
-              fullName: itemToEdit.fullName,
-              role: itemToEdit.role,
-              degree: itemToEdit.degree,
-              imageUrl: itemToEdit.imageUrl,
-              review: itemToEdit.review,
-              status: itemToEdit.status
-          });
-      }
-    }
-  }, [id, isEditMode]);
+    const loadData = async () => {
+        if (isEditMode && id) {
+            setLoading(true);
+            try {
+                const data = await getGraduateById(id);
+                if (data) {
+                    setFormData({
+                        identityCard: data.identityCard || id,
+                        fullName: data.fullName,
+                        role: data.role,
+                        degree: data.degree,
+                        imageUrl: data.imageUrl,
+                        review: data.review,
+                        status: data.status
+                    });
+                } else {
+                    alert("לא נמצא בוגר עם תעודת זהות זו");
+                    navigate('/graduates');
+                }
+            } catch (error) {
+                console.error("Error loading:", error);
+            } finally {
+                setLoading(false);
+            }
+        }
+    };
+    loadData();
+  }, [id, isEditMode, navigate]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    const isValid = event.target.validity ? event.target.validity.valid : value !== ''; 
+    
+    let isValid = event.target.validity ? event.target.validity.valid : value !== ''; 
+    
+    // בדיקת ולידציה ספציפית לתעודת זהות
+    if (name === 'identityCard') {
+        isValid = isValidIsraeliID(value);
+    }
+
     setErrors((prev) => ({ ...prev, [name]: !isValid }));
   };
 
   const isFormValid = Object.values(errors).every((error) => !error) && 
-                      Object.values(formData).every((value) => value !== "");
+                      formData.identityCard !== "" && formData.fullName !== "";
 
-  const handleSave = () => {
-    const saved = JSON.parse(localStorage.getItem('graduates') || '[]');
-    const newItem = new Graduate(
-        isEditMode ? id! : Date.now().toString(),
-        formData.fullName,
-        formData.role,
-        formData.degree,
-        formData.imageUrl,
-        formData.review,
-        formData.status 
-    );
-
-    if (isEditMode) {
-      const updated = saved.map((g: any) => g.id === id ? newItem : g);
-      localStorage.setItem('graduates', JSON.stringify(updated));
-    } else {
-      localStorage.setItem('graduates', JSON.stringify([...saved, newItem]));
+  const handleSave = async () => {
+    if (!isValidIsraeliID(formData.identityCard)) {
+        alert("תעודת הזהות אינה תקינה");
+        setErrors(prev => ({...prev, identityCard: true}));
+        return;
     }
 
-    setShowSuccess(true);
-    setTimeout(() => {
-        navigate('/graduates');
-    }, 1500);
+    setSaving(true);
+    try {
+        const dataToSend = {
+            identityCard: formData.identityCard,
+            fullName: formData.fullName,
+            role: formData.role,
+            degree: formData.degree,
+            imageUrl: formData.imageUrl,
+            review: formData.review,
+            status: formData.status
+        };
+
+        if (isEditMode && id) {
+            // בעריכה אנחנו לא משנים את ה-ID (המפתח)
+            await updateGraduate(id, dataToSend);
+        } else {
+            // ביצירה אנחנו שולחים את תעודת הזהות כמפתח
+            await createGraduate(formData.identityCard, dataToSend);
+        }
+
+        setShowSuccess(true);
+        setTimeout(() => {
+            navigate('/graduates');
+        }, 1500);
+
+    } catch (error) {
+        console.error("Error saving:", error);
+        alert("שגיאה בשמירה (ייתכן שתעודת הזהות כבר קיימת)");
+    } finally {
+        setSaving(false);
+    }
   };
+
+  if (loading) return <CircularProgress sx={{ display: 'block', mx: 'auto', mt: 4 }} />;
 
   return (
     <Container maxWidth="sm">
@@ -128,6 +158,18 @@ const GraduateForm: React.FC = () => {
       <Paper elevation={3} sx={{ p: 4 }}>
         <Stack spacing={3}>
             
+            {/* שדה תעודת זהות */}
+            <TextField
+                fullWidth label="תעודת זהות" name="identityCard"
+                value={formData.identityCard} onChange={handleChange}
+                error={!!errors.identityCard} 
+                helperText={errors.identityCard ? 'מספר זהות לא תקין' : 'משמש כמזהה ייחודי במערכת'}
+                required
+                // חוסמים עריכה אם זה מצב עריכה (כי זה המפתח)
+                slotProps={{ input: { readOnly: isEditMode } }}
+                variant={isEditMode ? "filled" : "outlined"}
+            />
+
             <TextField
               fullWidth label="שם מלא" name="fullName"
               value={formData.fullName} onChange={handleChange}
@@ -165,6 +207,7 @@ const GraduateForm: React.FC = () => {
               required
             />
             
+            {/* הצגת שדה סטטוס רק בעריכה */}
             {isEditMode && (
                 <TextField
                   select fullWidth label="סטטוס אישור" name="status"
@@ -179,9 +222,10 @@ const GraduateForm: React.FC = () => {
             <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
                 <Button 
                     variant="contained" onClick={handleSave} 
-                    startIcon={<SaveIcon />} disabled={!isFormValid} fullWidth
+                    startIcon={saving ? null : <SaveIcon />} 
+                    disabled={!isFormValid || saving} fullWidth
                 >
-                    שמור
+                    {saving ? "שומר..." : "שמור"}
                 </Button>
                 <Button 
                     variant="outlined" color="secondary" onClick={() => navigate('/graduates')} 

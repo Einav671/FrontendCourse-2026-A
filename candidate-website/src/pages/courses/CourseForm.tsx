@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import {
   Container, TextField, Button, Paper, Radio, FormControlLabel,
-  Snackbar, Alert, Stack, Typography, Box, RadioGroup
+  Snackbar, Alert, Stack, Typography, Box, RadioGroup, CircularProgress
 } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Course } from './Course';
 import { PageHeader } from '../../components/PageHeader';
+import { createCourse, getCourseById, updateCourse } from '../../firebase/coursesService'; // Import Service
 
 const CourseForm: React.FC = () => {
   const navigate = useNavigate();
@@ -15,11 +15,14 @@ const CourseForm: React.FC = () => {
   const isEditMode = !!id;
 
   const [showSuccess, setShowSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
 
+  // הערה: נשתמש בסטייט עם מחרוזות עבור הטופס, ונמיר למספרים בשמירה
   const [formData, setFormData] = useState({
     name: '',
     code: '',
-    credits: 2,
+    credits: 2, 
     description: '',
     degreeCode: 'CS-BA',
     type: 'חובה'
@@ -34,15 +37,35 @@ const CourseForm: React.FC = () => {
     type: false,
   });
 
+  // טעינת קורס לעריכה
   useEffect(() => {
-    if (isEditMode) {
-      const savedCourses = JSON.parse(localStorage.getItem('my-courses') || '[]');
-      const courseToEdit = savedCourses.find((c: Course) => c.id === id);
-      if (courseToEdit) {
-        setFormData(courseToEdit);
-      }
-    }
-  }, [id, isEditMode]);
+    const loadCourse = async () => {
+        if (isEditMode && id) {
+            setLoading(true);
+            try {
+                const data = await getCourseById(id);
+                if (data) {
+                    setFormData({
+                        name: data.name,
+                        code: data.code,
+                        credits: data.credits,
+                        description: data.description,
+                        degreeCode: data.degreeCode,
+                        type: data.type
+                    });
+                } else {
+                    alert("הקורס לא נמצא");
+                    navigate('/courses');
+                }
+            } catch (error) {
+                console.error("Error loading course:", error);
+            } finally {
+                setLoading(false);
+            }
+        }
+    };
+    loadCourse();
+  }, [id, isEditMode, navigate]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -51,29 +74,54 @@ const CourseForm: React.FC = () => {
     setErrors((prev) => ({ ...prev, [name]: !isValid }));
   };
 
-  const handleSave = () => {
-    const savedCourses = JSON.parse(localStorage.getItem('my-courses') || '[]');
-
-    if (isEditMode) {
-      const updatedCourses = savedCourses.map((c: Course) =>
-        c.id === id ? { ...formData, id } : c
-      );
-      localStorage.setItem('my-courses', JSON.stringify(updatedCourses));
-    } else {
-      const newCourse = {
-        ...formData,
-        id: Date.now().toString()
-      };
-      localStorage.setItem('my-courses', JSON.stringify([...savedCourses, newCourse]));
+  const handleSave = async () => {
+    if (!formData.name || !formData.code) {
+        alert("נא למלא את שדות החובה");
+        return;
     }
 
-    setShowSuccess(true);
-    setTimeout(() => {
-        navigate('/management'); // שים לב: זה מחזיר ל-/management לפי הקוד המקורי שלך, אולי תרצה לשנות ל-/courses?
-    }, 1500);
+    setSaving(true);
+
+    try {
+        const dataToSend = {
+            name: formData.name,
+            code: formData.code, // משאירים כסטרינג או ממירים למספר לפי הצורך (במודל הגדרת string לקוד)
+            credits: Number(formData.credits), // המרה למספר
+            description: formData.description,
+            degreeCode: formData.degreeCode,
+            type: formData.type
+        };
+
+        if (isEditMode && id) {
+            await updateCourse(id, dataToSend);
+        } else {
+            // יצירה אוטומטית של ID ע"י Firebase
+            await createCourse(dataToSend);
+        }
+
+        setShowSuccess(true);
+        setTimeout(() => {
+            // שיניתי את הניווט ל-/management כדי שיחזור לטבלה
+            navigate('/management');
+        }, 1500);
+
+    } catch (error) {
+        console.error("Error saving course:", error);
+        alert("שגיאה בשמירת הקורס");
+    } finally {
+        setSaving(false);
+    }
   };
 
-  const isFormValid = Object.values(errors).every((error) => !error) && Object.values(formData).every((value) => value !== "");
+  const isFormValid = Object.values(errors).every((error) => !error) && formData.name !== "";
+
+  if (loading) {
+      return (
+          <Container maxWidth="sm" sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
+              <CircularProgress />
+          </Container>
+      );
+  }
 
   return (
     <Container maxWidth="sm" sx={{ mt: 4 }}>
@@ -150,19 +198,19 @@ const CourseForm: React.FC = () => {
             <Button
               variant="contained"
               color="primary"
-              startIcon={<SaveIcon />}
+              startIcon={saving ? null : <SaveIcon />}
               onClick={handleSave}
-              disabled={!isFormValid}
+              disabled={!isFormValid || saving}
               fullWidth
             >
-              שמור וחזור
+              {saving ? "שומר..." : "שמור וחזור"}
             </Button>
 
             <Button
               variant="outlined"
               color="secondary"
               startIcon={<ArrowForwardIcon />}
-              onClick={() => navigate('/management')}
+              onClick={() => navigate('/management')} 
               fullWidth
             >
               ביטול

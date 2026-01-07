@@ -1,36 +1,44 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Chip } from '@mui/material';
+import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Chip, CircularProgress } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from 'react-router-dom';
-import { Candidate } from './Candidate';
-// ייבוא הכותרת המשותפת
+import type { Candidate } from './Candidate';
 import { PageHeader } from '../../components/PageHeader';
+import { getAllCandidates, deleteCandidate } from '../../firebase/candidatesService';
 import DesktopOnly from '../../components/DesktopOnly';
 
 const CandidatesManagement: React.FC = () => {
   const navigate = useNavigate();
   const [candidates, setCandidates] = useState<Candidate[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchCandidates = async () => {
+    setLoading(true);
+    try {
+      const data = await getAllCandidates();
+      setCandidates(data);
+    } catch (error) {
+      console.error("Error fetching candidates:", error);
+      alert("שגיאה בטעינת המועמדים");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const saved = localStorage.getItem('candidates');
-    if (saved) {
-      setCandidates(JSON.parse(saved));
-    } else {
-      // נתוני דמו אם אין כלום
-      const demoData = [
-        new Candidate("1", "ישראל", "ישראלי", "israel@test.com", "0501234567", "CS", 85, 650, "נפתח"),
-        new Candidate("2", "דנה", "כהן", "dana@test.com", "0527654321", "CS", 90, 700, "בטיפול")
-      ];
-      setCandidates(demoData);
-    }
+    fetchCandidates();
   }, []);
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (window.confirm("למחוק את המועמד?")) {
-      const updated = candidates.filter(c => c.id !== id);
-      setCandidates(updated);
-      localStorage.setItem('candidates', JSON.stringify(updated));
+      try {
+        await deleteCandidate(id);
+        setCandidates(prev => prev.filter(c => c.id !== id));
+      } catch (error) {
+        console.error("Error deleting candidate:", error);
+        alert("שגיאה במחיקת המועמד");
+      }
     }
   };
 
@@ -46,8 +54,7 @@ const CandidatesManagement: React.FC = () => {
   };
 
   return (
-    <DesktopOnly>
-      <Container maxWidth="lg" sx={{ mt: 4 }}>
+    <Container maxWidth="lg" sx={{ mt: 4 }}>
       {/* שימוש ברכיב המשותף לחיסכון בקוד ועיצוב אחיד */}
       <PageHeader 
         title="ניהול מועמדים" 
@@ -59,7 +66,8 @@ const CandidatesManagement: React.FC = () => {
         <Table>
           <TableHead>
             <TableRow>
-              {/* כותרות מודגשות - יישור לימין הוא אוטומטי בגלל הגדרת ה-RTL */}
+              {/* הוספנו עמודת תעודת זהות */}
+              <TableCell sx={{ fontWeight: 'bold' }}>ת.ז.</TableCell>
               <TableCell sx={{ fontWeight: 'bold' }}>שם פרטי</TableCell>
               <TableCell sx={{ fontWeight: 'bold' }}>שם משפחה</TableCell>
               <TableCell sx={{ fontWeight: 'bold' }}>אימייל</TableCell>
@@ -69,8 +77,21 @@ const CandidatesManagement: React.FC = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {candidates.map((c) => (
+            {loading ? (
+               <TableRow>
+                 <TableCell colSpan={7} align="center" sx={{ py: 3 }}>
+                   <CircularProgress />
+                 </TableCell>
+               </TableRow>
+            ) : candidates.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} align="center">לא נמצאו מועמדים</TableCell>
+              </TableRow>
+            ) : (
+              candidates.map((c) => (
               <TableRow key={c.id} hover>
+                {/* הצגת תעודת זהות (או ה-ID אם השדה ריק במידע ישן) */}
+                <TableCell>{c.identityCard || c.id}</TableCell>
                 <TableCell>{c.firstName}</TableCell>
                 <TableCell>{c.lastName}</TableCell>
                 <TableCell>{c.email}</TableCell>
@@ -87,11 +108,7 @@ const CandidatesManagement: React.FC = () => {
                   </IconButton>
                 </TableCell>
               </TableRow>
-            ))}
-            {candidates.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={6} align="center">לא נמצאו מועמדים</TableCell>
-              </TableRow>
+              ))
             )}
           </TableBody>
         </Table>

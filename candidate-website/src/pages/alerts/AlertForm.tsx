@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Container, Paper, TextField, Button, MenuItem, 
-  Snackbar, Alert, Stack 
+  Snackbar, Alert, Stack, CircularProgress 
 } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useNavigate, useParams } from 'react-router-dom';
-import { SystemAlert } from './SystemAlert';
-// ייבוא הכותרת המשותפת
 import { PageHeader } from '../../components/PageHeader';
+
+// Import Service & Type
+import { createAlert, getAlertById, updateAlert } from '../../firebase/alertsService';
 
 const AlertForm: React.FC = () => {
   const navigate = useNavigate();
@@ -16,6 +17,8 @@ const AlertForm: React.FC = () => {
   const isEdit = !!id;
 
   const [showSuccess, setShowSuccess] = useState(false);
+  const [loading, setLoading] = useState(false); // לטעינת נתונים בעריכה
+  const [saving, setSaving] = useState(false);   // למניעת לחיצות כפולות
 
   const [formData, setFormData] = useState({
     message: '',
@@ -27,19 +30,31 @@ const AlertForm: React.FC = () => {
     type: false
   });
 
+  // טעינת נתונים במצב עריכה
   useEffect(() => {
-    if (isEdit) {
-      const saved: SystemAlert[] = JSON.parse(localStorage.getItem('system-alerts') || '[]');
-      const found = saved.find((a) => a.id === id);
-      
-      if (found) {
-        setFormData({
-            message: found.message,
-            type: found.type
-        });
-      }
-    }
-  }, [id, isEdit]);
+    const loadAlert = async () => {
+        if (isEdit && id) {
+            setLoading(true);
+            try {
+                const data = await getAlertById(id);
+                if (data) {
+                    setFormData({
+                        message: data.message,
+                        type: data.type
+                    });
+                } else {
+                    alert("ההתראה לא נמצאה");
+                    navigate('/alerts');
+                }
+            } catch (error) {
+                console.error("Error loading alert:", error);
+            } finally {
+                setLoading(false);
+            }
+        }
+    };
+    loadAlert();
+  }, [id, isEdit, navigate]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -48,32 +63,49 @@ const AlertForm: React.FC = () => {
     setErrors((prev) => ({ ...prev, [name]: !isValid }));
   };
 
-  const handleSave = () => {
-    const saved: SystemAlert[] = JSON.parse(localStorage.getItem('system-alerts') || '[]');
-    const newAlert = new SystemAlert(
-      isEdit ? id! : Date.now().toString(),
-      formData.message,
-      formData.type
-    );
-
-    if (isEdit) {
-      const updated = saved.map((a) => a.id === id ? newAlert : a);
-      localStorage.setItem('system-alerts', JSON.stringify(updated));
-    } else {
-      localStorage.setItem('system-alerts', JSON.stringify([...saved, newAlert]));
+  const handleSave = async () => {
+    if (!formData.message) {
+        setErrors(prev => ({ ...prev, message: true }));
+        return;
     }
-    
-    setShowSuccess(true);
-    setTimeout(() => {
-        navigate('/alerts');
-    }, 1500);
+
+    setSaving(true);
+    try {
+        const dataToSend = {
+            message: formData.message,
+            type: formData.type
+        };
+
+        if (isEdit && id) {
+            await updateAlert(id, dataToSend);
+        } else {
+            await createAlert(dataToSend);
+        }
+        
+        setShowSuccess(true);
+        setTimeout(() => {
+            navigate('/alerts');
+        }, 1500);
+    } catch (error) {
+        console.error("Error saving alert:", error);
+        alert("שגיאה בשמירת ההתראה");
+    } finally {
+        setSaving(false);
+    }
   };
 
-  const isFormValid = Object.values(errors).every((error) => !error) && formData.message !== "";
+  const isFormValid = !errors.message && !errors.type && formData.message !== "";
+
+  if (loading) {
+      return (
+          <Container maxWidth="sm" sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
+              <CircularProgress />
+          </Container>
+      );
+  }
 
   return (
     <Container maxWidth="sm" sx={{ mt: 4 }}>
-      {/* כותרת הדף */}
       <PageHeader title={isEdit ? 'עריכת התראה' : 'התראה חדשה'} />
 
       <Paper elevation={3} sx={{ p: 4 }}>
@@ -109,18 +141,18 @@ const AlertForm: React.FC = () => {
                 <Button
                     variant="contained"
                     color="primary"
-                    startIcon={<SaveIcon />}
+                    startIcon={saving ? null : <SaveIcon />}
                     onClick={handleSave}
-                    disabled={!isFormValid}
+                    disabled={!isFormValid || saving}
                     fullWidth
                 >
-                    שמור וחזור
+                    {saving ? "שומר..." : "שמור וחזור"}
                 </Button>
 
                 <Button
                     variant="outlined"
                     color="secondary"
-                    startIcon={<ArrowForwardIcon />} // האייקון יתהפך אוטומטית ב-RTL
+                    startIcon={<ArrowForwardIcon />}
                     onClick={() => navigate('/alerts')}
                     fullWidth
                 >
