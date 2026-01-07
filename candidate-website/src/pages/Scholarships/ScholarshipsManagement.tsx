@@ -1,43 +1,47 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Container, Table, TableBody, TableCell, TableContainer, 
-  TableHead, TableRow, Paper, IconButton, Chip 
+  Container, Table, TableBody, TableCell, TableContainer,
+  TableHead, TableRow, Paper, IconButton, Chip, CircularProgress
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '../../components/PageHeader';
+import { getAllScholarships,deleteScholarship } from '../../firebase/scholarshipService';
+import type { Scholarship } from './Scholarship';
 
-// הערה: עדיף לייבא את Scholarship מקובץ Scholarship.ts אם הוא קיים בפרויקט
-// לצורך הדוגמה נשאיר את המבנה שהיה בטבלה
-interface ScholarshipData {
-    id: string;
-    code: string;
-    name: string;
-    targetAudience: string;
-    amount: number;
-    link: string;
-    conditions: string;
-}
 
 const ScholarshipsManagement: React.FC = () => {
   const navigate = useNavigate();
-  const [scholarships, setScholarships] = useState<ScholarshipData[]>([]);
+  const [scholarships, setScholarships] = useState<Scholarship[]>([]);
+  const [loading, setLoading] = useState(true); // הוספנו אינדיקציה לטעינה
+
+  // פונקציה לשליפת הנתונים מ-Firebase
+  const fetchScholarships = async () => {
+    setLoading(true);
+     getAllScholarships().then((list) => {
+        setScholarships(list);
+      }).catch((error) => {
+        console.error("Error fetching scholarships: ", error);
+        alert("שגיאה בטעינת המלגות");
+      }).finally(() => {
+        setLoading(false);
+      });
+
+  };
 
   useEffect(() => {
-    const saved = localStorage.getItem('scholarships');
-    if (saved) {
-      setScholarships(JSON.parse(saved));
-    } else {
-      setScholarships([]); 
-    }
+    fetchScholarships();
   }, []);
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string) => {
     if (window.confirm("למחוק את המלגה?")) {
-      const updated = scholarships.filter((s) => s.id !== id);
-      setScholarships(updated);
-      localStorage.setItem('scholarships', JSON.stringify(updated));
+      deleteScholarship(id).then(() => {
+        fetchScholarships();
+      }).catch((error) => {
+        console.error("Error deleting scholarship: ", error);
+        alert("שגיאה במחיקת המלגה");
+      });
     }
   };
 
@@ -64,7 +68,13 @@ const ScholarshipsManagement: React.FC = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {scholarships.length === 0 ? (
+            {loading ? (
+               <TableRow>
+                 <TableCell colSpan={7} align="center" sx={{ py: 3 }}>
+                   <CircularProgress />
+                 </TableCell>
+               </TableRow>
+            ) : scholarships.length === 0 ? (
                 <TableRow>
                     <TableCell colSpan={7} align="center">לא נמצאו מלגות. לחץ על "הוסף מלגה" כדי להתחיל.</TableCell>
                 </TableRow>
