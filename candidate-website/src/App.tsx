@@ -1,10 +1,9 @@
-import React, { Suspense, lazy } from 'react'; // 1. הוספת Suspense ו-lazy
+import { Suspense, lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Header from "./components/Header";
-import PageLoader from './components/PageLoader'; // 2. ייבוא הספינר
+import PageLoader from './components/PageLoader';
 import './App.css';
-
-// 3. שינוי כל הייבואים של הדפים ל-Lazy Imports
+// --- דפים כלליים ---
 const Home = lazy(() => import('./pages/Home'));
 const Management = lazy(() => import('./pages/Management'));
 const Forms = lazy(() => import('./pages/Forms'));
