@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Container, Paper, TextField, Button, MenuItem,
-  Snackbar, Alert, Stack, LinearProgress, Box
+  Snackbar, Alert, Stack, LinearProgress,
 } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
