@@ -234,4 +234,4 @@ const CourseForm: React.FC = () => {
   );
 };
 
-export default CourseForm;
+export default CourseForm; 
