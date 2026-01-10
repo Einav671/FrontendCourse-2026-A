@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Container, Table, TableBody, TableCell, TableContainer, 
-  TableHead, TableRow, Paper, IconButton, Chip, CircularProgress 
+  TableHead, TableRow, Paper, IconButton, Chip, LinearProgress, Box 
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -65,6 +65,12 @@ const UsersManagement: React.FC = () => {
             />
 
             <TableContainer component={Paper} elevation={3}>
+                {/* אינדיקציית טעינה - LinearProgress */}
+                {loading && <Box sx={{ width: '100%' }}><LinearProgress /></Box>}
+
+                {!loading && users.length === 0 ? (
+                    <Box p={3} textAlign="center">אין משתמשים במערכת</Box>
+                ) : (
                 <Table>
                     <TableHead sx={{ bgcolor: 'action.hover' }}>
                         <TableRow>
@@ -76,37 +82,32 @@ const UsersManagement: React.FC = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {loading ? (
-                             <TableRow><TableCell colSpan={5} align="center"><CircularProgress /></TableCell></TableRow>
-                        ) : users.length === 0 ? (
-                            <TableRow><TableCell colSpan={5} align="center">אין משתמשים במערכת</TableCell></TableRow>
-                        ) : (
-                            users.map((user) => (
-                                <TableRow key={user.id}>
-                                    {/* מציגים את המייל שהוא גם ה-ID */}
-                                    <TableCell sx={{ direction: 'ltr', textAlign: 'right' }}>{user.id}</TableCell>
-                                    <TableCell>{user.fullName}</TableCell>
-                                    <TableCell>{user.password}</TableCell>
-                                    <TableCell align="center">
-                                        <Chip 
-                                            label={user.userType} 
-                                            color={getUserTypeColor(user.userType) as any} 
-                                            size="small" 
-                                        />
-                                    </TableCell>
-                                    <TableCell align="center">
-                                        <IconButton color="primary" onClick={() => navigate(`/users/edit/${user.id}`)}>
-                                            <EditIcon />
-                                        </IconButton>
-                                        <IconButton color="error" onClick={() => handleDelete(user.id)}>
-                                            <DeleteIcon />
-                                        </IconButton>
-                                    </TableCell>
-                                </TableRow>
-                            ))
-                        )}
+                        {users.map((user) => (
+                            <TableRow key={user.id}>
+                                {/* מציגים את המייל שהוא גם ה-ID */}
+                                <TableCell sx={{ direction: 'ltr', textAlign: 'right' }}>{user.id}</TableCell>
+                                <TableCell>{user.fullName}</TableCell>
+                                <TableCell>{user.password}</TableCell>
+                                <TableCell align="center">
+                                    <Chip 
+                                        label={user.userType} 
+                                        color={getUserTypeColor(user.userType) as any} 
+                                        size="small" 
+                                    />
+                                </TableCell>
+                                <TableCell align="center">
+                                    <IconButton color="primary" onClick={() => navigate(`/users/edit/${user.id}`)}>
+                                        <EditIcon />
+                                    </IconButton>
+                                    <IconButton color="error" onClick={() => handleDelete(user.id)}>
+                                        <DeleteIcon />
+                                    </IconButton>
+                                </TableCell>
+                            </TableRow>
+                        ))}
                     </TableBody>
                 </Table>
+                )}
             </TableContainer>
         </Container>
         </DesktopOnly>

@@ -4,7 +4,7 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useNavigate, useParams } from 'react-router-dom';
 import { 
     Container, TextField, Button, Paper, MenuItem, 
-    Stack, Snackbar, Alert, CircularProgress 
+    Stack, Snackbar, Alert, LinearProgress 
 } from '@mui/material';
 import { PageHeader } from '../../components/PageHeader';
 import { createUser, getUserByEmail, updateUser } from '../../firebase/usersService';
@@ -120,7 +120,13 @@ const UsersForm: React.FC = () => {
     const isFormValid = Object.values(errors).every((error) => !error) &&
         Object.values(formData).every((value) => value !== "");
 
-    if (loading) return <CircularProgress sx={{ display: 'block', mx: 'auto', mt: 4 }} />;
+    if (loading) {
+        return (
+            <Container maxWidth="sm" sx={{ mt: 4 }}>
+                <LinearProgress />
+            </Container>
+        );
+    }
 
     return (
         <Container maxWidth="sm">
