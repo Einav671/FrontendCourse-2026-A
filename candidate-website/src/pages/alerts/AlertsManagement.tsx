@@ -1,21 +1,20 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Chip, CircularProgress } from '@mui/material';
+import { 
+  Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Chip, LinearProgress, Box 
+} from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import { useNavigate } from 'react-router-dom';
 import type { SystemAlert } from './SystemAlert';
 import { PageHeader } from '../../components/PageHeader';
 import DesktopOnly from '../../components/DesktopOnly';
-// Import Service
 import { getAllAlerts, deleteAlert } from '../../firebase/alertsService';
-
 
 const AlertsManagement: React.FC = () => {
   const navigate = useNavigate();
   const [alerts, setAlerts] = useState<SystemAlert[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // פונקציה לטעינת הנתונים
   const fetchAlerts = async () => {
     setLoading(true);
     try {
@@ -37,7 +36,6 @@ const AlertsManagement: React.FC = () => {
     if (window.confirm("למחוק את ההתראה?")) {
       try {
         await deleteAlert(id);
-        // רענון הרשימה לאחר מחיקה (או סינון מקומי)
         setAlerts(prev => prev.filter(a => a.id !== id));
       } catch (error) {
         console.error("Error deleting alert:", error);
@@ -58,7 +56,6 @@ const AlertsManagement: React.FC = () => {
   return (
     <DesktopOnly>
     <Container maxWidth="lg" sx={{ mt: 4 }}>
-      {/* שימוש ברכיב המשותף - כותרת וכפתור הוספה */}
       <PageHeader 
         title="ניהול התראות מערכת"
         buttonText="הוסף התראה"
@@ -66,27 +63,22 @@ const AlertsManagement: React.FC = () => {
       />
 
       <TableContainer component={Paper} elevation={3}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell sx={{ fontWeight: 'bold' }}>הודעה</TableCell>
-              <TableCell align="center" sx={{ fontWeight: 'bold' }}>סוג/דחיפות</TableCell>
-              <TableCell align="center" sx={{ fontWeight: 'bold' }}>פעולות</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {loading ? (
+        {/* אינדיקציית טעינה - LinearProgress */}
+        {loading && <Box sx={{ width: '100%' }}><LinearProgress /></Box>}
+
+        {!loading && alerts.length === 0 ? (
+           <Box p={3} textAlign="center">אין התראות פעילות כרגע</Box>
+        ) : (
+          <Table>
+            <TableHead>
               <TableRow>
-                <TableCell colSpan={3} align="center" sx={{ py: 3 }}>
-                  <CircularProgress />
-                </TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>הודעה</TableCell>
+                <TableCell align="center" sx={{ fontWeight: 'bold' }}>סוג/דחיפות</TableCell>
+                <TableCell align="center" sx={{ fontWeight: 'bold' }}>פעולות</TableCell>
               </TableRow>
-            ) : alerts.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={3} align="center">אין התראות פעילות כרגע</TableCell>
-              </TableRow>
-            ) : (
-              alerts.map((alert) => (
+            </TableHead>
+            <TableBody>
+              {alerts.map((alert) => (
                 <TableRow key={alert.id} hover>
                   <TableCell>{alert.message}</TableCell>
                   <TableCell align="center">
@@ -101,10 +93,10 @@ const AlertsManagement: React.FC = () => {
                     </IconButton>
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </TableContainer>
       </Container>
     </DesktopOnly>

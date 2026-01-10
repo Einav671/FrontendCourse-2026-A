@@ -1,14 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Container, Paper, TextField, Button, MenuItem, 
-  Snackbar, Alert, Stack, CircularProgress 
+  Snackbar, Alert, Stack, LinearProgress 
 } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useNavigate, useParams } from 'react-router-dom';
 import { PageHeader } from '../../components/PageHeader';
-
-// Import Service & Type
 import { createAlert, getAlertById, updateAlert } from '../../firebase/alertsService';
 
 const AlertForm: React.FC = () => {
@@ -17,8 +15,8 @@ const AlertForm: React.FC = () => {
   const isEdit = !!id;
 
   const [showSuccess, setShowSuccess] = useState(false);
-  const [loading, setLoading] = useState(false); // לטעינת נתונים בעריכה
-  const [saving, setSaving] = useState(false);   // למניעת לחיצות כפולות
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const [formData, setFormData] = useState({
     message: '',
@@ -30,7 +28,6 @@ const AlertForm: React.FC = () => {
     type: false
   });
 
-  // טעינת נתונים במצב עריכה
   useEffect(() => {
     const loadAlert = async () => {
         if (isEdit && id) {
@@ -98,8 +95,8 @@ const AlertForm: React.FC = () => {
 
   if (loading) {
       return (
-          <Container maxWidth="sm" sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
-              <CircularProgress />
+          <Container maxWidth="sm" sx={{ mt: 4 }}>
+              <LinearProgress />
           </Container>
       );
   }
