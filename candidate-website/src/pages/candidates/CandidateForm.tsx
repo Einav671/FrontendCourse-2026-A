@@ -1,37 +1,30 @@
 import React, { useState, useEffect } from 'react';
 import {
   Container, Paper, TextField, Button, MenuItem,
-  Snackbar, Alert, Stack, CircularProgress
+  Snackbar, Alert, Stack, LinearProgress, Box
 } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useNavigate, useParams } from 'react-router-dom';
 import { PageHeader } from '../../components/PageHeader';
-
-// Import Service & Type
 import { createCandidate, getCandidateById, updateCandidate } from '../../firebase/candidatesService';
 
-// פונקציית עזר לוולידציה של תעודת זהות ישראלית
 const isValidIsraeliID = (id: string): boolean => {
     let strId = String(id).trim();
     if (strId.length > 9 || strId.length < 5) return false;
-    
-    // ריפוד באפסים אם המספר קצר מ-9 ספרות
     strId = strId.padStart(9, '0');
-    
     let sum = 0;
     for (let i = 0; i < 9; i++) {
         let num = Number(strId.charAt(i)) * ((i % 2) + 1);
         if (num > 9) num -= 9;
         sum += num;
     }
-    
     return sum % 10 === 0;
 };
 
 const CandidateForm: React.FC = () => {
   const navigate = useNavigate();
-  const { id } = useParams(); // id כאן הוא תעודת הזהות
+  const { id } = useParams();
   const isEditMode = !!id;
 
   const [showSuccess, setShowSuccess] = useState(false);
@@ -39,7 +32,7 @@ const CandidateForm: React.FC = () => {
   const [saving, setSaving] = useState(false);
 
   const [formData, setFormData] = useState({
-    identityCard: '', // שדה חדש
+    identityCard: '',
     firstName: '',
     lastName: '',
     email: '',
@@ -56,7 +49,6 @@ const CandidateForm: React.FC = () => {
     degreeCode: false, bagrut: false, psychometric: false, status: false,
   });
 
-  // טעינת נתונים בעריכה
   useEffect(() => {
     const loadCandidate = async () => {
         if (isEditMode && id) {
@@ -65,7 +57,7 @@ const CandidateForm: React.FC = () => {
                 const data = await getCandidateById(id);
                 if (data) {
                     setFormData({ ...data,
-                        identityCard: data.identityCard || id, // אם אין שדה כזה בדאטה הישן, קח מה-ID
+                        identityCard: data.identityCard || id,
                         firstName: data.firstName,
                         lastName: data.lastName,
                         email: data.email,
@@ -94,17 +86,13 @@ const CandidateForm: React.FC = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
     
     let isValid = event.target.validity.valid;
-    
-    // בדיקה מיוחדת לתעודת זהות
     if (name === 'identityCard') {
         isValid = isValidIsraeliID(value);
     }
-    
     setErrors((prev) => ({ ...prev, [name]: !isValid && value !== '' }));
   };
 
   const handleSave = async () => {
-    // בדיקות ולידציה לפני שליחה
     if (!isValidIsraeliID(formData.identityCard)) {
         alert("תעודת הזהות אינה תקינה");
         setErrors(prev => ({...prev, identityCard: true}));
@@ -119,7 +107,7 @@ const CandidateForm: React.FC = () => {
     setSaving(true);
     try {
         const dataToSend = {
-            identityCard: formData.identityCard, // נשמור את זה גם כשדה רגיל
+            identityCard: formData.identityCard,
             firstName: formData.firstName,
             lastName: formData.lastName,
             email: formData.email,
@@ -131,10 +119,8 @@ const CandidateForm: React.FC = () => {
         };
 
         if (isEditMode && id) {
-            // בעריכה - ה-ID (תעודת זהות) לא משתנה
             await updateCandidate(id, dataToSend);
         } else {
-            // ביצירה - אנחנו שולחים את תעודת הזהות כ-ID של המסמך
             await createCandidate(formData.identityCard, dataToSend);
         }
 
@@ -156,8 +142,8 @@ const CandidateForm: React.FC = () => {
 
   if (loading) {
       return (
-          <Container maxWidth="sm" sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
-              <CircularProgress />
+          <Container maxWidth="sm" sx={{ mt: 4 }}>
+              <LinearProgress />
           </Container>
       );
   }
@@ -169,7 +155,6 @@ const CandidateForm: React.FC = () => {
       <Paper elevation={3} sx={{ p: 4 }}>
         <Stack spacing={3}>
           
-          {/* שדה תעודת זהות - ראשון */}
           <TextField
               fullWidth 
               label="תעודת זהות" 
@@ -179,7 +164,6 @@ const CandidateForm: React.FC = () => {
               required 
               error={!!errors.identityCard}
               helperText={errors.identityCard ? "מספר זהות לא תקין" : "מספר ייחודי (משמש כמזהה)"}
-              // חוסמים עריכה אם אנחנו במצב עריכה - אי אפשר לשנות מפתח ראשי
               slotProps={{ input: { readOnly: isEditMode } }}
               variant={isEditMode ? "filled" : "outlined"}
             />
