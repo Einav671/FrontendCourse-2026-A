@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Container, TextField, Button, Paper, MenuItem, 
-  Snackbar, Alert, Stack, CircularProgress 
+  Snackbar, Alert, Stack, LinearProgress 
 } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
@@ -129,10 +129,8 @@ const GraduateForm: React.FC = () => {
         };
 
         if (isEditMode && id) {
-            // בעריכה אנחנו לא משנים את ה-ID (המפתח)
             await updateGraduate(id, dataToSend);
         } else {
-            // ביצירה אנחנו שולחים את תעודת הזהות כמפתח
             await createGraduate(formData.identityCard, dataToSend);
         }
 
@@ -149,7 +147,13 @@ const GraduateForm: React.FC = () => {
     }
   };
 
-  if (loading) return <CircularProgress sx={{ display: 'block', mx: 'auto', mt: 4 }} />;
+  if (loading) {
+      return (
+          <Container maxWidth="sm" sx={{ mt: 4 }}>
+              <LinearProgress />
+          </Container>
+      );
+  }
 
   return (
     <Container maxWidth="sm">

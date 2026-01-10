@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Container, Table, TableBody, TableCell, 
-  TableContainer, TableHead, TableRow, Paper, IconButton, Avatar, Chip, Tooltip, CircularProgress 
+  TableContainer, TableHead, TableRow, Paper, IconButton, Avatar, Chip, Tooltip, LinearProgress, Box 
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -77,11 +77,16 @@ const GraduatesManagement: React.FC = () => {
       />
       
       <TableContainer component={Paper} elevation={3}>
+        {/* אינדיקציית טעינה - LinearProgress */}
+        {loading && <Box sx={{ width: '100%' }}><LinearProgress /></Box>}
+
+        {!loading && graduates.length === 0 ? (
+            <Box p={3} textAlign="center">אין נתונים. לחץ על "הוסף בוגר" כדי להתחיל.</Box>
+        ) : (
         <Table>
           <TableHead sx={{ bgcolor: 'action.hover' }}>
             <TableRow>
               <TableCell><b>תמונה</b></TableCell>
-              {/* הוספנו עמודת תעודת זהות */}
               <TableCell><b>ת.ז</b></TableCell> 
               <TableCell><b>שם מלא</b></TableCell>
               <TableCell><b>תפקיד</b></TableCell>
@@ -92,48 +97,41 @@ const GraduatesManagement: React.FC = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {loading ? (
-               <TableRow><TableCell colSpan={8} align="center"><CircularProgress /></TableCell></TableRow>
-            ) : graduates.length === 0 ? (
-                <TableRow>
-                    <TableCell colSpan={8} align="center">אין נתונים. לחץ על "הוסף בוגר" כדי להתחיל.</TableCell>
-                </TableRow>
-            ) : (
-                graduates.map((g) => (
-                <TableRow key={g.id} sx={{ bgcolor: g.status === 'pending' ? 'warning.light' : 'inherit' }}>
-                    <TableCell>
-                        <Avatar src={g.imageUrl} alt={g.fullName}>{g.fullName?.charAt(0)}</Avatar>
-                    </TableCell>
-                    <TableCell>{g.identityCard || g.id}</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold' }}>{g.fullName}</TableCell>
-                    <TableCell>{g.role}</TableCell>
-                    <TableCell sx={{ maxWidth: 200, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        <Tooltip title={g.review || ""}><span>{g.review}</span></Tooltip>
-                    </TableCell>
-                    <TableCell align="center">
-                        {getStatusChip(g.status)}
-                    </TableCell>
-                    <TableCell align="center">
-                        {g.status === 'pending' && (
-                            <>
-                                <IconButton color="success" onClick={() => handleStatusChange(g.id, 'approved')} title="אשר">
-                                    <CheckIcon />
-                                </IconButton>
-                                <IconButton color="error" onClick={() => handleStatusChange(g.id, 'rejected')} title="דחה">
-                                    <CloseIcon />
-                                </IconButton>
-                            </>
-                        )}
-                    </TableCell>
-                    <TableCell align="center">
-                        <IconButton color="primary" onClick={() => navigate(`/graduates/edit/${g.id}`)}><EditIcon /></IconButton>
-                        <IconButton color="error" onClick={() => handleDelete(g.id)}><DeleteIcon /></IconButton>
-                    </TableCell>
-                </TableRow>
-                ))
-            )}
+            {graduates.map((g) => (
+            <TableRow key={g.id} sx={{ bgcolor: g.status === 'pending' ? 'warning.light' : 'inherit' }}>
+                <TableCell>
+                    <Avatar src={g.imageUrl} alt={g.fullName}>{g.fullName?.charAt(0)}</Avatar>
+                </TableCell>
+                <TableCell>{g.identityCard || g.id}</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>{g.fullName}</TableCell>
+                <TableCell>{g.role}</TableCell>
+                <TableCell sx={{ maxWidth: 200, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <Tooltip title={g.review || ""}><span>{g.review}</span></Tooltip>
+                </TableCell>
+                <TableCell align="center">
+                    {getStatusChip(g.status)}
+                </TableCell>
+                <TableCell align="center">
+                    {g.status === 'pending' && (
+                        <>
+                            <IconButton color="success" onClick={() => handleStatusChange(g.id, 'approved')} title="אשר">
+                                <CheckIcon />
+                            </IconButton>
+                            <IconButton color="error" onClick={() => handleStatusChange(g.id, 'rejected')} title="דחה">
+                                <CloseIcon />
+                            </IconButton>
+                        </>
+                    )}
+                </TableCell>
+                <TableCell align="center">
+                    <IconButton color="primary" onClick={() => navigate(`/graduates/edit/${g.id}`)}><EditIcon /></IconButton>
+                    <IconButton color="error" onClick={() => handleDelete(g.id)}><DeleteIcon /></IconButton>
+                </TableCell>
+            </TableRow>
+            ))}
           </TableBody>
         </Table>
+        )}
       </TableContainer>
       </Container>
     </DesktopOnly>
