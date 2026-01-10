@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Container, TextField, Button, Paper, MenuItem, Box, 
-  Snackbar, Alert, Stack, CircularProgress 
+  Snackbar, Alert, Stack, LinearProgress 
 } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
@@ -22,8 +22,8 @@ import { createInternship, getInternshipById, updateInternship } from '../../fir
 interface InternshipFormState {
     title: string;
     description: string;
-    careerPaths: string; // נשמר בטופס כמחרוזת עם פסיקים
-    skills: string;      // נשמר בטופס כמחרוזת עם פסיקים
+    careerPaths: string; 
+    skills: string;      
     icon: string;
 }
 
@@ -62,7 +62,6 @@ const InternshipForm: React.FC = () => {
                     setFormData({
                         title: data.title,
                         description: data.description,
-                        // המרה ממערך למחרוזת לתצוגה בשדה
                         careerPaths: Array.isArray(data.careerPaths) ? data.careerPaths.join(', ') : '',
                         skills: Array.isArray(data.skills) ? data.skills.join(', ') : '',
                         icon: data.icon
@@ -99,11 +98,9 @@ const InternshipForm: React.FC = () => {
         const dataToSend = {
             title: formData.title,
             description: formData.description,
-            // המרה ממחרוזת למערך
             careerPaths: formData.careerPaths.split(',').map(s => s.trim()).filter(Boolean),
             skills: formData.skills.split(',').map(s => s.trim()).filter(Boolean),
             icon: formData.icon,
-            // אפשר להוסיף לוגיקה לבחירת צבע לפי האייקון כאן אם רוצים לשמור ב-DB
         };
 
         if (isEditMode && id) {
@@ -125,7 +122,13 @@ const InternshipForm: React.FC = () => {
     }
   };
 
-  if (loading) return <CircularProgress sx={{ display: 'block', mx: 'auto', mt: 4 }} />;
+  if (loading) {
+      return (
+          <Container maxWidth="sm" sx={{ mt: 4 }}>
+              <LinearProgress />
+          </Container>
+      );
+  }
 
   return (
     <Container maxWidth="sm">

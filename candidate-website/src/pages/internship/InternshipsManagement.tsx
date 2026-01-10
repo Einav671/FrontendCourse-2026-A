@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Container, Grid, Paper, Typography, Box, CircularProgress, IconButton, useTheme } from '@mui/material';
+import { Container, Paper, Typography, Box, IconButton, useTheme, LinearProgress } from '@mui/material';
 import { PageHeader } from '../../components/PageHeader';
 
 // אייקונים לניהול
@@ -103,12 +103,10 @@ const InternshipsManagement: React.FC = () => {
     return baseColor;
   };
 
-  // צבע רקע ברירת מחדל אם לא מוגדר
   const getBackgroundColor = (iconKey: string | undefined) => {
     return getCardBgFromIcon(iconKey);
   };
 
-  // פונקציה לטעינת הנתונים
   const fetchInternships = async () => {
     setLoading(true);
     try {
@@ -172,16 +170,20 @@ const InternshipsManagement: React.FC = () => {
         גלו את המסלולים האקדמיים שלנו ובחרו בקריירה שמתאימה לכם
       </Typography>
 
-      {loading ? (
-        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-          <CircularProgress />
-        </Box>
-      ) : internships.length === 0 ? (
+      {/* אינדיקציית טעינה - LinearProgress */}
+      {loading && <Box sx={{ width: '100%', mb: 4 }}><LinearProgress /></Box>}
+
+      {!loading && internships.length === 0 ? (
         <Typography align="center">לא נמצאו מסלולי התמחות.</Typography>
       ) : (
-        <Grid container spacing={4}>
+        // שימוש ב-Box Grid במקום Grid Component כדי למנוע שגיאות גרסה
+        <Box sx={{ 
+          display: 'grid', 
+          gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', md: '1fr 1fr 1fr' }, 
+          gap: 4 
+        }}>
           {internships.map((internship) => (
-            <Grid key={internship.id}>
+            <Box key={internship.id} sx={{ minWidth: 0 }}>
               <Paper elevation={3} sx={{ ...styles.card, backgroundColor: internship.color || getBackgroundColor(internship.icon) }}>
               
                 {/* כפתורי ניהול בפינה */}
@@ -236,9 +238,9 @@ const InternshipsManagement: React.FC = () => {
                   </Box>
                 </Box>
               </Paper>
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Box>
       )}
     </Container>
   );
