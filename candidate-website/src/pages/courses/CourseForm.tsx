@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import {
   Container, TextField, Button, Paper, Radio, FormControlLabel,
-  Snackbar, Alert, Stack, Typography, Box, RadioGroup, CircularProgress
+  Snackbar, Alert, Stack, Typography, Box, RadioGroup, LinearProgress 
 } from '@mui/material';
+// ^^^ שינוי 1: החלפתי CircularProgress ב-LinearProgress בשורה למעלה ^^^
+
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useNavigate, useParams } from 'react-router-dom';
 import { PageHeader } from '../../components/PageHeader';
-import { createCourse, getCourseById, updateCourse } from '../../firebase/coursesService'; // Import Service
+import { createCourse, getCourseById, updateCourse } from '../../firebase/coursesService';
 
 const CourseForm: React.FC = () => {
   const navigate = useNavigate();
@@ -18,7 +20,6 @@ const CourseForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
-  // הערה: נשתמש בסטייט עם מחרוזות עבור הטופס, ונמיר למספרים בשמירה
   const [formData, setFormData] = useState({
     name: '',
     code: '',
@@ -37,7 +38,6 @@ const CourseForm: React.FC = () => {
     type: false,
   });
 
-  // טעינת קורס לעריכה
   useEffect(() => {
     const loadCourse = async () => {
         if (isEditMode && id) {
@@ -85,8 +85,8 @@ const CourseForm: React.FC = () => {
     try {
         const dataToSend = {
             name: formData.name,
-            code: formData.code, // משאירים כסטרינג או ממירים למספר לפי הצורך (במודל הגדרת string לקוד)
-            credits: Number(formData.credits), // המרה למספר
+            code: formData.code,
+            credits: Number(formData.credits),
             description: formData.description,
             degreeCode: formData.degreeCode,
             type: formData.type
@@ -95,13 +95,11 @@ const CourseForm: React.FC = () => {
         if (isEditMode && id) {
             await updateCourse(id, dataToSend);
         } else {
-            // יצירה אוטומטית של ID ע"י Firebase
             await createCourse(dataToSend);
         }
 
         setShowSuccess(true);
         setTimeout(() => {
-            // שיניתי את הניווט ל-/management כדי שיחזור לטבלה
             navigate('/management');
         }, 1500);
 
@@ -115,13 +113,15 @@ const CourseForm: React.FC = () => {
 
   const isFormValid = Object.values(errors).every((error) => !error) && formData.name !== "";
 
+  // --- שינוי 2: כאן החלפנו את הלוגיקה כדי להציג LinearProgress ---
   if (loading) {
       return (
-          <Container maxWidth="sm" sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
-              <CircularProgress />
+          <Container maxWidth="sm" sx={{ mt: 4 }}>
+              <LinearProgress />
           </Container>
       );
   }
+  // -------------------------------------------------------------
 
   return (
     <Container maxWidth="sm" sx={{ mt: 4 }}>

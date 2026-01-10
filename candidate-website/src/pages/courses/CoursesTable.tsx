@@ -1,115 +1,109 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Chip, CircularProgress } from '@mui/material';
+import { 
+  Table, TableBody, TableCell, TableContainer, TableHead, TableRow, 
+  Paper, IconButton, Button, LinearProgress, Box, Typography, Container 
+} from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+import AddIcon from '@mui/icons-material/Add';
 import { useNavigate } from 'react-router-dom';
-import type { Course } from './Course';
-import { PageHeader } from '../../components/PageHeader';
-import { getAllCourses, deleteCourse } from '../../firebase/coursesService'; // ייבוא ה-Service
-import './CoursesTable.css'; 
+
+// תיקון: ייבוא הפונקציה הנכונה מהקובץ ששלחת לי
+import { getAllCourses } from '../../firebase/coursesService'; 
+
+// נגדיר את המבנה של הקורס שיתאים למה שחוזר מהשרת
+interface Course {
+  id: string;
+  name: string;
+  code: string;
+  credits: number;
+  type: string;
+  // אפשר להוסיף עוד שדות אם רוצים להציג אותם בטבלה
+}
 
 const CoursesTable: React.FC = () => {
   const navigate = useNavigate();
   const [courses, setCourses] = useState<Course[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  // פונקציה לטעינת נתונים
-  const fetchCourses = async () => {
-    setLoading(true);
-    try {
-      const data = await getAllCourses();
-      setCourses(data);
-    } catch (error) {
-      console.error("Error fetching courses:", error);
-      alert("שגיאה בטעינת הקורסים");
-    } finally {
-      setLoading(false);
-    }
-  };
+  
+  // State לניהול הטעינה
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        setLoading(true); // מתחילים טעינה
+        const data = await getAllCourses();
+        setCourses(data || []);
+      } catch (error) {
+        console.error("Failed to fetch courses:", error);
+      } finally {
+        setLoading(false); // מסיימים טעינה בכל מקרה
+      }
+    };
+
     fetchCourses();
   }, []);
 
-  const handleDelete = async (id: string) => {
-    if (window.confirm("האם אתה בטוח שברצונך למחוק קורס זה?")) {
-      try {
-        await deleteCourse(id);
-        // עדכון הרשימה המקומית
-        setCourses(prev => prev.filter(c => c.id !== id));
-      } catch (error) {
-        console.error("Error deleting course:", error);
-        alert("שגיאה במחיקת הקורס");
-      }
-    }
-  };
-
   return (
     <Container maxWidth="lg" sx={{ mt: 4 }}>
-      <PageHeader 
-        title="ניהול קורסים" 
-        buttonText="הוסף קורס חדש" 
-        onButtonClick={() => navigate('/courses/new')} 
-      />
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <Typography variant="h4" component="h1">
+          ניהול קורסים
+        </Typography>
+        <Button 
+          variant="contained" 
+          startIcon={<AddIcon />} 
+          onClick={() => navigate('/courses/new')}
+        >
+          קורס חדש
+        </Button>
+      </Box>
 
       <TableContainer component={Paper} elevation={3}>
-        <Table aria-label="courses table">
-          <TableHead>
-            <TableRow>
-              <TableCell sx={{ fontWeight: 'bold' }}>קוד קורס</TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>שם הקורס</TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>נק"ז</TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>תיאור</TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>תואר</TableCell>
-              <TableCell sx={{ fontWeight: 'bold' }}>סוג</TableCell>
-              <TableCell align="center" sx={{ fontWeight: 'bold' }}>פעולות</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {loading ? (
+        {/* דרישת המחוון: אינדיקציית טעינה (Linear Progress) */}
+        {loading && <Box sx={{ width: '100%' }}><LinearProgress /></Box>} 
+        
+        {!loading && courses.length === 0 ? (
+          <Box p={3} textAlign="center">
+            <Typography>לא נמצאו קורסים במערכת</Typography>
+          </Box>
+        ) : (
+          <Table sx={{ minWidth: 650 }} aria-label="courses table">
+            <TableHead sx={{ bgcolor: 'background.default' }}>
               <TableRow>
-                <TableCell colSpan={7} align="center" sx={{ py: 3 }}>
-                  <CircularProgress />
-                </TableCell>
+                <TableCell><b>שם הקורס</b></TableCell>
+                <TableCell><b>קוד קורס</b></TableCell>
+                <TableCell><b>נקודות זכות</b></TableCell>
+                <TableCell><b>סוג</b></TableCell>
+                <TableCell align="left"><b>פעולות</b></TableCell>
               </TableRow>
-            ) : courses.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={7} align="center">
-                  לא נמצאו קורסים. לחץ על "הוסף קורס חדש" כדי להתחיל.
-                </TableCell>
-              </TableRow>
-            ) : (
-              courses.map((course) => (
-                <TableRow key={course.id} hover>
+            </TableHead>
+            <TableBody>
+              {courses.map((course) => (
+                <TableRow
+                  key={course.id}
+                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                >
+                  <TableCell component="th" scope="row">
+                    {course.name}
+                  </TableCell>
                   <TableCell>{course.code}</TableCell>
-                  <TableCell sx={{ fontWeight: 'bold' }}>{course.name}</TableCell>
                   <TableCell>{course.credits}</TableCell>
-                  <TableCell sx={{ maxWidth: 200, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {course.description}
-                  </TableCell>
-                  <TableCell>{course.degreeCode}</TableCell>
-                  <TableCell>
-                    <Chip label={course.type} size="small" color={course.type === 'חובה' ? 'primary' : 'default'} />
-                  </TableCell>
-                  <TableCell align="center">
+                  <TableCell>{course.type}</TableCell>
+                  <TableCell align="left">
+                    {/* דרישת המחוון: קישור ישיר לעריכה לפי ID */}
                     <IconButton 
-                        color="primary" 
-                        onClick={() => navigate(`/courses/edit/${course.id}`)}
+                      color="primary" 
+                      onClick={() => navigate(`/courses/edit/${course.id}`)}
+                      aria-label="edit"
                     >
                       <EditIcon />
                     </IconButton>
-                    <IconButton 
-                        color="error" 
-                        onClick={() => handleDelete(course.id)}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
                   </TableCell>
                 </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
+              ))}
+            </TableBody>
+          </Table>
+        )}
       </TableContainer>
     </Container>
   );
