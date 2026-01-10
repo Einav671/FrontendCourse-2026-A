@@ -1,23 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Container, TextField, Button, Paper, Stack, 
-  Snackbar, Alert, CircularProgress 
+  Snackbar, Alert, LinearProgress // שינינו ל-LinearProgress
 } from '@mui/material';
 import SaveIcon from '@mui/icons-material/Save';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import { useNavigate, useParams } from 'react-router-dom';
 import { PageHeader } from '../../components/PageHeader';
 import type { Scholarship } from './Scholarship';
-import { db } from '../../firebase/scholarshipService'; 
-import { doc, getDoc, collection, addDoc, updateDoc } from 'firebase/firestore';
+
+// שימוש בפונקציות מהסרוויס במקום קריאות ישירות
+import { createScholarship, getScholarshipById, updateScholarship } from '../../firebase/scholarshipService';
 
 const ScholarshipForm: React.FC = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const isEditMode = !!id;
   const [showSuccess, setShowSuccess] = useState(false);
-  const [loading, setLoading] = useState(false); // לטעינת הנתונים בעריכה
-  const [saving, setSaving] = useState(false);   // למניעת לחיצות כפולות בשמירה
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   const [formData, setFormData] = useState<Scholarship>({
     id: '', 
@@ -36,19 +37,16 @@ const ScholarshipForm: React.FC = () => {
     link: false
   });
 
-  // שליפת נתונים במצב עריכה
+  // שליפת נתונים במצב עריכה - דרך הסרוויס
   useEffect(() => {
     const fetchScholarshipData = async () => {
         if (isEditMode && id) {
             setLoading(true);
             try {
-                const docRef = doc(db, "scholarships", id);
-                const docSnap = await getDoc(docRef);
-
-                if (docSnap.exists()) {
-                    const data = docSnap.data();
+                const data = await getScholarshipById(id);
+                if (data) {
                     setFormData({
-                        id: docSnap.id, // Set the ID from the document snapshot
+                        id: data.id,
                         code: data.code,
                         name: data.name,
                         targetAudience: data.targetAudience,
@@ -57,7 +55,7 @@ const ScholarshipForm: React.FC = () => {
                         conditions: data.conditions
                     });
                 } else {
-                    alert("המסמך לא נמצא!");
+                    alert("המלגה לא נמצאה!");
                     navigate('/scholarships');
                 }
             } catch (error) {
@@ -82,7 +80,6 @@ const ScholarshipForm: React.FC = () => {
                       formData.code !== '' && formData.name !== '' && formData.amount !== 0;
   
   const handleSave = async () => {
-    // בדיקת שדות חובה
     if (!formData.code || !formData.name || !formData.amount || isNaN(Number(formData.amount))) {
         alert("נא למלא את שדות החובה ולוודא שסכום המלגה הוא מספר תקין");
         return;
@@ -91,33 +88,19 @@ const ScholarshipForm: React.FC = () => {
     setSaving(true);
 
     try {
-        // הכנת האובייקט לשליחה ל-Firebase
         const dataToSend = {
             code: formData.code,
             name: formData.name,
             targetAudience: formData.targetAudience,
-            amount: Number(formData.amount), // תמיד מספר
+            amount: Number(formData.amount),
             link: formData.link,
             conditions: formData.conditions
         };
 
         if (isEditMode && id) {
-            // עדכון מסמך קיים
-            const docRef = doc(db, "scholarships", id);
-            await updateDoc(docRef, dataToSend);
+            await updateScholarship(id, dataToSend);
         } else {
-            // יצירת מסמך חדש
-            await addDoc(collection(db, "scholarships"), dataToSend);
-            // איפוס הטופס אחרי שמירה
-            setFormData({
-                id: '',
-                code: '',
-                name: '',
-                targetAudience: '',
-                amount: 0,
-                link: '',
-                conditions: ''
-            });
+            await createScholarship(dataToSend);
         }
 
         setShowSuccess(true);
@@ -127,7 +110,7 @@ const ScholarshipForm: React.FC = () => {
 
     } catch (error) {
         console.error("Error saving document: ", error);
-        alert("אירעה שגיאה בשמירת הנתונים ל-Firestore");
+        alert("אירעה שגיאה בשמירת הנתונים");
     } finally {
         setSaving(false);
     }
@@ -135,14 +118,14 @@ const ScholarshipForm: React.FC = () => {
 
   if (loading) {
       return (
-          <Container maxWidth="sm" sx={{ mt: 4, display: 'flex', justifyContent: 'center' }}>
-              <CircularProgress />
+          <Container maxWidth="sm" sx={{ mt: 4 }}>
+              <LinearProgress />
           </Container>
       );
   }
 
   return (
-    <Container maxWidth="sm">
+    <Container maxWidth="sm" sx={{ mt: 4 }}>
       
       <PageHeader title={isEditMode ? 'עריכת מלגה' : 'הוספת מלגה חדשה'} />
 

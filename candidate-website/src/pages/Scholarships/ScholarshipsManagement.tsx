@@ -1,26 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Container, Table, TableBody, TableCell, TableContainer,
-  TableHead, TableRow, Paper, IconButton, Chip, CircularProgress
+  TableHead, TableRow, Paper, IconButton, Chip, LinearProgress, Box
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import { useNavigate } from 'react-router-dom';
 import { PageHeader } from '../../components/PageHeader';
 import DesktopOnly from '../../components/DesktopOnly';
-import { getAllScholarships,deleteScholarship } from '../../firebase/scholarshipService';
+import { getAllScholarships, deleteScholarship } from '../../firebase/scholarshipService';
 import type { Scholarship } from './Scholarship';
-
 
 const ScholarshipsManagement: React.FC = () => {
   const navigate = useNavigate();
   const [scholarships, setScholarships] = useState<Scholarship[]>([]);
-  const [loading, setLoading] = useState(true); // הוספנו אינדיקציה לטעינה
+  const [loading, setLoading] = useState(true);
 
-  // פונקציה לשליפת הנתונים מ-Firebase
   const fetchScholarships = async () => {
     setLoading(true);
-     getAllScholarships().then((list) => {
+      getAllScholarships().then((list) => {
         setScholarships(list);
       }).catch((error) => {
         console.error("Error fetching scholarships: ", error);
@@ -28,7 +26,6 @@ const ScholarshipsManagement: React.FC = () => {
       }).finally(() => {
         setLoading(false);
       });
-
   };
 
   useEffect(() => {
@@ -38,7 +35,7 @@ const ScholarshipsManagement: React.FC = () => {
   const handleDelete = async (id: string) => {
     if (window.confirm("למחוק את המלגה?")) {
       deleteScholarship(id).then(() => {
-        fetchScholarships();
+        setScholarships(prev => prev.filter(s => s.id !== id));
       }).catch((error) => {
         console.error("Error deleting scholarship: ", error);
         alert("שגיאה במחיקת המלגה");
@@ -48,7 +45,7 @@ const ScholarshipsManagement: React.FC = () => {
 
   return (
     <DesktopOnly>
-      <Container maxWidth="lg">
+      <Container maxWidth="lg" sx={{ mt: 4 }}>
       
       <PageHeader 
         title="ניהול מלגות" 
@@ -57,6 +54,12 @@ const ScholarshipsManagement: React.FC = () => {
       />
       
       <TableContainer component={Paper} elevation={3}>
+        {/* אינדיקציית טעינה - LinearProgress */}
+        {loading && <Box sx={{ width: '100%' }}><LinearProgress /></Box>}
+
+        {!loading && scholarships.length === 0 ? (
+            <Box p={3} textAlign="center">לא נמצאו מלגות. לחץ על "הוסף מלגה" כדי להתחיל.</Box>
+        ) : (
         <Table>
           <TableHead sx={{ bgcolor: 'action.hover' }}>
             <TableRow>
@@ -70,44 +73,33 @@ const ScholarshipsManagement: React.FC = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {loading ? (
-               <TableRow>
-                 <TableCell colSpan={7} align="center" sx={{ py: 3 }}>
-                   <CircularProgress />
-                 </TableCell>
-               </TableRow>
-            ) : scholarships.length === 0 ? (
-                <TableRow>
-                    <TableCell colSpan={7} align="center">לא נמצאו מלגות. לחץ על "הוסף מלגה" כדי להתחיל.</TableCell>
-                </TableRow>
-            ) : (
-                scholarships.map((s) => (
-                <TableRow key={s.id}>
-                    <TableCell>{s.code}</TableCell>
-                    <TableCell sx={{ fontWeight: 'bold' }}>{s.name}</TableCell>
-                    <TableCell>{s.targetAudience}</TableCell>
-                    <TableCell>
-                        <Chip label={`₪${s.amount.toLocaleString()}`} color="success" variant="outlined" size="small" />
-                    </TableCell>
-                    <TableCell>
-                        {s.link ? <a href={s.link} target="_blank" rel="noopener noreferrer">קישור</a> : '-'}
-                    </TableCell>
-                    <TableCell sx={{ maxWidth: 200, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {s.conditions}
-                    </TableCell>
-                    <TableCell align="center">
-                        <IconButton color="primary" onClick={() => navigate(`/scholarships/edit/${s.id}`)}>
-                            <EditIcon />
-                        </IconButton>
-                        <IconButton color="error" onClick={() => handleDelete(s.id)}>
-                            <DeleteIcon />
-                        </IconButton>
-                    </TableCell>
-                </TableRow>
-                ))
-            )}
+            {scholarships.map((s) => (
+              <TableRow key={s.id}>
+                  <TableCell>{s.code}</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>{s.name}</TableCell>
+                  <TableCell>{s.targetAudience}</TableCell>
+                  <TableCell>
+                      <Chip label={`₪${s.amount.toLocaleString()}`} color="success" variant="outlined" size="small" />
+                  </TableCell>
+                  <TableCell>
+                      {s.link ? <a href={s.link} target="_blank" rel="noopener noreferrer">קישור</a> : '-'}
+                  </TableCell>
+                  <TableCell sx={{ maxWidth: 200, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {s.conditions}
+                  </TableCell>
+                  <TableCell align="center">
+                      <IconButton color="primary" onClick={() => navigate(`/scholarships/edit/${s.id}`)}>
+                          <EditIcon />
+                      </IconButton>
+                      <IconButton color="error" onClick={() => handleDelete(s.id)}>
+                          <DeleteIcon />
+                      </IconButton>
+                  </TableCell>
+              </TableRow>
+              ))}
           </TableBody>
         </Table>
+        )}
       </TableContainer>
       </Container>
     </DesktopOnly>
