@@ -1,14 +1,14 @@
-import { 
-    collection, 
-    getDocs, 
-    getDoc, 
-    addDoc, 
-    updateDoc, 
-    deleteDoc, 
+import {
+    collection,
+    getDocs,
+    getDoc,
+    addDoc,
+    updateDoc,
+    deleteDoc,
     doc,
 } from 'firebase/firestore';
 import { db } from './config'; // או הנתיב לקובץ הקונפיגורציה שלך
-import type { Scholarship } from '../pages/Scholarships/Scholarship';
+import type { Scholarship } from '../pages/scholarships/types/Scholarship';
 
 // הגדרת שם האוסף במקום אחד
 const COLLECTION_NAME = "scholarships";
@@ -27,7 +27,7 @@ export const getAllScholarships = async (): Promise<Scholarship[]> => {
 export const getScholarshipById = async (id: string): Promise<Scholarship | null> => {
     const docRef = doc(db, COLLECTION_NAME, id);
     const docSnap = await getDoc(docRef);
-    
+
     if (docSnap.exists()) {
         return { id: docSnap.id, ...docSnap.data() } as Scholarship;
     } else {

@@ -1,14 +1,14 @@
-import { 
-    collection, 
-    getDocs, 
-    getDoc, 
+import {
+    collection,
+    getDocs,
+    getDoc,
     setDoc, // שימוש ב-setDoc כדי לקבוע ID ידנית (המייל)
-    updateDoc, 
-    deleteDoc, 
+    updateDoc,
+    deleteDoc,
     doc,
 } from 'firebase/firestore';
-import { db } from './config'; 
-import type { User } from '../pages/Users/User'; // נגדיר את זה מיד
+import { db } from './config';
+import type { User } from '../pages/users/types/User'; // נגדיר את זה מיד
 
 const COLLECTION_NAME = "users";
 
@@ -25,7 +25,7 @@ export const getAllUsers = async (): Promise<User[]> => {
 export const getUserByEmail = async (email: string): Promise<User | null> => {
     const docRef = doc(db, COLLECTION_NAME, email);
     const docSnap = await getDoc(docRef);
-    
+
     if (docSnap.exists()) {
         return { id: docSnap.id, ...docSnap.data() } as User;
     } else {

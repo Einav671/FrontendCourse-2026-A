@@ -1,0 +1,109 @@
+/* הגדרות כלליות */
+.management-container {
+  margin-top: 32px;
+  /* mt: 4 */
+}
+
+.page-subtitle {
+  text-align: center;
+  margin-bottom: 32px;
+  /* mb: 4 */
+  margin-top: -24px;
+  /* mt: -3 */
+  color: #666;
+  /* text.secondary */
+}
+
+.loading-box {
+  width: 100%;
+  margin-bottom: 32px;
+}
+
+.grid-container {
+  display: grid;
+  gap: 32px;
+  /* gap: 4 */
+  /* הגדרת העמודות תישאר רספונסיבית, אבל אפשר להגדיר כאן ברירת מחדל */
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+/* כרטיס המסלול */
+.internship-card {
+  padding: 24px;
+  /* p: 3 */
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.internship-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
+  /* shadow: 6 equivalent */
+}
+
+/* כפתורי פעולה (עריכה/מחיקה) */
+.action-buttons {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: flex;
+  gap: 4px;
+}
+
+.action-icon-btn {
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+.action-icon-btn:hover {
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+/* תוכן הכרטיס */
+.icon-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+  /* mb: 2 */
+}
+
+.card-title {
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.card-description {
+  margin-bottom: 16px;
+  /* mb: 2 */
+  text-align: center;
+  flex-grow: 1;
+}
+
+.section-box {
+  margin-top: 16px;
+  /* mt: 2 */
+}
+
+.section-title {
+  font-weight: bold;
+  margin-bottom: 8px;
+  /* mb: 1 */
+  text-align: right;
+  font-size: 0.9rem;
+}
+
+/* רשימות (כיווני קריירה / מיומנויות) */
+.info-list {
+  padding-inline-start: 20px;
+  margin: 0;
+  text-align: right;
+}
+
+.info-list li {
+  margin-bottom: 4px;
+}

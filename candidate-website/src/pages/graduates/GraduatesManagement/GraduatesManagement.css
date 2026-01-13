@@ -1,0 +1,33 @@
+.management-container {
+    margin-top: 32px;
+}
+
+.loading-box {
+    width: 100%;
+}
+
+.empty-message {
+    padding: 24px;
+    text-align: center;
+}
+
+.table-head-row {
+    background-color: #f5f5f5;
+    /* מחליף את action.hover */
+}
+
+.name-cell {
+    font-weight: bold;
+}
+
+.review-cell {
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* צביעת שורה שממתינה לאישור (במקום warning.light) */
+.row-pending {
+    background-color: #fff8e1;
+}
