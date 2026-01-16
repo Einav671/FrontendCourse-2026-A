@@ -2,6 +2,7 @@ import { Suspense, lazy } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Header from "./components/Header";
 import PageLoader from './components/PageLoader';
+import DesktopOnly from './components/DesktopOnly';
 import './App.css';
 // --- דפים כלליים ---
 const Home = lazy(() => import('./pages/Home'));
@@ -49,49 +50,135 @@ function App() {
         {/* 4. עטיפת הנתיבים ב-Suspense */}
         <Suspense fallback={<PageLoader />}>
           <Routes>
-            {/* --- דפים כלליים --- */}
+           {/* --- דפים כלליים --- */}
             <Route path="/" element={<Home />} />
-            <Route path="/management" element={<Management />} />
+            
+            <Route path="/management" element={
+              <DesktopOnly>
+                <Management />
+              </DesktopOnly>
+            } />
+            
             <Route path="/forms" element={<Forms />} />
             <Route path="/help" element={<Help />} />
-            
+
             {/* --- ניהול משתמשים --- */}
-            <Route path="/users" element={<UsersManagement />} />
-            <Route path="/users/new" element={<UserForm />} />
-            <Route path="/users/edit/:id" element={<UserForm />} />
+            <Route path="/users" element={
+              <DesktopOnly>
+                <UsersManagement />
+              </DesktopOnly>
+            } />
+            <Route path="/users/new" element={
+              <DesktopOnly>
+                <UserForm />
+              </DesktopOnly>
+            } />
+            <Route path="/users/edit/:id" element={
+              <DesktopOnly>
+                <UserForm />
+              </DesktopOnly>
+            } />
 
             {/* --- מחשבון --- */}
             <Route path="/calculator" element={<AdmissionCalculator />} />
       
             {/* --- קורסים --- */}
-            <Route path="/courses/new" element={<CourseForm />} />
-            <Route path="/courses/edit/:id" element={<CourseForm />} />
-            
+           <Route path="/courses/new" element={
+              <DesktopOnly>
+                <CourseForm />
+              </DesktopOnly>
+            } />
+            <Route path="/courses/edit/:id" element={
+              <DesktopOnly>
+                <CourseForm />
+              </DesktopOnly>
+            } />
+
             {/* --- מועמדים --- */}
-            <Route path="/candidates" element={<CandidatesManagement />} />
-            <Route path="/candidates/new" element={<CandidateForm />} />
-            <Route path="/candidates/edit/:id" element={<CandidateForm />} />
+            <Route path="/candidates" element={
+              <DesktopOnly>
+                <CandidatesManagement />
+              </DesktopOnly>
+            } />
+            <Route path="/candidates/new" element={
+              <DesktopOnly>
+                <CandidateForm />
+              </DesktopOnly>
+            } />
+            <Route path="/candidates/edit/:id" element={
+              <DesktopOnly>
+                <CandidateForm />
+              </DesktopOnly>
+            } />
 
             {/* --- מלגות --- */}
-            <Route path="/scholarships" element={<ScholarshipsManagement />} />
-            <Route path="/scholarships/new" element={<ScholarshipForm />} />
-            <Route path="/scholarships/edit/:id" element={<ScholarshipForm />} />
+            <Route path="/scholarships" element={
+              <DesktopOnly>
+                <ScholarshipsManagement />
+              </DesktopOnly>
+            } />
+            <Route path="/scholarships/new" element={
+              <DesktopOnly>
+                <ScholarshipForm />
+              </DesktopOnly>
+            } />
+            <Route path="/scholarships/edit/:id" element={
+              <DesktopOnly>
+                <ScholarshipForm />
+              </DesktopOnly>
+            } />
 
             {/* --- מסלולי התמחות --- */}
-            <Route path="/internships" element={<InternshipsManagement />} />
-            <Route path="/internships/new" element={<InternshipForm />} />
-            <Route path="/internships/edit/:id" element={<InternshipForm />} />
-            
+            <Route path="/internships" element={
+              <DesktopOnly>
+                <InternshipsManagement />
+              </DesktopOnly>
+            } />
+            <Route path="/internships/new" element={
+              <DesktopOnly>
+                <InternshipForm />
+              </DesktopOnly>
+            } />
+            <Route path="/internships/edit/:id" element={
+              <DesktopOnly>
+                <InternshipForm />
+              </DesktopOnly>
+            } />
+
             {/* --- בוגרים --- */}
-            <Route path="/graduates" element={<GraduatesManagement />} />
-            <Route path="/graduates/new" element={<GraduateForm />} />
-            <Route path="/graduates/edit/:id" element={<GraduateForm />} />
+            <Route path="/graduates" element={
+              <DesktopOnly>
+                <GraduatesManagement />
+              </DesktopOnly>
+            } />
+            <Route path="/graduates/new" element={
+              <DesktopOnly>
+                <GraduateForm />
+              </DesktopOnly>
+            } />
+            <Route path="/graduates/edit/:id" element={
+              <DesktopOnly>
+                <GraduateForm />
+              </DesktopOnly>
+            } />
 
             {/* --- התראות מערכת --- */}
-            <Route path="/alerts" element={<AlertsManagement />} />
-            <Route path="/alerts/new" element={<AlertForm />} />
-            <Route path="/alerts/edit/:id" element={<AlertForm />} />
-
+            <Route path="/alerts" element={
+              <DesktopOnly>
+                <AlertsManagement />
+              </DesktopOnly>
+            } />
+            <Route path="/alerts/new" element={
+              <DesktopOnly>
+                <AlertForm />
+              </DesktopOnly>
+            } />
+            <Route path="/alerts/edit/:id" element={
+              <DesktopOnly>
+                <AlertForm />
+              </DesktopOnly>
+            } />
+            
           </Routes>
         </Suspense>
       </main>
