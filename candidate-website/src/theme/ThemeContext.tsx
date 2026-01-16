@@ -1,6 +1,6 @@
-// שים לב לשינוי בשורה הראשונה: הוספנו type לפני ReactNode
 import { createContext, useContext, useState, type ReactNode } from 'react';
-import { createTheme, ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
+// הוספנו כאן את responsiveFontSizes
+import { createTheme, ThemeProvider as MuiThemeProvider, responsiveFontSizes } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import rtlPlugin from 'stylis-plugin-rtl';
 import { prefixer } from 'stylis';
@@ -42,25 +42,31 @@ export const ThemeContextProvider = ({ children }: ThemeContextProviderProps) =>
     setIsDarkMode((prev) => !prev);
   };
 
+  // הגדרות בסיס שמשותפות לשני הנושאים (כדי למנוע שכפול)
+  const typographySettings = {
+    fontFamily: 'Rubik, Arial, sans-serif', // שינינו את הפונט ל-Rubik
+    h1: { fontWeight: 700 },
+    h2: { fontWeight: 600 },
+    h3: { fontWeight: 600 },
+  };
+
   // Create light theme
   const lightTheme = createTheme({
     direction: 'rtl',
     palette: {
       mode: 'light',
       primary: {
-        main: '#581a96', // Your primary color for light mode
+        main: '#581a96',
       },
       secondary: {
-        main: '#240888ff', // Your secondary color for light mode
+        main: '#240888',
       },
       background: {
-        default: '#ffffff',
-        paper: '#f5f5f5',
+        default: '#f5f5f5', // צבע רקע כללי קצת יותר נעים מלבן מוחלט
+        paper: '#ffffff',
       },
     },
-    typography: {
-      fontFamily: 'Roboto, Arial, sans-serif',
-    },
+    typography: typographySettings,
   });
 
   // Create dark theme
@@ -69,22 +75,24 @@ export const ThemeContextProvider = ({ children }: ThemeContextProviderProps) =>
     palette: {
       mode: 'dark',
       primary: {
-        main: '#1A1A1A', // Your primary color for dark mode
+        main: '#9c4dcc', // הבהרתי קצת את הצבע כדי שיראה טוב על שחור
       },
       secondary: {
-        main: '#96961A', // Your secondary color for dark mode
+        main: '#7c4dff',
       },
       background: {
         default: '#121212',
         paper: '#1e1e1e',
       },
     },
-    typography: {
-      fontFamily: 'Roboto, Arial, sans-serif',
-    },
+    typography: typographySettings,
   });
 
-  const theme = isDarkMode ? darkTheme : lightTheme;
+  // בחירת ה-Theme המתאים
+  let theme = isDarkMode ? darkTheme : lightTheme;
+
+  // --- כאן הקסם קורה: הופך את הפונטים לרספונסיביים ---
+  theme = responsiveFontSizes(theme);
 
   return (
     <ThemeContext.Provider value={{ isDarkMode, toggleTheme }}>
