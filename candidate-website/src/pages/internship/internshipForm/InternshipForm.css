@@ -1,0 +1,25 @@
+.form-container {
+    margin-top: 32px;
+    /* mt: 4 */
+}
+
+.form-paper {
+    padding: 32px;
+    /* p: 4 */
+}
+
+.form-actions {
+    margin-top: 16px;
+    /* mt: 2 */
+}
+
+.icon-menu-item {
+    display: flex;
+    gap: 8px;
+    /* gap: 1 */
+    align-items: center;
+}
+
+.snackbar-alert {
+    width: 100%;
+}

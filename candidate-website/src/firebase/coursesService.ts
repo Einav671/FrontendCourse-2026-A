@@ -8,7 +8,7 @@ import {
     doc,
 } from 'firebase/firestore';
 import { db } from './config'; // וודא שהנתיב תואם לקובץ ההגדרות שלך
-import type { Course } from '../pages/courses/Course';
+import type { Course } from '../pages/courses/types/Course';
 
 const COLLECTION_NAME = "courses";
 

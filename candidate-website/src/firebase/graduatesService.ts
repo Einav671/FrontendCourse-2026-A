@@ -1,14 +1,14 @@
-import { 
-    collection, 
-    getDocs, 
-    getDoc, 
+import {
+    collection,
+    getDocs,
+    getDoc,
     setDoc, // שימוש ב-setDoc כדי לקבוע ID ידנית
-    updateDoc, 
-    deleteDoc, 
+    updateDoc,
+    deleteDoc,
     doc,
-} from 'firebase/firestore'; 
-import { db } from './config'; 
-import type { Graduate } from '../pages/graduates/Graduate';
+} from 'firebase/firestore';
+import { db } from './config';
+import type { Graduate } from '../pages/graduates/types/Graduate';
 
 const COLLECTION_NAME = "graduates";
 
@@ -25,7 +25,7 @@ export const getAllGraduates = async (): Promise<Graduate[]> => {
 export const getGraduateById = async (id: string): Promise<Graduate | null> => {
     const docRef = doc(db, COLLECTION_NAME, id);
     const docSnap = await getDoc(docRef);
-    
+
     if (docSnap.exists()) {
         return { id: docSnap.id, ...docSnap.data() } as Graduate;
     } else {

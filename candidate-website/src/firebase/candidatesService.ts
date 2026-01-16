@@ -1,14 +1,14 @@
-import { 
-    collection, 
-    getDocs, 
-    getDoc, 
+import {
+    collection,
+    getDocs,
+    getDoc,
     setDoc, // שינינו מ-addDoc ל-setDoc
-    updateDoc, 
-    deleteDoc, 
+    updateDoc,
+    deleteDoc,
     doc,
 } from 'firebase/firestore';
-import { db } from './config'; 
-import type { Candidate } from '../pages/candidates/Candidate';
+import { db } from './config';
+import type { Candidate } from '../pages/candidates/types/Candidate';
 
 const COLLECTION_NAME = "candidates";
 
@@ -25,7 +25,7 @@ export const getAllCandidates = async (): Promise<Candidate[]> => {
 export const getCandidateById = async (id: string): Promise<Candidate | null> => {
     const docRef = doc(db, COLLECTION_NAME, id);
     const docSnap = await getDoc(docRef);
-    
+
     if (docSnap.exists()) {
         return { id: docSnap.id, ...docSnap.data() } as Candidate;
     } else {

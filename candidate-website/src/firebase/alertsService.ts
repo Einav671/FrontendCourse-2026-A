@@ -1,14 +1,14 @@
-import { 
-    collection, 
-    getDocs, 
-    getDoc, 
-    addDoc, 
-    updateDoc, 
-    deleteDoc, 
+import {
+    collection,
+    getDocs,
+    getDoc,
+    addDoc,
+    updateDoc,
+    deleteDoc,
     doc,
 } from 'firebase/firestore';
 import { db } from './config'; // וודא שזה הנתיב לקובץ הגדרות ה-Firebase שלך
-import type { SystemAlert } from '../pages/alerts/SystemAlert';
+import type { SystemAlert } from '../pages/alerts/types/SystemAlert';
 
 const COLLECTION_NAME = "systemAlerts";
 
@@ -25,7 +25,7 @@ export const getAllAlerts = async (): Promise<SystemAlert[]> => {
 export const getAlertById = async (id: string): Promise<SystemAlert | null> => {
     const docRef = doc(db, COLLECTION_NAME, id);
     const docSnap = await getDoc(docRef);
-    
+
     if (docSnap.exists()) {
         return { id: docSnap.id, ...docSnap.data() } as SystemAlert;
     } else {

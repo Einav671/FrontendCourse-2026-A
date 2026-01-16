@@ -1,14 +1,14 @@
-import { 
-    collection, 
-    getDocs, 
-    getDoc, 
-    addDoc, 
-    updateDoc, 
-    deleteDoc, 
+import {
+    collection,
+    getDocs,
+    getDoc,
+    addDoc,
+    updateDoc,
+    deleteDoc,
     doc,
 } from 'firebase/firestore';
 import { db } from './config';
-import type { Internship } from '../pages/internship/Internship';
+import type { Internship } from '../pages/internship/types/Internship';
 
 const COLLECTION_NAME = "internships";
 
@@ -25,7 +25,7 @@ export const getAllInternships = async (): Promise<Internship[]> => {
 export const getInternshipById = async (id: string): Promise<Internship | null> => {
     const docRef = doc(db, COLLECTION_NAME, id);
     const docSnap = await getDoc(docRef);
-    
+
     if (docSnap.exists()) {
         return { id: docSnap.id, ...docSnap.data() } as Internship;
     } else {
