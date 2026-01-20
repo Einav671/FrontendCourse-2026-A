@@ -85,7 +85,10 @@ export default function Header() {
               מערכת ניהול אקדמית
             </Typography>
           </Box>
-
+          {/* login button */}
+          <IconButton component={Link} to="/login" color="inherit">
+            התחבר
+          </IconButton>
           {/* כפתור החלפת מצב (light/dark mode) */}
           <IconButton
             color="inherit"

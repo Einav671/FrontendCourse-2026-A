@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import {
   Table, TableBody, TableCell, TableContainer, TableHead, TableRow,
-  Paper, IconButton, Button, LinearProgress, Box, Typography, Container
+  Paper, IconButton, LinearProgress, Box, Typography, Container
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
-import AddIcon from '@mui/icons-material/Add';
 import { useNavigate } from 'react-router-dom';
 
 // תיקון: ייבוא הפונקציה הנכונה מהקובץ ששלחת לי
 import { getAllCourses } from '../../../firebase/coursesService';
 import type { Course } from '../types/Course';
 import './CoursesTable.css'; // Import CSS
+import { PageHeader } from '../../../components/PageHeader';
+
 
 const CoursesTable: React.FC = () => {
   const navigate = useNavigate();
@@ -36,18 +37,11 @@ const CoursesTable: React.FC = () => {
 
   return (
     <Container maxWidth="lg" className="management-container">
-      <Box className="page-title-row">
-        <Typography variant="h4" component="h1">
-          ניהול קורסים
-        </Typography>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => navigate('/courses/new')}
-        >
-          קורס חדש
-        </Button>
-      </Box>
+      <PageHeader
+        title="ניהול קורסים"
+        buttonText="קורס חדש"
+        onButtonClick={() => navigate('/courses/new')}
+      />
 
       <TableContainer component={Paper} elevation={3}>
         {/* אינדיקציית טעינה */}

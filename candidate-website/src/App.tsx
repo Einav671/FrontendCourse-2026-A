@@ -4,6 +4,7 @@ import Header from "./components/Header";
 import PageLoader from './components/PageLoader';
 import DesktopOnly from './components/DesktopOnly';
 import './App.css';
+import LoginForm from './pages/login/loginForm';
 
 // --- דפים כלליים ---
 const Home = lazy(() => import('./pages/home/Home'));
@@ -53,6 +54,12 @@ function App() {
             {/* --- דפים כלליים --- */}
             <Route path="/" element={<Home />} />
             
+            {/* --- ניהול --- */}
+            <Route path="/login" element={
+              <DesktopOnly>
+                <LoginForm />
+              </DesktopOnly>
+            } />
             <Route path="/management" element={
               <DesktopOnly>
                 <Management />
