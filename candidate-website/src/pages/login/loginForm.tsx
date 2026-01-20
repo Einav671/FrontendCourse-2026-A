@@ -1,10 +1,19 @@
 import { useState } from "react";
-import { TextField, Button, Box, Container, Alert, CircularProgress } from "@mui/material";
+import {
+  TextField,
+  Button,
+  Box,
+  Container,
+  Alert,
+  CircularProgress,
+} from "@mui/material";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../firebase/config";
 import { PageHeader } from "../../components/PageHeader";
+import { useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -99,7 +108,7 @@ const LoginForm = () => {
             disabled={loading || isFormInvalid}
           >
             {loading ? <CircularProgress size={24} /> : "Login"}
-            </Button>
+          </Button>
         </Box>
       </Box>
     </Container>
