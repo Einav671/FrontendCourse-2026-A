@@ -2,13 +2,19 @@ import {
     collection,
     getDocs,
     getDoc,
-    setDoc, // שימוש ב-setDoc כדי לקבוע ID ידנית (המייל)
+    setDoc,
     updateDoc,
     deleteDoc,
     doc,
 } from 'firebase/firestore';
-import { db } from './config';
-import type { User } from '../pages/users/types/User'; // נגדיר את זה מיד
+import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    signOut
+} from 'firebase/auth';
+import { initializeApp, deleteApp } from 'firebase/app';
+import { db, firebaseConfig } from './config';
+import type { User } from '../pages/users/types/User'; // וודא שהנתיב נכון אצלך
 
 const COLLECTION_NAME = "users";
 
@@ -16,12 +22,12 @@ const COLLECTION_NAME = "users";
 export const getAllUsers = async (): Promise<User[]> => {
     const querySnapshot = await getDocs(collection(db, COLLECTION_NAME));
     return querySnapshot.docs.map(doc => ({
-        id: doc.id, // ה-ID הוא המייל בפועל
+        id: doc.id,
         ...doc.data()
     } as User));
 };
 
-// 2. קבלת משתמש בודד לפי אימייל
+// 2. קבלת משתמש בודד
 export const getUserByEmail = async (email: string): Promise<User | null> => {
     const docRef = doc(db, COLLECTION_NAME, email);
     const docSnap = await getDoc(docRef);
@@ -33,10 +39,28 @@ export const getUserByEmail = async (email: string): Promise<User | null> => {
     }
 };
 
-// 3. יצירת משתמש חדש (המייל הוא המזהה)
-export const createUser = async (email: string, user: Omit<User, 'id'>) => {
-    // אנחנו שומרים את המסמך כשהמפתח שלו הוא האימייל
-    return await setDoc(doc(db, COLLECTION_NAME, email), user);
+// 3. יצירת משתמש חדש - באמצעות אפליקציה משנית
+// זה מונע מהאדמין המחובר להתנתק בעת יצירת משתמש חדש
+export const createUser = async (email: string, password: string, userDetails: Omit<User, 'id'>) => {
+
+    // יצירת מופע זמני של אפליקציית Firebase
+    const secondaryApp = initializeApp(firebaseConfig, "SecondaryApp");
+    const secondaryAuth = getAuth(secondaryApp);
+
+    try {
+        // יצירת המשתמש ב-Auth של האפליקציה המשנית
+        await createUserWithEmailAndPassword(secondaryAuth, email, password);
+
+        // שמירת שאר הפרטים ב-Firestore (ב-DB הראשי)
+        await setDoc(doc(db, COLLECTION_NAME, email), userDetails);
+
+        // התנתקות מהאפליקציה המשנית ליתר ביטחון
+        await signOut(secondaryAuth);
+
+    } finally {
+        // מחיקת האפליקציה המשנית מהזיכרון
+        await deleteApp(secondaryApp);
+    }
 };
 
 // 4. עדכון פרטי משתמש
@@ -47,6 +71,9 @@ export const updateUser = async (email: string, user: Partial<User>) => {
 
 // 5. מחיקת משתמש
 export const deleteUser = async (email: string) => {
+    // שים לב: פונקציה זו מוחקת רק מה-DB.
+    // מחיקה מ-Auth דורשת Firebase Admin SDK (צד שרת/Cloud Function) 
+    // ואינה אפשרית לביצוע מכאן עבור משתמש אחר.
     const docRef = doc(db, COLLECTION_NAME, email);
     return await deleteDoc(docRef);
 };

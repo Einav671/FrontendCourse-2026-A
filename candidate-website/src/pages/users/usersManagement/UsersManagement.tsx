@@ -10,7 +10,7 @@ import { PageHeader } from '../../../components/PageHeader';
 import { getAllUsers, deleteUser } from '../../../firebase/usersService';
 import type { User } from '../types/User';
 import DesktopOnly from '../../../components/DesktopOnly';
-import './UsersManagement.css'; // Import CSS
+import './UsersManagement.css';
 
 const UsersManagement: React.FC = () => {
     const navigate = useNavigate();
@@ -35,7 +35,8 @@ const UsersManagement: React.FC = () => {
     }, []);
 
     const handleDelete = async (email: string) => {
-        if (window.confirm("האם למחוק את המשתמש?")) {
+        // הודעה מפורטת למשתמש
+        if (window.confirm("האם למחוק את המשתמש?\n\nשים לב: המשתמש יימחק מרשימת הנתונים, אך החשבון שלו (Auth) לא יימחק לצמיתות כי נדרשת מערכת צד-שרת לכך.")) {
             try {
                 await deleteUser(email);
                 setUsers(prev => prev.filter(user => user.id !== email));
@@ -66,7 +67,6 @@ const UsersManagement: React.FC = () => {
                 />
 
                 <TableContainer component={Paper} elevation={3}>
-                    {/* אינדיקציית טעינה */}
                     {loading && <Box className="loading-box"><LinearProgress /></Box>}
 
                     {!loading && users.length === 0 ? (
@@ -77,7 +77,6 @@ const UsersManagement: React.FC = () => {
                                 <TableRow>
                                     <TableCell><b>מייל (מזהה)</b></TableCell>
                                     <TableCell><b>שם מלא</b></TableCell>
-                                    <TableCell><b>סיסמא</b></TableCell>
                                     <TableCell align="center"><b>סוג משתמש</b></TableCell>
                                     <TableCell align="center"><b>פעולות</b></TableCell>
                                 </TableRow>
@@ -85,10 +84,8 @@ const UsersManagement: React.FC = () => {
                             <TableBody>
                                 {users.map((user) => (
                                     <TableRow key={user.id}>
-                                        {/* מציגים את המייל שהוא גם ה-ID */}
                                         <TableCell className="email-cell">{user.id}</TableCell>
                                         <TableCell>{user.fullName}</TableCell>
-                                        <TableCell>{user.password}</TableCell>
                                         <TableCell align="center">
                                             <Chip
                                                 label={user.userType}
