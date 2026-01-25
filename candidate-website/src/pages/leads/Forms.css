@@ -1,0 +1,18 @@
+.forms-container {
+    margin-top: 32px;
+    /* נוצר אוטומטית ע"י Container, אבל אפשר לשלוט בזה כאן */
+}
+
+.forms-paper {
+    padding: 32px;
+    /* p: 4 */
+}
+
+.submit-button {
+    height: 48px;
+    /* size="large" equivalent adjustment */
+}
+
+.snackbar-alert {
+    width: 100%;
+}

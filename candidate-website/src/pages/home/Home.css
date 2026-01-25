@@ -1,0 +1,98 @@
+/* src/pages/home/Home.css */
+
+.dashboard-container {
+    padding-bottom: 64px;
+}
+
+.kpi-paper {
+    padding: 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100%;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.kpi-paper:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.kpi-content {
+    text-align: right;
+    flex-grow: 1;
+    margin-right: 16px;
+    /* מרווח מהאייקון */
+}
+
+.card-value {
+    font-weight: bold;
+    font-size: 2.2rem;
+    margin: 8px 0;
+    line-height: 1;
+}
+
+.card-subtext {
+    font-size: 0.85rem;
+    color: #666;
+}
+
+/* אזור ההתראות */
+.alerts-section-paper {
+    padding: 24px;
+    min-height: 250px;
+}
+
+.section-title {
+    font-weight: bold;
+    margin-bottom: 24px;
+}
+
+.alert-item {
+    padding: 16px;
+    border-radius: 8px;
+    font-weight: 500;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-right-width: 4px;
+    border-right-style: solid;
+}
+
+/* סוגי התראות */
+.alert-success {
+    background-color: #e8f5e9;
+    color: #1b5e20;
+    border-right-color: #4caf50;
+}
+
+.alert-error {
+    background-color: #ffebee;
+    color: #b71c1c;
+    border-right-color: #ef5350;
+}
+
+.alert-warning {
+    background-color: #fff3e0;
+    color: #e65100;
+    border-right-color: #ff9800;
+}
+
+.alert-info {
+    background-color: #e3f2fd;
+    color: #0d47a1;
+    border-right-color: #2196f3;
+}
+
+.loading-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 32px;
+}
+
+.no-alerts-text {
+    text-align: center;
+    color: #666;
+    margin-top: 16px;
+}

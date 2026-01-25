@@ -1,0 +1,18 @@
+.form-container {
+    margin-top: 32px;
+    /* mt: 4 */
+}
+
+.form-paper {
+    padding: 32px;
+    /* p: 4 */
+}
+
+.form-actions {
+    margin-top: 16px;
+    /* mt: 2 */
+}
+
+.snackbar-alert {
+    width: 100%;
+}

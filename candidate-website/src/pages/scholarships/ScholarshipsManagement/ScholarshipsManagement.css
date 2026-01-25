@@ -1,0 +1,30 @@
+.management-container {
+    margin-top: 32px;
+    /* mt: 4 */
+}
+
+.loading-box {
+    width: 100%;
+}
+
+.empty-state-box {
+    padding: 24px;
+    /* p: 3 */
+    text-align: center;
+}
+
+.table-head-row {
+    background-color: #f5f5f5;
+    /* מחליף את action.hover */
+}
+
+.scholarship-name {
+    font-weight: bold;
+}
+
+.conditions-cell {
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
