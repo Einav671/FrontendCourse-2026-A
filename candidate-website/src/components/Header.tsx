@@ -11,12 +11,13 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 import { Link, useNavigate } from 'react-router-dom';
 import SchoolIcon from '@mui/icons-material/School';
-import { Box, Button } from '@mui/material';
+import { Box, Button, Stack } from '@mui/material';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import AccountCircle from '@mui/icons-material/AccountCircle';
 import LogoutIcon from '@mui/icons-material/Logout';
-import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings'; // אייקון למנהל
+import AdminPanelSettingsIcon from '@mui/icons-material/AdminPanelSettings';
+import ContactMailIcon from '@mui/icons-material/ContactMail';
 
 import { onAuthStateChanged, signOut, type User } from 'firebase/auth';
 import { auth } from '../firebase/config';
@@ -49,45 +50,49 @@ export default function Header() {
   const handleLogout = async () => {
     try {
       await signOut(auth);
-      navigate('/'); // ביציאה חוזרים לדף הבית הציבורי
+      navigate('/');
     } catch (error) {
       console.error("Error signing out: ", error);
     }
   };
 
-  // --- תפריטים ---
-
-  // 1. תפריט למשתמשים/אורחים בלבד
+  // --- תפריט למשתמשים אורחים (האתר הציבורי) ---
   const guestMenuItems = [
     { text: 'דף הבית', path: '/' },
-    { text: 'מחשבון קבלה', path: '/calculator' },
-    { text: 'קטלוג קורסים', path: '/courses-info' },
     { text: 'מסלולי התמחות', path: '/tracks' },
+    { text: 'קטלוג קורסים', path: '/courses-info' },
+    { text: 'מלגות', path: '/scholarships-info' },
+    { text: 'בוגרים', path: '/graduates-info' },
+    { text: 'מחשבון קבלה', path: '/calculator' },
     { text: 'מרכז עזרה', path: '/help' },
   ];
 
-  // 2. תפריט למנהלים בלבד (רק דפי ניהול)
+  // --- תפריט למנהלים (כל מסכי הניהול) ---
   const adminMenuItems = [
     { text: 'דשבורד ניהול', path: '/admin' },
     { text: 'ניהול קורסים', path: '/management' },
     { text: 'ניהול משתמשים', path: '/users' },
-    { text: 'ניהול מלגות', path: '/scholarships' },
-    { text: 'ניהול בוגרים', path: '/graduates' },
-    { text: 'ניהול מועמדים', path: '/candidates' },
-    { text: 'ניהול התמחויות', path: '/internships' },
+    { text: 'ניהול מועמדים', path: '/candidates' },     // הוספתי
+    { text: 'ניהול מלגות', path: '/scholarships' },      // הוספתי
+    { text: 'ניהול בוגרים', path: '/graduates' },        // הוספתי
+    { text: 'ניהול התמחויות', path: '/internships' },    // הוספתי
     { text: 'פניות (לידים)', path: '/forms' },
-    { text: 'ניהול התראות', path: '/alerts' },
-    { text: 'מעבר לאתר הציבורי', path: '/' }, // אופציה אופציונלית למקרה שרוצים להציץ
+    { text: 'ניהול התראות', path: '/alerts' },           // הוספתי
+    { text: '----------------', path: '#' },             // מפריד ויזואלי
+    { text: 'מעבר לאתר הציבורי', path: '/' },
   ];
 
   const menuItems = user ? adminMenuItems : guestMenuItems;
-
-  // לאן הלוגו מוביל? אם מנהל -> דשבורד, אם אורח -> בית
   const logoLink = user ? '/admin' : '/';
 
   return (
     <>
-      <AppBar position="static">
+      <AppBar
+        position="sticky"
+        color="default"
+        elevation={1}
+        sx={{ top: 0, zIndex: 1100, bgcolor: 'background.paper' }}
+      >
         <Toolbar>
           <IconButton
             size="large" edge="start" color="inherit" aria-label="menu"
@@ -96,29 +101,47 @@ export default function Header() {
             <MenuIcon />
           </IconButton>
 
-          {/* לוגו - הלינק משתנה דינמית */}
           <Box sx={styles.logoContainer}>
-            <IconButton component={Link} to={logoLink} color="inherit" edge="start">
+            <IconButton component={Link} to={logoLink} color="primary" edge="start">
               {user ? <AdminPanelSettingsIcon /> : <SchoolIcon />}
             </IconButton>
-            <Typography variant="h6" component="div" sx={styles.logoText}>
+            <Typography variant="h6" component="div" sx={styles.logoText} color="text.primary">
               {user ? 'מערכת ניהול' : 'המחלקה למדעי המחשב'}
             </Typography>
           </Box>
+
+          {/* תפריט עליון מהיר למשתמשים אורחים */}
+          {!user && (
+            <Stack direction="row" spacing={1} sx={{ display: { xs: 'none', md: 'flex' }, ml: 2 }}>
+              <Button component={Link} to="/tracks" color="inherit">מסלולים</Button>
+              <Button component={Link} to="/scholarships-info" color="inherit">מלגות</Button>
+              <Button component={Link} to="/calculator" color="inherit">בדיקת קבלה</Button>
+              <Button
+                component={Link}
+                to="/forms"
+                variant="contained"
+                color="primary"
+                startIcon={<ContactMailIcon />}
+                sx={{ borderRadius: 20, px: 3 }}
+              >
+                צור קשר
+              </Button>
+            </Stack>
+          )}
 
           {user ? (
             <Box sx={styles.userSection}>
               <Typography variant="body2" sx={{ display: { xs: 'none', sm: 'block' } }}>
                 {user.email}
               </Typography>
-              <AccountCircle />
+              <AccountCircle color="action" />
               <Button color="inherit" onClick={handleLogout} startIcon={<LogoutIcon />}>
                 יציאה
               </Button>
             </Box>
           ) : (
-            <Button component={Link} to="/login" color="inherit">
-              התחברות סגל
+            <Button component={Link} to="/login" color="inherit" sx={{ ml: 1 }}>
+              סגל
             </Button>
           )}
 
@@ -130,11 +153,16 @@ export default function Header() {
 
       <Drawer anchor="left" open={open} onClose={toggleDrawer}>
         <List sx={styles.drawerList}>
-          {menuItems.map((item) => (
-            <ListItem key={item.path} disablePadding>
-              <ListItemButton component={Link} to={item.path} onClick={toggleDrawer}>
-                <ListItemText primary={item.text} style={{ textAlign: 'right' }} />
-              </ListItemButton>
+          {menuItems.map((item, index) => (
+            <ListItem key={index} disablePadding>
+              {/* טיפול במפריד */}
+              {item.text === '----------------' ? (
+                <Box sx={{ width: '100%', borderBottom: '1px solid #ddd', my: 1 }} />
+              ) : (
+                <ListItemButton component={Link} to={item.path} onClick={toggleDrawer}>
+                  <ListItemText primary={item.text} style={{ textAlign: 'right' }} />
+                </ListItemButton>
+              )}
             </ListItem>
           ))}
         </List>
