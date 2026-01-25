@@ -136,12 +136,12 @@ export default function Header() {
               </Typography>
               <AccountCircle color="action" />
               <Button color="inherit" onClick={handleLogout} startIcon={<LogoutIcon />}>
-                יציאה
+                Logout
               </Button>
             </Box>
           ) : (
             <Button component={Link} to="/login" color="inherit" sx={{ ml: 1 }}>
-              סגל
+              Login
             </Button>
           )}
 
