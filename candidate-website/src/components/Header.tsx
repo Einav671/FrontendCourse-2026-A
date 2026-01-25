@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; // הוספנו useEffect
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
@@ -9,17 +9,24 @@ import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // הוספנו useNavigate
 import SchoolIcon from '@mui/icons-material/School';
-import { Box } from '@mui/material';
+import { Box, Button } from '@mui/material'; // הוספנו Button רגיל כי IconButton פחות מתאים לטקסט
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
+import AccountCircle from '@mui/icons-material/AccountCircle'; // אייקון למשתמש
+import LogoutIcon from '@mui/icons-material/Logout'; // אייקון יציאה
+
+// --- Firebase Imports ---
+import { onAuthStateChanged, signOut, type User } from 'firebase/auth';
+import { auth } from '../firebase/config'; // וודא שהנתיב הזה נכון לקובץ config שלך
+
 import { useThemeContext } from '../theme/ThemeContext';
 
 // --- הפרדת עיצובים (Styles) ---
 const styles = {
   menuButton: {
-    ml: 2, // ב-RTL אנחנו רוצים מרווח משמאל לכפתור (כדי להרחיק את הלוגו)
+    ml: 2,
   },
   logoContainer: {
     flexGrow: 1,
@@ -34,7 +41,14 @@ const styles = {
     width: 250
   },
   listItemText: {
-    textAlign: 'right' // מוודא שהטקסט בתפריט מיושר לימין
+    textAlign: 'right'
+  },
+  // עיצוב לאזור המשתמש
+  userSection: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 1,
+    ml: 2 // מרווח קטן מהכפתור של החלפת הנושא
   }
 };
 
@@ -42,8 +56,34 @@ export default function Header() {
   const [open, setOpen] = useState(false);
   const { isDarkMode, toggleTheme } = useThemeContext();
 
+  // 1. משתנה לשמירת המשתמש המחובר
+  const [user, setUser] = useState<User | null>(null);
+  const navigate = useNavigate();
+
+  // 2. המאזין של Firebase - רץ פעם אחת כשההדר עולה
+  useEffect(() => {
+    // הפונקציה הזו רצה אוטומטית כל פעם שמישהו מתחבר או מתנתק
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser); // מעדכן את ה-State (אם מחובר נקבל אובייקט, אם לא נקבל null)
+    });
+
+    // פונקציית ניקוי - מפסיקה להאזין כשהרכיב יורד מהמסך (מונע דליפות זיכרון)
+    return () => unsubscribe();
+  }, []);
+
   const toggleDrawer = () => {
     setOpen(!open);
+  };
+
+  // 3. פונקציית היציאה
+  const handleLogout = async () => {
+    try {
+      await signOut(auth); // מנתק מ-Firebase
+      // המאזין ב-useEffect יזהה את זה לבד ויעדכן את הכפתור
+      navigate('/login'); // אופציונלי: מעביר לדף התחברות או לדף הבית
+    } catch (error) {
+      console.error("Error signing out: ", error);
+    }
   };
 
   const menuItems = [
@@ -82,28 +122,50 @@ export default function Header() {
               <SchoolIcon />
             </IconButton>
             <Typography variant="h6" component="div" sx={styles.logoText}>
-              מערכת ניהול אקדמית
+              מערכת ניהול
             </Typography>
           </Box>
-          {/* login button */}
-          <IconButton component={Link} to="/login" color="inherit">
-            התחבר
-          </IconButton>
+
+          {/* --- אזור כפתורי התחברות/משתמש --- */}
+          {user ? (
+            // מצב 1: המשתמש מחובר
+            <Box sx={styles.userSection}>
+              {/* הצגת אימייל המשתמש (מוסתר במסכים קטנים אם תרצה, כרגע מוצג תמיד) */}
+              <Typography variant="body2" sx={{ display: { xs: 'none', sm: 'block' } }}>
+                {user.email}
+              </Typography>
+
+              {/* אייקון משתמש */}
+              <AccountCircle />
+
+              {/* כפתור יציאה */}
+              <Button
+                color="inherit"
+                onClick={handleLogout}
+                startIcon={<LogoutIcon />} // אייקון יציאה ליד הטקסט
+              >
+                יציאה
+              </Button>
+            </Box>
+          ) : (
+            // מצב 2: המשתמש לא מחובר
+            <Button component={Link} to="/login" color="inherit">
+              התחבר
+            </Button>
+          )}
+
           {/* כפתור החלפת מצב (light/dark mode) */}
           <IconButton
             color="inherit"
             onClick={toggleTheme}
             aria-label="toggle theme"
+            sx={{ ml: 1 }}
           >
             {isDarkMode ? <Brightness7Icon /> : <Brightness4Icon />}
           </IconButton>
         </Toolbar>
       </AppBar>
 
-      {/* תיקון הכיוון:
-         בגלל stylis-plugin-rtl שמותקן אצלך, הוא הופך את ה-CSS.
-         לכן, anchor="left" יהפוך בפועל ל-Right במסך.
-      */}
       <Drawer anchor="left" open={open} onClose={toggleDrawer}>
         <List sx={styles.drawerList}>
           {menuItems.map((item) => (
