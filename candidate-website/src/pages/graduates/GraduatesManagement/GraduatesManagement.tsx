@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Container, Table, TableBody, TableCell,
-  TableContainer, TableHead, TableRow, Paper, IconButton, Avatar, Chip, Tooltip, LinearProgress, Box
+  TableContainer, TableHead, TableRow, Paper, IconButton, Avatar, Chip, Tooltip, LinearProgress, Box, useTheme, alpha
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -12,14 +12,13 @@ import { PageHeader } from '../../../components/PageHeader';
 import DesktopOnly from '../../../components/DesktopOnly';
 import type { Graduate } from '../types/Graduate';
 import { getAllGraduates, deleteGraduate, updateGraduate } from '../../../firebase/graduatesService';
-import './GraduatesManagement.css'; // Import CSS
 
 const GraduatesManagement: React.FC = () => {
   const navigate = useNavigate();
+  // אין צורך במשתנה theme כאן למעלה, נשתמש בו בתוך ה-sx במידת הצורך
   const [graduates, setGraduates] = useState<Graduate[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // טעינת הנתונים
   const fetchGraduates = async () => {
     setLoading(true);
     try {
@@ -52,7 +51,6 @@ const GraduatesManagement: React.FC = () => {
   const handleStatusChange = async (id: string, newStatus: 'approved' | 'rejected') => {
     try {
       await updateGraduate(id, { status: newStatus });
-      // עדכון מקומי מהיר
       setGraduates(prev => prev.map(g => g.id === id ? { ...g, status: newStatus } : g));
     } catch (error) {
       console.error("Error updating status:", error);
@@ -70,7 +68,7 @@ const GraduatesManagement: React.FC = () => {
 
   return (
     <DesktopOnly>
-      <Container maxWidth="lg" className="management-container">
+      <Container maxWidth="lg" sx={{ mt: 4 }}>
         <PageHeader
           title="ניהול בוגרים וחוות דעת"
           buttonText="הוסף בוגר"
@@ -78,38 +76,43 @@ const GraduatesManagement: React.FC = () => {
         />
 
         <TableContainer component={Paper} elevation={3}>
-          {/* אינדיקציית טעינה */}
-          {loading && <Box className="loading-box"><LinearProgress /></Box>}
+          {loading && <Box sx={{ width: '100%' }}><LinearProgress /></Box>}
 
           {!loading && graduates.length === 0 ? (
-            <Box className="empty-message">אין נתונים. לחץ על "הוסף בוגר" כדי להתחיל.</Box>
+            <Box sx={{ p: 3, textAlign: 'center' }}>אין נתונים. לחץ על "הוסף בוגר" כדי להתחיל.</Box>
           ) : (
             <Table>
-              <TableHead className="table-head-row">
+              <TableHead>
                 <TableRow>
-                  <TableCell><b>תמונה</b></TableCell>
-                  <TableCell><b>ת.ז</b></TableCell>
-                  <TableCell><b>שם מלא</b></TableCell>
-                  <TableCell><b>תפקיד</b></TableCell>
-                  <TableCell><b>חוות דעת</b></TableCell>
-                  <TableCell align="center"><b>סטטוס</b></TableCell>
-                  <TableCell align="center"><b>אישור</b></TableCell>
-                  <TableCell align="center"><b>פעולות</b></TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>תמונה</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>ת.ז</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>שם מלא</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>תפקיד</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>חוות דעת</TableCell>
+                  <TableCell align="center" sx={{ fontWeight: 'bold' }}>סטטוס</TableCell>
+                  <TableCell align="center" sx={{ fontWeight: 'bold' }}>אישור</TableCell>
+                  <TableCell align="center" sx={{ fontWeight: 'bold' }}>פעולות</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {graduates.map((g) => (
                   <TableRow
                     key={g.id}
-                    className={g.status === 'pending' ? 'row-pending' : ''}
+                    hover // מוסיף אפקט ריחוף יפה כמו במועמדים
+                    sx={{
+                      // צביעה עדינה מאוד לשורות שממתינות, שמותאמת גם ל-Dark Mode
+                      bgcolor: g.status === 'pending'
+                        ? (theme) => alpha(theme.palette.warning.main, theme.palette.mode === 'dark' ? 0.15 : 0.08)
+                        : 'inherit'
+                    }}
                   >
                     <TableCell>
                       <Avatar src={g.imageUrl} alt={g.fullName}>{g.fullName?.charAt(0)}</Avatar>
                     </TableCell>
                     <TableCell>{g.identityCard || g.id}</TableCell>
-                    <TableCell className="name-cell">{g.fullName}</TableCell>
+                    <TableCell>{g.fullName}</TableCell>
                     <TableCell>{g.role}</TableCell>
-                    <TableCell className="review-cell">
+                    <TableCell sx={{ maxWidth: 200, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       <Tooltip title={g.review || ""}><span>{g.review}</span></Tooltip>
                     </TableCell>
                     <TableCell align="center">

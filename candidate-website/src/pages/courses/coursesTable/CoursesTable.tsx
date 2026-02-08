@@ -5,13 +5,9 @@ import {
 } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import { useNavigate } from 'react-router-dom';
-
-// תיקון: ייבוא הפונקציה הנכונה מהקובץ ששלחת לי
 import { getAllCourses } from '../../../firebase/coursesService';
 import type { Course } from '../types/Course';
-import './CoursesTable.css'; // Import CSS
 import { PageHeader } from '../../../components/PageHeader';
-
 
 const CoursesTable: React.FC = () => {
   const navigate = useNavigate();
@@ -23,7 +19,6 @@ const CoursesTable: React.FC = () => {
       try {
         setLoading(true);
         const data = await getAllCourses();
-        // המרה ידנית אם צריך, או שימוש בנתונים כפי שהם אם הסרוויס מחזיר מחלקה
         setCourses(data || []);
       } catch (error) {
         console.error("Failed to fetch courses:", error);
@@ -36,7 +31,7 @@ const CoursesTable: React.FC = () => {
   }, []);
 
   return (
-    <Container maxWidth="lg" className="management-container">
+    <Container maxWidth="lg" sx={{ mt: 4 }}>
       <PageHeader
         title="ניהול קורסים"
         buttonText="קורס חדש"
@@ -44,37 +39,37 @@ const CoursesTable: React.FC = () => {
       />
 
       <TableContainer component={Paper} elevation={3}>
-        {/* אינדיקציית טעינה */}
-        {loading && <Box className="loading-box"><LinearProgress /></Box>}
+        {loading && <Box sx={{ width: '100%' }}><LinearProgress /></Box>}
 
         {!loading && courses.length === 0 ? (
-          <Box className="empty-message">
+          <Box sx={{ p: 3, textAlign: 'center' }}>
             <Typography>לא נמצאו קורסים במערכת</Typography>
           </Box>
         ) : (
           <Table sx={{ minWidth: 650 }} aria-label="courses table">
-            <TableHead className="table-head-row">
+            <TableHead>
               <TableRow>
-                <TableCell><b>שם הקורס</b></TableCell>
-                <TableCell><b>קוד קורס</b></TableCell>
-                <TableCell><b>נקודות זכות</b></TableCell>
-                <TableCell><b>סוג</b></TableCell>
-                <TableCell align="left"><b>פעולות</b></TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>שם הקורס</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>קוד קורס</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>נקודות זכות</TableCell>
+                <TableCell sx={{ fontWeight: 'bold' }}>סוג</TableCell>
+                <TableCell align="left" sx={{ fontWeight: 'bold' }}>פעולות</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {courses.map((course) => (
                 <TableRow
                   key={course.id}
+                  hover // הוספת אפקט ריחוף
                   sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                 >
-                  <TableCell component="th" scope="row" className="course-name-cell">
+                  <TableCell component="th" scope="row" sx={{ fontWeight: 'bold' }}>
                     {course.name}
                   </TableCell>
                   <TableCell>{course.code}</TableCell>
                   <TableCell>{course.credits}</TableCell>
                   <TableCell>{course.type}</TableCell>
-                  <TableCell className="actions-cell">
+                  <TableCell sx={{ textAlign: 'left' }}>
                     <IconButton
                       color="primary"
                       onClick={() => navigate(`/courses/edit/${course.id}`)}

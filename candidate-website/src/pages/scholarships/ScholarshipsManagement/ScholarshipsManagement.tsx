@@ -10,7 +10,6 @@ import { PageHeader } from '../../../components/PageHeader';
 import DesktopOnly from '../../../components/DesktopOnly';
 import { getAllScholarships, deleteScholarship } from '../../../firebase/scholarshipService';
 import type { Scholarship } from '../types/Scholarship';
-import './ScholarshipsManagement.css'; // Import CSS
 
 const ScholarshipsManagement: React.FC = () => {
   const navigate = useNavigate();
@@ -46,7 +45,7 @@ const ScholarshipsManagement: React.FC = () => {
 
   return (
     <DesktopOnly>
-      <Container maxWidth="lg" className="management-container">
+      <Container maxWidth="lg" sx={{ mt: 4 }}>
 
         <PageHeader
           title="ניהול מלגות"
@@ -55,37 +54,36 @@ const ScholarshipsManagement: React.FC = () => {
         />
 
         <TableContainer component={Paper} elevation={3}>
-          {/* אינדיקציית טעינה - LinearProgress */}
-          {loading && <Box className="loading-box"><LinearProgress /></Box>}
+          {loading && <Box sx={{ width: '100%' }}><LinearProgress /></Box>}
 
           {!loading && scholarships.length === 0 ? (
-            <Box className="empty-state-box">לא נמצאו מלגות. לחץ על "הוסף מלגה" כדי להתחיל.</Box>
+            <Box sx={{ p: 3, textAlign: 'center' }}>לא נמצאו מלגות. לחץ על "הוסף מלגה" כדי להתחיל.</Box>
           ) : (
             <Table>
-              <TableHead className="table-head-row">
+              <TableHead>
                 <TableRow>
-                  <TableCell><b>קוד</b></TableCell>
-                  <TableCell><b>שם המלגה</b></TableCell>
-                  <TableCell><b>קהל יעד</b></TableCell>
-                  <TableCell><b>סכום</b></TableCell>
-                  <TableCell><b>קישור לאתר</b></TableCell>
-                  <TableCell><b>תנאים</b></TableCell>
-                  <TableCell align="center"><b>פעולות</b></TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>קוד</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>שם המלגה</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>קהל יעד</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>סכום</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>קישור לאתר</TableCell>
+                  <TableCell sx={{ fontWeight: 'bold' }}>תנאים</TableCell>
+                  <TableCell align="center" sx={{ fontWeight: 'bold' }}>פעולות</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {scholarships.map((s) => (
-                  <TableRow key={s.id}>
+                  <TableRow key={s.id} hover>
                     <TableCell>{s.code}</TableCell>
-                    <TableCell className="scholarship-name">{s.name}</TableCell>
+                    <TableCell sx={{ fontWeight: 'bold' }}>{s.name}</TableCell>
                     <TableCell>{s.targetAudience}</TableCell>
                     <TableCell>
                       <Chip label={`₪${s.amount.toLocaleString()}`} color="success" variant="outlined" size="small" />
                     </TableCell>
                     <TableCell>
-                      {s.link ? <a href={s.link} target="_blank" rel="noopener noreferrer">קישור</a> : '-'}
+                      {s.link ? <a href={s.link} target="_blank" rel="noopener noreferrer" style={{ color: 'inherit' }}>קישור</a> : '-'}
                     </TableCell>
-                    <TableCell className="conditions-cell">
+                    <TableCell sx={{ maxWidth: 200, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {s.conditions}
                     </TableCell>
                     <TableCell align="center">
