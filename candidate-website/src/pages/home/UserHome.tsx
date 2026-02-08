@@ -16,6 +16,7 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import PsychologyIcon from '@mui/icons-material/Psychology';
 import MemoryIcon from '@mui/icons-material/Memory';
 import SendIcon from '@mui/icons-material/Send';
+import StarIcon from '@mui/icons-material/Star';
 
 // Firebase Services
 import { getAllInternships } from '../../firebase/internshipsService';
