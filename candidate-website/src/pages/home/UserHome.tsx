@@ -318,20 +318,94 @@ const UserHome: React.FC = () => {
       </Box>
 
       <Container maxWidth="lg" sx={{ py: 10 }}>
-        <Typography variant="h3" fontWeight="bold" textAlign="center" gutterBottom>הבוגרים שלנו מספרים</Typography>
-        <Grid container spacing={4} sx={{ mt: 4 }}>
+        <Typography variant="h3" fontWeight="bold" textAlign="center" gutterBottom>
+          הבוגרים שלנו מספרים
+        </Typography>
+        <Typography variant="subtitle1" textAlign="center" color="text.secondary" sx={{ mb: 6 }}>
+          הסיפורים האמיתיים של מי שכבר עשו את זה
+        </Typography>
+
+        <Grid container spacing={4}>
           {graduates.map((grad) => (
             <Grid key={grad.id}>
-              <Paper elevation={3} sx={{ p: 4, borderRadius: 4, height: '100%', position: 'relative' }}>
-                <Typography variant="h1" sx={{ position: 'absolute', top: 10, right: 20, fontSize: '6rem', color: theme.palette.action.hover, lineHeight: 0.5 }}>"</Typography>
-                <Typography variant="body1" paragraph sx={{ position: 'relative', zIndex: 1, fontStyle: 'italic', minHeight: '80px', fontSize: '1.1rem' }}>
-                  {grad.quote || grad.description || "הלימודים במכללה נתנו לי את הכלים להצליח בהייטק."}
+              <Paper
+                elevation={3}
+                sx={{
+                  p: 4,
+                  borderRadius: 4,
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  position: 'relative',
+                  overflow: 'hidden'
+                }}
+              >
+                {/* Decorative Quote Icon */}
+                <Typography
+                  variant="h1"
+                  sx={{
+                    position: 'absolute',
+                    top: -10,
+                    right: 20,
+                    fontSize: '8rem',
+                    color: alpha(theme.palette.secondary.main, 0.1),
+                    lineHeight: 1,
+                    fontFamily: 'serif'
+                  }}
+                >
+                  "
                 </Typography>
-                <Stack direction="row" spacing={2} alignItems="center" mt={2}>
-                  <Avatar sx={{ bgcolor: theme.palette.secondary.main }}>{grad.fullName?.[0]}</Avatar>
+
+                <Box sx={{ position: 'relative', zIndex: 1 }}>
+                  {/* Rating Stars - מציג 5 כוכבים כי אין שדה דירוג ב-DB */}
+                  <Stack direction="row" spacing={0.5} mb={2}>
+                    {[...Array(5)].map((_, index) => (
+                      <StarIcon
+                        key={index}
+                        sx={{
+                          color: '#FFD700',
+                          fontSize: '1.2rem'
+                        }}
+                      />
+                    ))}
+                  </Stack>
+
+                  {/* Review Text - השינוי המרכזי כאן: grad.review */}
+                  <Typography
+                    variant="body1"
+                    paragraph
+                    sx={{
+                      fontStyle: 'italic',
+                      fontSize: '1.05rem',
+                      color: 'text.secondary',
+                      minHeight: '80px'
+                    }}
+                  >
+                    {grad.review || grad.quote || "הלימודים נתנו לי את הכלים להצליח בהייטק."}
+                  </Typography>
+                </Box>
+
+                {/* User Info - השינוי המרכזי כאן: grad.imageUrl */}
+                <Stack direction="row" spacing={2} alignItems="center" mt={3} sx={{ position: 'relative', zIndex: 1 }}>
+                  <Avatar
+                    src={grad.imageUrl}
+                    alt={grad.fullName}
+                    sx={{
+                      bgcolor: theme.palette.secondary.main,
+                      width: 50,
+                      height: 50,
+                      border: `2px solid ${theme.palette.background.paper}`,
+                      boxShadow: 2
+                    }}
+                  >
+                    {grad.fullName?.[0]}
+                  </Avatar>
                   <Box>
-                    <Typography fontWeight="bold">{grad.fullName}</Typography>
-                    <Typography variant="caption" color="text.secondary">{grad.role || grad.jobTitle || 'בוגר/ת'}</Typography>
+                    <Typography fontWeight="bold" variant="subtitle1">{grad.fullName}</Typography>
+                    <Typography variant="caption" color="primary" fontWeight="bold">
+                      {grad.role || 'בוגר המכללה'}
+                    </Typography>
                   </Box>
                 </Stack>
               </Paper>
