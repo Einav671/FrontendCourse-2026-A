@@ -56,7 +56,7 @@ const CourseForm: React.FC = () => {
             });
           } else {
             alert("הקורס לא נמצא");
-            navigate('/courses');
+            navigate('/management');
           }
         } catch (error) {
           console.error("Error loading course:", error);
@@ -101,7 +101,7 @@ const CourseForm: React.FC = () => {
 
       setShowSuccess(true);
       setTimeout(() => {
-        navigate('/courses'); // חזרה לניהול קורסים
+        navigate('/management'); // חזרה לניהול קורסים
       }, 1500);
 
     } catch (error) {
@@ -209,7 +209,7 @@ const CourseForm: React.FC = () => {
               variant="outlined"
               color="secondary"
               startIcon={<ArrowForwardIcon />}
-              onClick={() => navigate('/courses')}
+              onClick={() => navigate('/management')}
               fullWidth
             >
               ביטול
@@ -229,7 +229,7 @@ const CourseForm: React.FC = () => {
         </Alert>
       </Snackbar>
 
-    </Container>
+    </Container >
   );
 };
 
