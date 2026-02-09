@@ -1,19 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import {
     Container, Grid, Card, CardContent, Typography,
-    Box, LinearProgress, Chip, Button
+    Box, LinearProgress, Chip, Button, Divider, CardActions
 } from '@mui/material';
 import { PageHeader } from '../../components/PageHeader';
 import { getAllScholarships } from '../../firebase/scholarshipService';
 import StarsIcon from '@mui/icons-material/Stars';
+import LaunchIcon from '@mui/icons-material/Launch';
 import { useNavigate } from 'react-router-dom';
 
+// עדכון הממשק שיתאים לנתוני המנהל
 interface Scholarship {
     id: string;
     name: string;
-    amount: string;
+    amount: string | number;
     description: string;
-    // שדות נוספים אם יש
+    targetAudience?: string;
+    link?: string;
+    conditions?: string;
+    code?: string;
 }
 
 const PublicScholarships: React.FC = () => {
@@ -44,7 +49,7 @@ const PublicScholarships: React.FC = () => {
                     אנו מאמינים כי השכלה גבוהה צריכה להיות נגישה לכולם.
                     המכללה מציעה מגוון מלגות הצטיינות וסיוע כלכלי.
                 </Typography>
-                <Button variant="contained" onClick={() => navigate('/calculator')}>
+                <Button variant="contained" size="large" onClick={() => navigate('/calculator')}>
                     בדקו זכאות במחשבון ההתאמה
                 </Button>
             </Box>
@@ -57,33 +62,74 @@ const PublicScholarships: React.FC = () => {
                                 height: '100%',
                                 display: 'flex',
                                 flexDirection: 'column',
-                                borderRight: '6px solid #4caf50', // צבע ירוק למלגות
-                                boxShadow: 3
+                                borderTop: '6px solid #4caf50',
+                                borderRadius: 2,
+                                boxShadow: 4,
+                                transition: '0.3s',
+                                '&:hover': { boxShadow: 10 }
                             }}>
-                                <CardContent>
+                                <CardContent sx={{ flexGrow: 1 }}>
                                     <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
-                                        <Typography variant="h5" fontWeight="bold" color="primary">
+                                        <Typography variant="h6" fontWeight="bold" color="primary.main">
                                             {scholarship.name}
                                         </Typography>
-                                        <StarsIcon color="success" fontSize="large" />
+                                        <StarsIcon color="success" />
                                     </Box>
 
-                                    <Chip
-                                        label={`גובה המלגה: ${scholarship.amount}`}
-                                        color="success"
-                                        variant="outlined"
-                                        sx={{ mb: 2, fontWeight: 'bold' }}
-                                    />
+                                    <Box mb={2}>
+                                        <Chip
+                                            label={`₪${scholarship.amount?.toLocaleString()}`}
+                                            color="success"
+                                            sx={{ fontWeight: 'bold', mr: 1 }}
+                                        />
+                                        {scholarship.targetAudience && (
+                                            <Chip
+                                                label={scholarship.targetAudience}
+                                                variant="outlined"
+                                                size="small"
+                                            />
+                                        )}
+                                    </Box>
 
-                                    <Typography variant="body1" color="text.secondary" sx={{ lineHeight: 1.6 }}>
+                                    <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
                                         {scholarship.description}
                                     </Typography>
+
+                                    {scholarship.conditions && (
+                                        <>
+                                            <Divider sx={{ my: 1.5 }} />
+                                            <Typography variant="subtitle2" fontWeight="bold">
+                                                תנאי סף:
+                                            </Typography>
+                                            <Typography variant="body2" color="text.secondary">
+                                                {scholarship.conditions}
+                                            </Typography>
+                                        </>
+                                    )}
                                 </CardContent>
+
+                                <CardActions sx={{ p: 2, pt: 0 }}>
+                                    {scholarship.link ? (
+                                        <Button
+                                            fullWidth
+                                            variant="outlined"
+                                            endIcon={<LaunchIcon />}
+                                            href={scholarship.link}
+                                            target="_blank"
+                                        >
+                                            להגשת מועמדות
+                                        </Button>
+                                    ) : (
+                                        <Typography variant="caption" color="text.disabled">
+                                            פרטים נוספים במזכירות
+                                        </Typography>
+                                    )}
+                                </CardActions>
                             </Card>
                         </Grid>
                     )) : (
                         <Box width="100%" textAlign="center" mt={4}>
-                            <Typography>לא נמצאו מלגות פעילות כרגע.</Typography>
+                            <Typography variant="h6">לא נמצאו מלגות פעילות כרגע.</Typography>
                         </Box>
                     )}
                 </Grid>
