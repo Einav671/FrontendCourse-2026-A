@@ -61,6 +61,7 @@ const PublicGraduates: React.FC = () => {
                 </Typography>
             </Box>
 
+
             {loading ? <LinearProgress /> : (
                 <Grid container spacing={4}>
                     {graduates.length > 0 ? graduates.map((grad) => (
