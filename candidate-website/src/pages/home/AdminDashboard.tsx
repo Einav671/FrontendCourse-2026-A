@@ -82,7 +82,7 @@ const AdminDashboard: React.FC = () => {
             <PageHeader title="דשבורד ניהול" />
             <Grid container spacing={3} sx={{ mb: 6 }}>
                 {renderKpiCard('מחשבוני התאמה', '0', 'לחץ לחישוב חדש', <CalculateIcon fontSize="large" />, '#e8f5e9', '#2e7d32', '/calculator')}
-                {renderKpiCard('פניות פתוחות', stats.leads, 'תיבת דואר', <ChatBubbleOutlineIcon fontSize="large" />, '#fff3e0', '#ef6c00', '/forms')}
+                {renderKpiCard('פניות פתוחות', stats.leads, 'תיבת דואר', <ChatBubbleOutlineIcon fontSize="large" />, '#fff3e0', '#ef6c00', '/leads')}
                 {renderKpiCard('מועמדים רשומים', stats.candidates, 'סה"כ מועמדים', <PeopleAltIcon fontSize="large" />, '#e3f2fd', '#1565c0', '/candidates')}
                 {renderKpiCard('מלגות פעילות', stats.scholarships, 'מספר מלגות', <AutorenewIcon fontSize="large" />, '#e0f2f1', '#00695c', '/scholarships')}
                 {renderKpiCard('חוות דעת לאישור', stats.pendingGraduates, stats.pendingGraduates > 0 ? 'נדרשת פעולה!' : 'הכל מעודכן', <AssignmentIcon fontSize="large" />, '#f3e5f5', '#7b1fa2', '/graduates')}
