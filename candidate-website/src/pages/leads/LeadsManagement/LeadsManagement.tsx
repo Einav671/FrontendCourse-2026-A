@@ -55,7 +55,17 @@ const LeadsManagement: React.FC = () => {
   const formatDate = (date: Date | undefined): string => {
     if (!date) return '-';
     try {
-      const dateObj = date instanceof Date ? date : new Date(date);
+      let dateObj: Date;
+      
+      // Handle Firestore Timestamp objects
+      if (date && typeof date === 'object' && 'toDate' in date) {
+        dateObj = (date as any).toDate();
+      } else if (date instanceof Date) {
+        dateObj = date;
+      } else {
+        dateObj = new Date(date);
+      }
+      
       return dateObj.toLocaleDateString('he-IL', {
         year: 'numeric',
         month: '2-digit',
