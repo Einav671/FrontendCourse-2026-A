@@ -4,12 +4,17 @@ import {
 } from '@mui/material';
 import SendIcon from '@mui/icons-material/Send';
 import { PageHeader } from '../../components/PageHeader'; // שים לב: הנתיב יתעדכן כשנעביר תיקייה
-import { createLead, type Lead } from '../../firebase/leadsService'; // שים לב: הנתיב יתעדכן
+import { createLead} from '../../firebase/leadsService'; // שים לב: הנתיב יתעדכן
 import './Forms.css'; // Import CSS
+import type { Lead } from './types/lead';
 
 const Forms: React.FC = () => {
   const [formData, setFormData] = useState<Lead>({
-    fullName: '', email: '', phone: '', notes: ''
+    id: '', // שדה ID יתווסף אוטומטית ב-Firebase, אבל אנחנו צריכים אותו במודל שלנו
+    fullName: '',
+    email: '',
+    phone: '',
+    notes: ''
   });
 
   const [errors, setErrors] = useState({
@@ -49,9 +54,13 @@ const Forms: React.FC = () => {
     setIsSubmitting(true);
 
     try {
-      await createLead(formData);
+      const leadWithTimestamp = {
+        ...formData,
+        createdAt: new Date()
+      };
+      await createLead(leadWithTimestamp);
       setShowSuccess(true);
-      setFormData({ fullName: '', email: '', phone: '', notes: '' });
+      setFormData({id: '', fullName: '', email: '', phone: '', notes: '', createdAt: undefined});
       setErrors({ fullName: false, email: false, phone: false });
     } catch (error) {
       console.error("Error submitting form: ", error);

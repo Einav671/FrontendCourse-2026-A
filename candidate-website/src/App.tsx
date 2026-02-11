@@ -19,6 +19,7 @@ const PublicGraduates = lazy(() => import('./pages/graduates/PublicGraduates'));
 const AdminDashboard = lazy(() => import('./pages/home/AdminDashboard'));
 const Management = lazy(() => import('./pages/courses/coursesTable/Management'));
 const Forms = lazy(() => import('./pages/leads/Forms'));
+const LeadsManagement = lazy(() => import('./pages/leads/LeadsManagement/LeadsManagement'));
 
 const CourseForm = lazy(() => import('./pages/courses/courseForm/CourseForm'));
 const CandidatesManagement = lazy(() => import('./pages/candidates/CandidatesManagement/CandidatesManagement'));
@@ -58,6 +59,7 @@ function App() {
             <Route path="/admin" element={<DesktopOnly><AdminDashboard /></DesktopOnly>} />
             <Route path="/management" element={<DesktopOnly><Management /></DesktopOnly>} />
             <Route path="/forms" element={<DesktopOnly><Forms /></DesktopOnly>} />
+            <Route path="/leads" element={<DesktopOnly><LeadsManagement /></DesktopOnly>} />
             <Route path="/users" element={<DesktopOnly><UsersManagement /></DesktopOnly>} />
             <Route path="/users/new" element={<DesktopOnly><UserForm /></DesktopOnly>} />
             <Route path="/users/edit/:id" element={<DesktopOnly><UserForm /></DesktopOnly>} />

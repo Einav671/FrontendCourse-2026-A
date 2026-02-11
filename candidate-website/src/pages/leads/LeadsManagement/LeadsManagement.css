@@ -1,0 +1,24 @@
+.management-container {
+    margin-top: 32px;
+    /* mt: 4 */
+}
+
+.loading-box {
+    width: 100%;
+}
+
+.empty-state-box {
+    padding: 24px;
+    /* p: 3 */
+    text-align: center;
+}
+
+.table-header-cell {
+    font-weight: bold;
+}
+
+.notes-cell {
+    max-width: 200px;
+    white-space: normal;
+    word-wrap: break-word;
+}

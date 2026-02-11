@@ -1,19 +1,35 @@
 import { 
     collection, 
     addDoc,
-    serverTimestamp 
+    serverTimestamp, 
+    getDocs,
+    doc,
+    getDoc
 } from 'firebase/firestore';
 import { db } from './config';
+import type { Lead } from '../pages/leads/types/lead';
+
 
 const COLLECTION_NAME = "leads";
 
-export interface Lead {
-    fullName: string;
-    email: string;
-    phone: string;
-    notes?: string;
-    createdAt?: Date; // שדה תאריך שנוסיף אוטומטית
-}
+
+// 1. קבלת כל הלידים 
+export const getAllLeads = async (): Promise<Lead[]> => {
+    const querySnapshot = await getDocs(collection(db, COLLECTION_NAME));
+    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Lead));
+};
+
+// 2. קבלת משתמש בודד
+export const getleadByEmail = async (email: string): Promise<Lead | null> => {
+    const docRef = doc(db, COLLECTION_NAME, email);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+        return { id: docSnap.id, ...docSnap.data() } as Lead;
+    } else {
+        return null;
+    }
+};
 
 // פונקציה לשמירת ליד חדש (פנייה)
 export const createLead = async (leadData: Lead) => {
