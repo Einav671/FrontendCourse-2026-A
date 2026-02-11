@@ -35,7 +35,7 @@ const UserHome: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   // --- State for Contact Form ---
-  const [leadForm, setLeadForm] = useState({ fullName: '', phone: '', email: '' });
+  const [leadForm, setLeadForm] = useState({id: '',  fullName: '', email: '', phone: '' });
   const [formStatus, setFormStatus] = useState<'idle' | 'sending' | 'success'>('idle');
 
   // --- Animation State ---
@@ -78,7 +78,7 @@ const UserHome: React.FC = () => {
     try {
       await createLead(leadForm);
       setFormStatus('success');
-      setLeadForm({ fullName: '', phone: '', email: '' });
+      setLeadForm({id: '', fullName: '', phone: '', email: '' });
     } catch (error) {
       console.error("Error sending lead:", error);
       setFormStatus('idle');

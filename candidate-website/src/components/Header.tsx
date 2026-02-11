@@ -76,7 +76,7 @@ export default function Header() {
     { text: 'ניהול מלגות', path: '/scholarships' },      // הוספתי
     { text: 'ניהול בוגרים', path: '/graduates' },        // הוספתי
     { text: 'ניהול התמחויות', path: '/internships' },    // הוספתי
-    { text: 'פניות (לידים)', path: '/forms' },
+    { text: 'פניות (לידים)', path: '/leads' },
     { text: 'ניהול התראות', path: '/alerts' },           // הוספתי
     { text: '----------------', path: '#' },             // מפריד ויזואלי
     { text: 'מעבר לאתר הציבורי', path: '/' },

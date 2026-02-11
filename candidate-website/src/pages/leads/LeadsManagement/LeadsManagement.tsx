@@ -4,14 +4,13 @@ import {
   TableHead, TableRow, Paper, IconButton, LinearProgress, Box
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
-import { useNavigate } from 'react-router-dom';
+
 import type { Lead } from '../types/lead';
 import { PageHeader } from '../../../components/PageHeader';
 import { getAllLeads } from '../../../firebase/leadsService';
 import './LeadsManagement.css';
 
 const LeadsManagement: React.FC = () => {
-  const navigate = useNavigate();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -22,8 +21,8 @@ const LeadsManagement: React.FC = () => {
       // Sort by createdAt descending (newest first)
       const sortedData = data.sort((a, b) => {
         if (!a.createdAt || !b.createdAt) return 0;
-        const dateA = a.createdAt instanceof Date ? a.createdAt : new Date(a.createdAt as any);
-        const dateB = b.createdAt instanceof Date ? b.createdAt : new Date(b.createdAt as any);
+        const dateA = a.createdAt instanceof Date ? a.createdAt : new Date(a.createdAt as Date | number | string);
+        const dateB = b.createdAt instanceof Date ? b.createdAt : new Date(b.createdAt as Date | number | string);
         return dateB.getTime() - dateA.getTime();
       });
       setLeads(sortedData);
@@ -53,7 +52,7 @@ const LeadsManagement: React.FC = () => {
     }
   };
 
-  const formatDate = (date: Date | any | undefined): string => {
+  const formatDate = (date: Date | undefined): string => {
     if (!date) return '-';
     try {
       const dateObj = date instanceof Date ? date : new Date(date);
@@ -73,7 +72,6 @@ const LeadsManagement: React.FC = () => {
     <Container maxWidth="lg" className="management-container">
       <PageHeader
         title="ניהול פניות"
-        buttonText="רענן"
         onButtonClick={fetchLeads}
       />
 
